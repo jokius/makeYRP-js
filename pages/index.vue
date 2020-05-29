@@ -1,65 +1,77 @@
 <template>
-  <section class="container">
-    <div>
-      <app-logo/>
-      <h1 class="title">
-        make YRP
-      </h1>
-      <h2 class="subtitle">
-        Стол для настольных ролевых игр
-      </h2>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green">Documentation</a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey">GitHub</a>
-      </div>
-    </div>
-  </section>
+  <v-app id="inspire">
+    <v-content v-if="user">
+      <v-container class="fill-height" fluid>
+        <div class="user-grid">
+          <v-avatar :key="user.id" size="36" color="indigo">
+            <img
+              v-if="user.avatar.thumb"
+              :src="user.avatar.thumb"
+              :alt="user.nickname"
+            />
+            <v-icon v-if="!user.avatar.thumb" dark>mdi-account-circle</v-icon>
+          </v-avatar>
+          <v-btn
+            tile
+            color="indigo"
+            dark
+            @click="logout"
+          >
+            Выйти
+          </v-btn>
+        </div>
+        <v-row
+          align="center"
+          justify="center"
+        >
+          <v-col
+            cols="12"
+            sm="8"
+            md="4"
+          >
+            <loader v-if="!loaded" />
+            <actions v-if="loaded" />
+            <tabs v-if="loaded" />
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-content>
+  </v-app>
 </template>
 
 <script>
-import AppLogo from '~/components/AppLogo.vue'
+  import { mapState } from 'vuex'
+  import Actions from '../components/games/Actions'
+  import Tabs from '../components/games/Tabs'
+  import Loader from '../components/Loader'
 
-export default {
-  components: {
-    AppLogo
+  export default {
+    components: { Loader, Tabs, Actions },
+
+    created() {
+      this.$store.dispatch('games/load', this.$axios)
+    },
+
+    computed: {
+      ...mapState({
+        games: state => state.games,
+        loaded: state => state.games.loaded,
+        user: state => state.auth.user,
+      }),
+    },
+
+    methods: {
+      logout: function () {
+        this.$auth.logout().catch(e => {this.error = e + ''}).then(() => this.$router.push('/login'))
+      }
+    },
   }
-}
 </script>
 
-<style>
-.container {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: "Quicksand", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* 1 */
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
+<style scoped lang="scss">
+  .user-grid {
+    align-self: end;
+    position: absolute;
+    right: 5px;
+  }
 </style>
-
