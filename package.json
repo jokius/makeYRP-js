@@ -6,9 +6,9 @@
   "description": "Стол для настольных ролевых игр",
   "scripts": {
     "dev": "nuxt",
-    "build": "nuxt build",
+    "build": "DOTENV_CONFIG_PATH=.env.production  nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate",
+    "generate": "DOTENV_CONFIG_PATH=.env.production nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "precommit": "npm run lint"
   },

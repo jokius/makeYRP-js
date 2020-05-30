@@ -1,4 +1,6 @@
-require('dotenv').config()
+require("dotenv").config({
+  path: process.env.DOTENV_CONFIG_PATH || null,
+})
 
 module.exports = {
   mode: 'spa',
@@ -70,6 +72,10 @@ module.exports = {
 
   axios: {
     baseUrl: process.env.API_URL
+  },
+
+  env: {
+    wsUrl: process.env.WS_URL,
   },
 
   router: {
