@@ -89,6 +89,7 @@
         game: state => state.game,
         marks: state => state.game.marks,
         user: state => state.auth.user,
+        auth: state => state.auth,
       }),
 
       loaded() {
@@ -101,6 +102,7 @@
     },
 
     mounted() {
+      this.$cable.connection.connect(`${process.env.wsUrl}?token=${this.$auth.getToken('local')}`)
       const gameId = this.$route.params.id
 
       this.$cable.subscribe({

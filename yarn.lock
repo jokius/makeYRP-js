@@ -1712,10 +1712,10 @@ acorn@^7.1.1:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.2.0.tgz#17ea7e40d7c8640ff54a694c889c26f31704effe"
   integrity sha512-apwXVmYVpQ34m/i71vrApRrRKCWQnZZF1+npOD0WV5xZFfwWOmKGQ2RWlfdy9vWITsenisM8M0Qeq8agcFHNiQ==
 
-actioncable-vue@^2.1.4:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/actioncable-vue/-/actioncable-vue-2.1.4.tgz#e1055719d777d477504d3746b5776f05372bedbe"
-  integrity sha512-mNVX/LitjR0sRnPSJfZhxF7xIStvjx+8h18w4EwzewxaJ0hEN5VBRdXZ/tC4HZkoOepNHI3D2rNlDhQydn0CaQ==
+actioncable-vue@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/actioncable-vue/-/actioncable-vue-2.2.0.tgz#c3f93adc717123e3b94f7d1ed7abf780e75305a9"
+  integrity sha512-9j5tS2Vqji7vA9ljVxWAtM9cjeqIOhKNHdC3nrVQkCUGHBB4jIEe4hDD7O/oEZw34acuIXt9xGAgDJB/hY+E5A==
   dependencies:
     "@rails/actioncable" "^6.0.2"
 

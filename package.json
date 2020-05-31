@@ -15,7 +15,7 @@
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.10.3",
-    "actioncable-vue": "^2.1.4",
+    "actioncable-vue": "^2.2.0",
     "dart-sass": "^1.25.0",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.19",

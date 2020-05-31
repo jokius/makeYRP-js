@@ -4,7 +4,5 @@ import ActionCableVue from 'actioncable-vue'
 Vue.use(ActionCableVue, {
   debug: true,
   debugLevel: 'all',
-  connectionUrl: process.env.wsUrl,
-  connectImmediately: true
+  connectImmediately: false,
 });
-
