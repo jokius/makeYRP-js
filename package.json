@@ -5,7 +5,7 @@
   "author": "konayre",
   "description": "Стол для настольных ролевых игр",
   "scripts": {
-    "dev": "nuxt",
+    "dev": "nuxt --port 8080",
     "build": "DOTENV_CONFIG_PATH=.env.production  nuxt build",
     "start": "nuxt start",
     "generate": "DOTENV_CONFIG_PATH=.env.production nuxt generate",

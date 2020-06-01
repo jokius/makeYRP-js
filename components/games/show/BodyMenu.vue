@@ -101,7 +101,7 @@
         marks: state => state.game.marks,
         currentItem: state => state.game.currentItem,
         master: state => state.game.info.master,
-        currentUser: state => state.game.currentUser,
+        user: state => state.auth.user,
       }),
 
       items: {
@@ -113,7 +113,7 @@
           ]
           let afterSystem = []
 
-          if (this.currentUser.id === this.master.id) {
+          if (this.user.id === this.master.id) {
             afterSystem =  [
               { label: 'Настройки страници', icon: 'mdi-cog', type: 'settings', mark: null },
             ]
