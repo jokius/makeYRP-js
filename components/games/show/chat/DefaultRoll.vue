@@ -3,7 +3,7 @@
     <p class="dices">бросок {{ rollText }}</p>
     <div v-for="(rolls, dice) in roll" :key="`${dice}-${Date.now}`">
       <div v-for="(value, index) in rolls" :key="`${dice}-${index}-${Date.now}`" class="dice">
-        <span :class="dice">{{ valueToSymb(dice, value) }}</span>
+        <span :class="dice.replace('d', 'dice')">{{ valueToSymb(dice, value) }}</span>
         <span v-if="index + 1 < rolls.length" class="plus"> + </span>
       </div>
     </div>
@@ -129,31 +129,31 @@
     right: 4px;
   }
 
-  .d4 {
+  .dice4 {
     font-size: 50px;
   }
 
-  .d6 {
+  .dice6 {
     font-size: 50px;
   }
 
-  .d8 {
+  .dice8 {
     font-size: 50px;
   }
 
-  .d10 {
+  .dice10 {
     font-size: 50px;
   }
 
-  .d12 {
+  .dice12 {
     font-size: 50px;
   }
 
-  .d20 {
+  .dice20 {
     font-size: 50px;
   }
 
-  .d100 {
+  .dice100 {
     font-size: 50px;
   }
 

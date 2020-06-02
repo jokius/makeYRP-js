@@ -58,7 +58,7 @@
     computed: {
       dropzoneOptions() {
         return {
-          url: process.env.API_URL + links.dynamic(links.base.folderImages, { folder_id: this.folderId }),
+          url: process.env.baseUrl + links.dynamic(links.base.folderImages, { folder_id: this.folderId }),
           acceptedFiles: 'image/*',
           headers: { Authorization: this.$auth.getToken('local') }
         }
