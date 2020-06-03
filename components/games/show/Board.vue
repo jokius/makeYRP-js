@@ -1,55 +1,25 @@
 <template>
-  <div class="pan-zoom-body" @contextmenu="handler">
-    <div v-if="!loaded" class="loaded">
-<!--      <body-loader />-->
-    </div>
-    <pan-zoom
-      class="pan-zoom"
-      :options="{
-        minZoom: 0.4,
-        maxZoom: 2,
-        beforeMouseDown: checkMove,
-        smoothScroll: false,
-        zoomDoubleClickSpeed: 1
-      }"
-    >
-      <drop class="drop" @drop="handleDrop">
-        <right-click-menu :position="position" :current-obj="item" :replaced-items="menuItems">
-<!--          <canvas ref="renderCanvas" />-->
-        </right-click-menu>
-      </drop>
-    </pan-zoom>
-  </div>
+  <v-stage
+      ref="stage"
+      class="stage"
+      :config="configKonva"
+      @contextmenu="handler($event)"
+      @mousedown="stageMove"
+      @mouseup="stageMove"
+  >
+    <v-layer ref="map">
+      <k-image :url="backgroundUrl" v-if="backgroundUrl" :size="{ width, height }" />
+    </v-layer>
+  </v-stage>
 </template>
 
 <script>
-  import { Application } from 'pixi.js'
   import { mapState } from 'vuex'
-  import RightClickMenu from './RightClickMenu'
-  import { mousePosition } from '../../../lib/mousePosition'
+  import KImage from './konva/KImage'
 
   export default {
     name: 'Board',
-    components: { RightClickMenu },
-    ssr: false,
-
-    data() {
-      return {
-        app: {},
-        playersContainer: {},
-        gmContainer: {},
-        mapContainer: {},
-        gridContainer: {},
-        tokens: {},
-        graphics: {},
-        position: { x: 0, y: 0 },
-        menuItems: [],
-        item: {},
-        loaded: false,
-        selectRect: {},
-        // observer: new EventObserver(),
-      }
-    },
+    components: { KImage },
 
     channels: {
       PageChannel: {
@@ -68,12 +38,7 @@
     computed: {
       ...mapState({
         currentPage: state => state.game.currentPage,
-        sheets: state => state.game.sheets,
-        currentLayer: state => state.game.currentLayer,
         currentCursor: state => state.game.currentCursor,
-        borderSize: state => state.game.borderSize,
-        borderColor: state => state.game.borderColor,
-        bodyColor: state => state.game.bodyColor,
       }),
 
       params: {
@@ -94,27 +59,27 @@
         },
       },
 
-      gridWidth: {
+      xOffset: {
         get() {
-          return parseInt(this.grid.width, 10)
+          const width = document.getElementsByClassName('body-content')[0].clientWidth
+          return (width - this.width) / 2
         },
       },
 
-      windowWidth: {
+      yOffset: {
         get() {
-          return this.width * window.devicePixelRatio
+          const height = document.getElementsByClassName('body-content')[0].clientHeight
+          return (height - this.height) / 2
         },
       },
 
-      windowHeight: {
+      configKonva: {
         get() {
-          return this.height * window.devicePixelRatio
-        },
-      },
-
-      grid: {
-        get() {
-          return this.params.grid
+          return {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            draggable: true,
+          }
         },
       },
 
@@ -123,202 +88,308 @@
           return this.currentPage.backgroundUrl
         },
       },
+    },
 
-      layer: {
-        get() {
-          return `${this.currentLayer}Container`
-        },
+    mounted() {
+      this.scaleStage()
+      this.setPosition()
+    },
+
+    watch: {
+      params() {
+        this.setPosition()
       },
     },
 
-    // watch: {
-    //   params() {
+    methods: {
+      setPosition() {
+        if (this.currentPage.backgroundUrl) {
+          const map = this.$refs.map.getNode()
+          map.absolutePosition({ x: this.xOffset, y: this.yOffset })
+        }
+      },
+
+      scaleStage() {
+        const stage = this.$refs.stage.getStage()
+
+        const scaleBy = 1.10
+        stage.on('wheel', (e) => {
+          e.evt.preventDefault()
+          const oldScale = stage.scaleX()
+
+          const pointer = stage.getPointerPosition()
+
+          const mousePointTo = {
+            x: (pointer.x - stage.x()) / oldScale,
+            y: (pointer.y - stage.y()) / oldScale,
+          }
+
+          const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy
+
+          stage.scale({ x: newScale, y: newScale })
+
+          const newPos = {
+            x: pointer.x - mousePointTo.x * newScale,
+            y: pointer.y - mousePointTo.y * newScale,
+          }
+
+          stage.position(newPos)
+          stage.batchDraw()
+        })
+      },
+
+      stageMove(event) {
+        const e = event.evt
+        const stage = this.$refs.stage.getStage()
+        stage.draggable(this.currentCursor === 'pointer' || (e.button === 0 && e.altKey) || e.button === 2)
+      },
+
+      handler(e) {
+        e.evt.preventDefault()
+      },
+    },
+
+    // data() {
+    //   return {
+    //     app: {},
+    //     playersContainer: {},
+    //     gmContainer: {},
+    //     mapContainer: {},
+    //     gridContainer: {},
+    //     tokens: {},
+    //     graphics: {},
+    //     position: { x: 0, y: 0 },
+    //     menuItems: [],
+    //     item: {},
+    //     loaded: false,
+    //     selectRect: {},
+    //     // observer: new EventObserver(),
+    //   }
+    // },
+    //
+    //
+    // computed: {
+    //   ...mapState({
+    //     currentPage: state => state.game.currentPage,
+    //     sheets: state => state.game.sheets,
+    //     currentLayer: state => state.game.currentLayer,
+    //     currentCursor: state => state.game.currentCursor,
+    //     borderSize: state => state.game.borderSize,
+    //     borderColor: state => state.game.borderColor,
+    //     bodyColor: state => state.game.bodyColor,
+    //   }),
+    //
+    //   params: {
+    //     get() {
+    //       return this.currentPage.params
+    //     },
+    //   },
+    //
+    //   gridWidth: {
+    //     get() {
+    //       return parseInt(this.grid.width, 10)
+    //     },
+    //   },
+    //
+    //
+    //   grid: {
+    //     get() {
+    //       return this.params.grid
+    //     },
+    //   },
+    //
+    //
+    //   layer: {
+    //     get() {
+    //       return `${this.currentLayer}Container`
+    //     },
+    //   },
+    // },
+    //
+    // // watch: {
+    // //   params() {
+    // //     this.mapContainer.changeBackground(this.backgroundUrl, this.width, this.height)
+    // //     this.gridContainer.drawGrid(this.grid, this.width, this.height)
+    // //   },
+    // //
+    // //   currentCursor() {
+    // //     this.containersBroadcast()
+    // //   },
+    // //
+    // //   currentLayer() {
+    // //     this.containersBroadcast()
+    // //   },
+    // //
+    // //   borderSize() {
+    // //     this.containersBroadcast()
+    // //   },
+    // //
+    // //   borderColor() {
+    // //     this.containersBroadcast()
+    // //   },
+    // //
+    // //   bodyColor() {
+    // //     this.containersBroadcast()
+    // //   },
+    // // },
+    //
+    // mounted() {
+    //   const pageId = this.currentPage.id
+    //   // this.$cable.subscribe({ channel: 'PageChannel', page_id: pageId })
+    //   // this.loadBoard()
+    //   // this.loadTokens(pageId)
+    //   // this.loadGraphics(pageId)
+    // },
+    //
+    // methods: {
+    //   // containersBroadcast() {
+    //   //   this.observer.broadcast({
+    //   //     layer: this.layer,
+    //   //     container: this[this.layer],
+    //   //     cursor: this.currentCursor,
+    //   //     borderSize: this.borderSize,
+    //   //     borderColor: this.borderColor,
+    //   //     bodyColor: this.bodyColor,
+    //   //   })
+    //   // },
+    //
+    //
+    //   checkMove(e) {
+    //     return !(e.button === 0 && e.altKey)
+    //   },
+    //
+    //   handler(e) {
+    //     this.position = mousePosition(e)
+    //     e.preventDefault()
+    //   },
+    //
+    //   addObj(obj) {
+    //     if (obj.token) this.tokens.add(obj.token)
+    //     if (obj.graphic) this.graphics.add(obj.graphic, this[obj.graphic.layer])
+    //   },
+    //
+    //   changeObj(obj) {
+    //     if (obj.token) this.tokens.change(obj.token)
+    //     if (obj.graphic) this.graphics.change(obj.graphic, this[obj.graphic.layer])
+    //   },
+    //
+    //   deleteObj(obj) {
+    //     if (obj.token) {
+    //       const sprite = this.playersContainer.getChildByName(`token_${obj.token.id}`)
+    //       this.playersContainer.removeChild(sprite)
+    //     }
+    //     if (obj.graphic) {
+    //       const container = this[obj.graphic.layer]
+    //       const sprite = container.getChildByName(`graphic_${obj.graphic.id}`)
+    //       container.removeChild(sprite)
+    //     }
+    //   },
+    //
+    //   add(params) {
+    //     this.$cable.perform({
+    //       channel: 'PageChannel',
+    //       action: 'add',
+    //       data: { ...params },
+    //     })
+    //   },
+    //
+    //   move(params) {
+    //     this.$cable.perform({
+    //       channel: 'PageChannel',
+    //       action: 'change',
+    //       data: { ...params },
+    //     })
+    //   },
+    //
+    //   remove(params) {
+    //     this.$cable.perform({
+    //       channel: 'PageChannel',
+    //       action: 'remove',
+    //       data: { ...params },
+    //     })
+    //   },
+    //
+    //   loadBoard() {
+    //     this.createApp()
+    //     this.initContainers()
+    //     this.showContainers()
+    //   },
+    //
+    //   tokenRightMenu(id) {
+    //     this.menuItems = [{ title: 'Удалить токен', callback: () => this.remove({ id, type: 'token' }) }]
+    //     this.item = { type: 'token', id }
+    //     this.$store.commit('game/updateCurrentRightClickMenu', `token-${id}`)
+    //   },
+    //
+    //   graphicRightMenu(id) {
+    //     this.menuItems = [{ title: 'Удалить рисунок', callback: () => this.remove({ id, type: 'graphic' }) }]
+    //     this.item = { type: 'graphic', id }
+    //     this.$store.commit('game/updateCurrentRightClickMenu', `graphic-${id}`)
+    //   },
+    //
+    //   createApp() {
+    //     this.app = new Application({
+    //       width: this.windowWidth,
+    //       height: this.windowHeight,
+    //       view: this.$refs.renderCanvas,
+    //       antialias: true,
+    //       transparent: true,
+    //       resolution: 1,
+    //       interactive: true,
+    //     })
+    //   },
+    //
+    //   initContainers() {
+    //     this.initContainer('mapContainer')
+    //     this.initContainer('gridContainer')
+    //     this.initContainer('gmContainer')
+    //     this.initContainer('playersContainer')
+    //
     //     this.mapContainer.changeBackground(this.backgroundUrl, this.width, this.height)
     //     this.gridContainer.drawGrid(this.grid, this.width, this.height)
     //   },
     //
-    //   currentCursor() {
-    //     this.containersBroadcast()
+    //   initContainer(name) {
+    //     this[name] = new BoardContainer({
+    //       name,
+    //       observer: this.observer,
+    //       addEvents: name === this.layer,
+    //       sendGraphic: this.add,
+    //     })
     //   },
     //
-    //   currentLayer() {
-    //     this.containersBroadcast()
+    //   showContainers() {
+    //     this.app.stage.addChild(this.mapContainer, this.gmContainer, this.playersContainer, this.gridContainer)
     //   },
     //
-    //   borderSize() {
-    //     this.containersBroadcast()
+    //   loadTokens(pageId) {
+    //     this.tokens = new Token(this.sheets, this.grid, this.tokenRightMenu, this.playersContainer, this.move)
+    //
+    //     loadTokens(pageId).then(tokens => {
+    //       tokens.forEach(token => this.tokens.add(token))
+    //       this.loaded = true
+    //     })
     //   },
     //
-    //   borderColor() {
-    //     this.containersBroadcast()
-    //   },
+    //   loadGraphics(pageId) {
+    //     this.graphics = new Graphic(this.graphicRightMenu, this.move)
     //
-    //   bodyColor() {
-    //     this.containersBroadcast()
+    //     loadGraphics(pageId).then(graphics => {
+    //       graphics.forEach(raw => {
+    //         const graphic = new GraphicModel().setInfo(raw)
+    //         this.graphics.add(graphic, this[graphic.layer])
+    //       })
+    //       this.loaded = true
+    //     })
     //   },
     // },
-
-    mounted() {
-      const pageId = this.currentPage.id
-      // this.$cable.subscribe({ channel: 'PageChannel', page_id: pageId })
-      // this.loadBoard()
-      // this.loadTokens(pageId)
-      // this.loadGraphics(pageId)
-    },
-
-    methods: {
-      // containersBroadcast() {
-      //   this.observer.broadcast({
-      //     layer: this.layer,
-      //     container: this[this.layer],
-      //     cursor: this.currentCursor,
-      //     borderSize: this.borderSize,
-      //     borderColor: this.borderColor,
-      //     bodyColor: this.bodyColor,
-      //   })
-      // },
-
-      handleDrop({ sheet }, e) {
-        const position = mousePosition(e)
-        this.add({ sheet_id: sheet.id, position_x: position.x, position_y: position.y - this.gridWidth, type: 'token' })
-      },
-
-      checkMove(e) {
-        return !(e.button === 0 && e.altKey)
-      },
-
-      handler(e) {
-        this.position = mousePosition(e)
-        e.preventDefault()
-      },
-
-      addObj(obj) {
-        if (obj.token) this.tokens.add(obj.token)
-        if (obj.graphic) this.graphics.add(obj.graphic, this[obj.graphic.layer])
-      },
-
-      changeObj(obj) {
-        if (obj.token) this.tokens.change(obj.token)
-        if (obj.graphic) this.graphics.change(obj.graphic, this[obj.graphic.layer])
-      },
-
-      deleteObj(obj) {
-        if (obj.token) {
-          const sprite = this.playersContainer.getChildByName(`token_${obj.token.id}`)
-          this.playersContainer.removeChild(sprite)
-        }
-        if (obj.graphic) {
-          const container = this[obj.graphic.layer]
-          const sprite = container.getChildByName(`graphic_${obj.graphic.id}`)
-          container.removeChild(sprite)
-        }
-      },
-
-      add(params) {
-        this.$cable.perform({
-          channel: 'PageChannel',
-          action: 'add',
-          data: { ...params },
-        })
-      },
-
-      move(params) {
-        this.$cable.perform({
-          channel: 'PageChannel',
-          action: 'change',
-          data: { ...params },
-        })
-      },
-
-      remove(params) {
-        this.$cable.perform({
-          channel: 'PageChannel',
-          action: 'remove',
-          data: { ...params },
-        })
-      },
-
-      loadBoard() {
-        this.createApp()
-        this.initContainers()
-        this.showContainers()
-      },
-
-      tokenRightMenu(id) {
-        this.menuItems = [{ title: 'Удалить токен', callback: () => this.remove({ id, type: 'token' }) }]
-        this.item = { type: 'token', id }
-        this.$store.commit('game/updateCurrentRightClickMenu', `token-${id}`)
-      },
-
-      graphicRightMenu(id) {
-        this.menuItems = [{ title: 'Удалить рисунок', callback: () => this.remove({ id, type: 'graphic' }) }]
-        this.item = { type: 'graphic', id }
-        this.$store.commit('game/updateCurrentRightClickMenu', `graphic-${id}`)
-      },
-
-      createApp() {
-        this.app = new Application({
-          width: this.windowWidth,
-          height: this.windowHeight,
-          view: this.$refs.renderCanvas,
-          antialias: true,
-          transparent: true,
-          resolution: 1,
-          interactive: true,
-        })
-      },
-
-      initContainers() {
-        this.initContainer('mapContainer')
-        this.initContainer('gridContainer')
-        this.initContainer('gmContainer')
-        this.initContainer('playersContainer')
-
-        this.mapContainer.changeBackground(this.backgroundUrl, this.width, this.height)
-        this.gridContainer.drawGrid(this.grid, this.width, this.height)
-      },
-
-      initContainer(name) {
-        this[name] = new BoardContainer({
-          name,
-          observer: this.observer,
-          addEvents: name === this.layer,
-          sendGraphic: this.add,
-        })
-      },
-
-      showContainers() {
-        this.app.stage.addChild(this.mapContainer, this.gmContainer, this.playersContainer, this.gridContainer)
-      },
-
-      loadTokens(pageId) {
-        this.tokens = new Token(this.sheets, this.grid, this.tokenRightMenu, this.playersContainer, this.move)
-
-        loadTokens(pageId).then(tokens => {
-          tokens.forEach(token => this.tokens.add(token))
-          this.loaded = true
-        })
-      },
-
-      loadGraphics(pageId) {
-        this.graphics = new Graphic(this.graphicRightMenu, this.move)
-
-        loadGraphics(pageId).then(graphics => {
-          graphics.forEach(raw => {
-            const graphic = new GraphicModel().setInfo(raw)
-            this.graphics.add(graphic, this[graphic.layer])
-          })
-          this.loaded = true
-        })
-      },
-    },
   }
 </script>
 
 <style scoped lang="scss">
   @import '~assets/css/colors';
 
-  .pan-zoom-body {
+  .stage {
     position: absolute;
   }
 

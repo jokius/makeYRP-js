@@ -28,6 +28,7 @@ export const state = () => ({
   bodyColor: { r: 0, g: 0, b: 0, a: 0 },
   pageColor: {},
   specialTabs: [],
+  altPressed: false,
 })
 
 export const actions = {
@@ -321,4 +322,8 @@ export const mutations = {
     state.messages.push(new MessageModel().setInfo(message))
     if (state.currentItem.mark !== 'chat') state.marks = { ...state.marks, chat: state.marks.chat + 1 }
   },
+
+  altIsPressed(state, value) {
+    state.altPressed = value
+  }
 }

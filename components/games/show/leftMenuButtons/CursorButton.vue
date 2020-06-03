@@ -1,12 +1,31 @@
 <template>
-  <div :class="[{ selected: cursor === 'default' }, 'button']" @click="cursor = 'default'">
-    <v-icon class="icon">mdi-cursor-default</v-icon>
-  </div>
+  <v-speed-dial direction="right" open-on-hover>
+    <template v-slot:activator>
+      <div
+        v-if="!altPressed && cursor !== 'pointer'"
+        :class="[{ selected: cursor === 'default' }, 'button']"
+        @click="cursor = 'default'"
+      >
+        <v-icon class="icon">mdi-cursor-default</v-icon>
+      </div>
+      <div v-else :class="[{ selected: cursor === 'pointer' }, 'button']" @click="cursor = 'pointer'">
+        <v-icon class="icon">mdi-cursor-pointer</v-icon>
+      </div>
+    </template>
+
+    <div class="grid-items">
+      <button :class="[{ selected: cursor === 'default' }, 'item']" @click="cursor = 'default'">
+        <v-icon class="icon">mdi-cursor-default</v-icon>
+      </button>
+      <button :class="[{ selected: cursor === 'pointer' }, 'item']" @click="cursor = 'pointer'">
+        <v-icon class="icon">mdi-cursor-pointer</v-icon>
+      </button>
+    </div>
+  </v-speed-dial>
 </template>
 
 <script>
   import { mapState } from 'vuex'
-
 
   export default {
     name: 'CursorButton',
@@ -14,6 +33,7 @@
     computed: {
       ...mapState({
         currentCursor: state => state.game.currentCursor,
+        altPressed: state => state.game.altPressed,
       }),
 
       cursor: {
@@ -31,6 +51,8 @@
 
 <style scoped lang="scss">
   @import '~assets/css/colors';
+
+  $border: 1px solid $black;
 
   .button {
     width: 30px;
@@ -51,10 +73,19 @@
     grid-template-columns: max-content;
     margin-top: 67px;
     margin-left: -17px;
-    border: 1px solid $black;
+    border: $border;
     background-color: $white;
     .item:last-child {
       border-bottom: none;
+    }
+  }
+
+  .item {
+    padding: 5px;
+    border-bottom: $border;
+
+    &:hover {
+      background-color: $indigoRGBA;
     }
   }
 

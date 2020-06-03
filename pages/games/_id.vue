@@ -2,15 +2,15 @@
   <v-app id="inspire">
     <client-only>
       <v-content v-if="loaded">
-        <left-menu/>
+        <left-menu />
         <div class="menu-grid">
-          <head-menu class="head-menu"/>
-          <body-menu class="body-menu"/>
-          <body-content class="body-content"/>
+          <head-menu class="head-menu" />
+          <body-menu class="body-menu" />
+          <body-content class="body-content" :size="bodySize" />
         </div>
-        <open-modals/>
+        <open-modals />
       </v-content>
-      <loader v-else/>
+      <loader v-else />
 
       <v-overlay :value="overlay">
         <v-card>
@@ -20,7 +20,7 @@
           </v-card-text>
         </v-card>
       </v-overlay>
-   </client-only>
+    </client-only>
   </v-app>
 </template>
 
@@ -95,6 +95,12 @@
       loaded() {
         return this.game.loaded
       },
+
+      bodySize: {
+        get() {
+          return 0
+        }
+      },
     },
 
     created() {
@@ -109,6 +115,14 @@
         channel: 'GameChannel',
         game_id: gameId,
       })
+
+      document.addEventListener('keydown', e => this.setAltPressed(e))
+      document.addEventListener('keyup', e => this.setAltPressed(e))
+    },
+
+    destroyed() {
+      document.removeEventListener('keydown', e => this.setAltPressed(e))
+      document.removeEventListener('keyup', e => this.setAltPressed(e))
     },
 
     methods: {
@@ -139,6 +153,10 @@
         this.$store.commit('game/addMessage', message)
         const audio = new Audio('/sounds/intuition.mp3')
         audio.play()
+      },
+
+      setAltPressed(e) {
+        this.$store.commit('game/altIsPressed', e.altKey)
       },
     },
   }

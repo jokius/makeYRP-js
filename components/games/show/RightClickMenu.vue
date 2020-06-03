@@ -40,7 +40,6 @@
   import RenameModal from './RenameModal'
   import AccessModal from './AccessModal'
 
-
   export default {
     name: 'RightClickMenu',
     components: { AccessModal, RenameModal },

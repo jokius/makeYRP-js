@@ -76,6 +76,7 @@ module.exports = {
 
   env: {
     wsUrl: process.env.WS_URL,
+    baseUrl: process.env.API_URL,
   },
 
   router: {

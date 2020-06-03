@@ -2,18 +2,28 @@
   <div class="left-menu-actions">
     <cursor-button />
     <!--    <drawing-button />-->
-    <layer-button />
+    <layer-button v-if="user.id === master.id"/>
     <dice-button />
   </div>
 </template>
 
 <script>
+  import { mapState } from 'vuex'
+
   import DiceButton from './leftMenuButtons/DiceButton'
   import LayerButton from './leftMenuButtons/LayerButton'
   import CursorButton from './leftMenuButtons/CursorButton'
+
   export default {
     name: 'LeftMenu',
     components: { CursorButton, LayerButton, DiceButton },
+
+    computed: {
+      ...mapState({
+        master: state => state.game.info.master,
+        user: state => state.auth.user,
+      }),
+    }
   }
 </script>
 
