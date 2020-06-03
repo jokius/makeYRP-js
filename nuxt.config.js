@@ -85,8 +85,8 @@ module.exports = {
   plugins: [
     { src: '~/plugins/actioncable-vue', ssr: false },
     { src: '~/plugins/dragDrop', ssr: false },
-    { src: '~/plugins/panzoom', ssr: false },
     { src: '~/plugins/wysiwyg', ssr: false },
+    { src: '~/plugins/konva', ssr: false },
   ],
 }
 
