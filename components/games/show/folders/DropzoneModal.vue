@@ -1,6 +1,6 @@
 <template>
   <v-dialog :value="openDialog" width="350" persistent>
-    <v-card>
+    <v-card class="dropzone-card">
       <v-card-title class="headline grey lighten-2" primary-title>
         Загрузить изображение
       </v-card-title>
@@ -79,6 +79,10 @@
 
 <style scoped lang="scss">
   @import '~assets/css/colors';
+
+  .dropzone-card {
+    overflow: hidden;
+  }
 
   .vue-dropzone {
     border: none;
