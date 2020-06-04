@@ -32,7 +32,7 @@
           color="indigo"
           @click="close"
         >
-          Закарыть
+          Закрыть
         </v-btn>
 
         <v-spacer />

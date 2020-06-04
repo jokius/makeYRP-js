@@ -18,7 +18,7 @@
         color="indigo"
         @click="onClose"
       >
-        Закарыть
+        Закрыть
       </v-btn>
 
       <v-spacer />

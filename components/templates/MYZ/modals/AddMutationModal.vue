@@ -44,7 +44,7 @@
           color="indigo"
           @click="close"
         >
-          Закарыть
+          Закрыть
         </v-btn>
       </v-card-actions>
     </v-card>
