@@ -332,7 +332,6 @@
     grid-template-columns: 30px max-content 1fr max-content;
     background-color: $black;
     color: $white;
-    height: 35px;
     line-height: 35px;
     margin-left: -5px;
   }
@@ -342,15 +341,15 @@
     grid-template-columns: max-content 1fr max-content;
     background-color: $black;
     color: $white;
-    height: 35px;
     line-height: 35px;
     margin-left: -5px;
   }
 
   .dice {
-    margin-left: 5px;
-    margin-right: -5px;
     font-size: 16px;
+    position: relative;
+    left: 5px;
+    top: 2px;
   }
 
   .button {

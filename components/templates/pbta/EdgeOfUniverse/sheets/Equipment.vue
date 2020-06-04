@@ -63,7 +63,7 @@
 
       <div class="tags-grid">
         <span class="label tag-label">Теги</span>
-        <v-chip-group>
+        <v-chip-group column>
           <v-chip
             v-for="(tag, tagIndex) in tags"
             :key="`tag-${tagIndex}`"
@@ -279,7 +279,6 @@
   @import '~assets/css/colors';
 
   .equipment-grid {
-    display: grid;
     margin-bottom: 5px;
     background-color: $grayC5;
   }
@@ -293,7 +292,6 @@
     grid-template-columns: 30px 1fr max-content;
     background-color: $black;
     color: $white;
-    height: 35px;
     line-height: 35px;
     margin-left: -5px;
   }
@@ -339,9 +337,8 @@
 
   .tags-grid {
     display: grid;
-    grid-template-columns: repeat(3, max-content);
+    grid-template-columns: max-content 1fr max-content;
     grid-column-gap: 10px;
-    height: 35px;
     line-height: 35px;
   }
 
@@ -356,5 +353,6 @@
 
   .tag-button {
     margin-top: 10px;
+    margin-right: 5px;
   }
 </style>
