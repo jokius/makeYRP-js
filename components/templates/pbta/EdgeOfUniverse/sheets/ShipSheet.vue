@@ -56,7 +56,6 @@
     computed: {
       ...mapState({
         sheets: state => state.game.sheets,
-        specialTabs: state => state.game.specialTabs,
       }),
 
       sheet: {

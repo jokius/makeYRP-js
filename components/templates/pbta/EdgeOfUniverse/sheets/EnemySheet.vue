@@ -8,6 +8,8 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
+
   import EnemyMainBody from './EnemyMainBody'
   import CharacterReadOnly from './CharacterReadOnly'
 
@@ -20,6 +22,16 @@
     },
 
     computed: {
+      ...mapState({
+        sheets: state => state.game.sheets,
+      }),
+
+      sheet: {
+        get() {
+          return this.sheets.find(sheet => sheet.id === this.id)
+        },
+      },
+
       canWrite: {
         get() {
           return this.sheet.acl.canWrite
