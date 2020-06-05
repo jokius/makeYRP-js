@@ -88,7 +88,9 @@
       character: {
         get() {
           let character = {}
-          if (this.body.as) {
+          if (this.body.as && this.body.as.id) {
+            character = this.body.as
+          } else if (this.body.as) {
             character = this.sheets.find(sheet => sheet.id === this.body.as) || {}
           }
 

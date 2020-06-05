@@ -92,7 +92,7 @@
 <script>
   import { mapState } from 'vuex'
 
-  import Move from './Move'
+  import Move from '../components/Move'
 
   import AddMoveModal from '../modals/AddMoveModal'
   import AddWorldMoveModal from '../modals/AddWorldMoveModal'

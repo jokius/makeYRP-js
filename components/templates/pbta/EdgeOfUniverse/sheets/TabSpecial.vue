@@ -117,7 +117,7 @@
 <script>
   import { mapState } from 'vuex'
 
-  import Move from './Move'
+  import Move from '../components/Move'
 
   export default {
     name: 'TabSpecial',

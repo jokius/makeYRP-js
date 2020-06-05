@@ -133,9 +133,19 @@
 
     computed: {
       ...mapState({
-        sheets: state => state.game.sheets,
         tables: state => state.game.info.template.tables,
       }),
+
+      asObj: {
+        get() {
+          return {
+            id: this.sheet.id,
+            name: this.sheet.name,
+            imgChat: this.sheet.imgChat,
+            damage: this.sheet.params.damage,
+          }
+        }
+      },
 
       type: {
         get() {
@@ -260,12 +270,13 @@
           data: {
             type: 'message',
             body: {
-              as: this.sheet.id,
+              as: this.asObj,
               name: this.move.name,
               autoFull: true,
               results: this.results,
               detailsAlways: this.move.detailsAlways || false,
               details: this.move.details,
+              damageButton: this.move.damageButton || false,
             },
           },
         })
@@ -278,12 +289,13 @@
           data: {
             type: 'message',
             body: {
-              as: this.sheet.id,
+              as: this.asObj,
               name: this.move.name,
               autoPart: true,
               results: this.results,
               detailsAlways: this.move.detailsAlways || false,
               details: this.move.details,
+              damageButton: this.move.damageButton || false,
             },
           },
         })
@@ -291,7 +303,6 @@
 
       roll(modifier) {
         const state = { name: this.tables.stats[this.type], value: this.sheet.params.stats[this.type] }
-        console.log('state', state)
         if (typeof state.value === 'undefined') {
           const specialsStat = this.specialsStats.find(item => item.key === this.type)
           state.name = specialsStat.name.toUpperCase()
@@ -304,7 +315,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.sheet.id,
+              as: this.asObj,
               name: this.move.name,
               dices: { d6: 2 },
               state,
@@ -312,6 +323,7 @@
               results: this.results,
               detailsAlways: this.move.detailsAlways || false,
               details: this.move.details,
+              damageButton: this.move.damageButton || false,
             },
           },
         })

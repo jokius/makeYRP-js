@@ -147,8 +147,8 @@
 <script>
   import { mapState } from 'vuex'
 
-  import Compartment from './Compartment'
-  import CompartmentEditable from './CompartmentEditable'
+  import Compartment from '../components/Compartment'
+  import CompartmentEditable from '../components/CompartmentEditable'
 
   export default {
     name: 'ShipCompartments',

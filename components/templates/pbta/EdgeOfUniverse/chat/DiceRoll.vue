@@ -14,12 +14,20 @@
       <div class="result-text" v-html="results[resultKey]" />
       <div v-if="result > 6 && details" class="details-text" v-html="details" />
     </div>
+
+    <div v-if="body.damageButton && result > 6" class="damage-button">
+      <damage-button :as="body.as" :damage="body.as.damage" />
+    </div>
   </div>
 </template>
 
 <script>
+  import DamageButton from '../components/DamageButton'
+
   export default {
     name: 'DiceRoll',
+
+    components: { DamageButton },
 
     props: {
       body: { type: Object, required: true },
@@ -169,5 +177,10 @@
     margin-top: 5px;
     margin-left: 5px;
     margin-right: 5px;
+  }
+
+  .damage-button {
+    width: 50%;
+    margin: 5px auto;
   }
 </style>

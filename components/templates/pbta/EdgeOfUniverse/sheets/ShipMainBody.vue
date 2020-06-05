@@ -60,15 +60,7 @@
               type="number"
               @change="saveSheet"
             />
-            <v-btn
-              class="button-damage"
-              raised
-              color="black"
-              dark
-              @click="modalOpen = true"
-            >
-              Нанести урон
-            </v-btn>
+            <damage-button :as="asObj" :damage="damage" />
           </div>
         </div>
       </div>
@@ -96,21 +88,19 @@
         @change="saveSheet"
       />
     </div>
-
-    <roll-damage-modal v-if="modalOpen" v-model="obj" :damage="damage" />
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
 
-  import Avatar from './Avatar'
+  import Avatar from '../components/Avatar'
 
-  import RollDamageModal from '../modals/RollDamageModal'
+  import DamageButton from '../components/DamageButton'
 
   export default {
     name: 'ShipMainBody',
-    components: { RollDamageModal, Avatar },
+    components: { DamageButton, Avatar },
 
     props: {
       id: { type: Number, required: true },
@@ -119,8 +109,6 @@
     data() {
       return {
         modalOpen: false,
-        modalModifierOpen: false,
-        currentState: {},
       }
     },
 
@@ -128,13 +116,23 @@
       ...mapState({
         sheets: state => state.game.sheets,
         tables: state => state.game.info.template.tables,
-        specialTabs: state => state.game.specialTabs,
       }),
 
       sheet: {
         get() {
           return this.sheets.find(sheet => sheet.id === this.id)
         },
+      },
+
+      asObj: {
+        get() {
+          return {
+            id: this.sheet.id,
+            name: this.sheet.name,
+            imgChat: this.sheet.imgChat,
+            damage: this.damage,
+          }
+        }
       },
 
       params: {
@@ -281,22 +279,6 @@
           channel: 'GameChannel',
           action: 'change',
           data: { ...this.sheet, type: 'sheet' },
-        })
-      },
-
-      rollDamage(dices) {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: {
-            type: 'message',
-            body: {
-              as: this.sheet.id,
-              name: 'Урон',
-              dices: { d6: dices },
-              damage: true,
-            },
-          },
         })
       },
     },

@@ -14,12 +14,20 @@
       <div class="result-text" v-html="results.full" />
       <div v-if="details" class="details-text" v-html="details" />
     </div>
+
+    <div v-if="body.damageButton" class="damage-button">
+      <damage-button :as="body.as" :damage="body.as.damage" />
+    </div>
   </div>
 </template>
 
 <script>
+  import DamageButton from '../components/DamageButton'
+
   export default {
     name: 'AutoFull',
+
+    components: { DamageButton },
 
     props: {
       body: { type: Object, required: true },
@@ -89,5 +97,10 @@
     margin-top: 5px;
     margin-left: 5px;
     margin-right: 5px;
+  }
+
+  .damage-button {
+    width: 50%;
+    margin: 5px auto;
   }
 </style>

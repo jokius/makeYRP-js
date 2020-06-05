@@ -3,15 +3,7 @@
     <div class="main-row1">
       <div class="main-row1-col1">
         <avatar :sheet="sheet" />
-        <v-btn
-          class="button-damage"
-          raised
-          color="black"
-          dark
-          @click="modalOpen = true"
-        >
-          Нанести урон
-        </v-btn>
+        <damage-button :as="asObj" :damage="damage" />
       </div>
       <div class="main-row1-col2">
         <div class="main-row1-col2-base-info">
@@ -122,28 +114,23 @@
         @change="saveSheet"
       />
     </div>
-    <roll-damage-modal v-if="modalOpen" v-model="obj" :damage="damage" />
-    <add-enemy-move-modal
-      v-if="movesOpen"
-      :id="id"
-      :obj="moveObj"
-      @completed="value => moveObj = value"
-    />
+
+    <add-enemy-move-modal v-if="modalOpen" :id="id" v-model="obj" />
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
 
-  import Avatar from './Avatar'
+  import Avatar from '../components/Avatar'
 
-  import RollDamageModal from '../modals/RollDamageModal'
   import Move from '../../HorrorMovieWorld/sheets/Move'
   import AddEnemyMoveModal from '../modals/AddEnemyMoveModal'
+  import DamageButton from '../components/DamageButton'
 
   export default {
     name: 'EnemyMainBody',
-    components: { AddEnemyMoveModal, Move, RollDamageModal, Avatar },
+    components: { DamageButton, AddEnemyMoveModal, Move, Avatar },
 
     props: {
       id: { type: Number, required: true },
@@ -152,7 +139,6 @@
     data() {
       return {
         modalOpen: false,
-        movesOpen: false,
         currentState: {},
       }
     },
@@ -167,6 +153,17 @@
         get() {
           return this.sheets.find(sheet => sheet.id === this.id)
         },
+      },
+
+      asObj: {
+        get() {
+          return {
+            id: this.sheet.id,
+            name: this.sheet.name,
+            imgChat: this.sheet.imgChat,
+            damage: this.damage,
+          }
+        }
       },
 
       params: {
@@ -192,7 +189,7 @@
 
       damage: {
         get() {
-          return this.params.damage
+          return this.params.damage || 1
         },
 
         set(value) {
@@ -270,23 +267,12 @@
 
       obj: {
         get() {
-          return { open: this.modalOpen, dices: 1 }
-        },
-
-        set({ open, dices, isClose }) {
-          if (!isClose) this.rollDamage(parseInt(dices))
-          this.modalOpen = open
-        },
-      },
-
-      moveObj: {
-        get() {
-          return { open: this.movesOpen, move: {} }
+          return { open: this.modalOpen, move: {} }
         },
 
         set({ open, move }) {
           this.setMove(move)
-          this.movesOpen = open
+          this.modalOpen = open
         },
       },
     },
@@ -299,11 +285,6 @@
                              path: target,
                              value: value,
                            })
-      },
-
-      openModifier(state) {
-        this.currentState = state
-        this.modalModifierOpen = true
       },
 
       setEnemy(value) {
@@ -340,22 +321,6 @@
                            })
 
         this.saveSheet()
-      },
-
-      rollDamage(dices) {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: {
-            type: 'message',
-            body: {
-              as: this.sheet.id,
-              name: 'Урон',
-              dices: { d6: dices },
-              damage: true,
-            },
-          },
-        })
       },
 
       saveSheet() {

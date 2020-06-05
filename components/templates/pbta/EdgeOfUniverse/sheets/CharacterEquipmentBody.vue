@@ -41,7 +41,7 @@
 <script>
   import { mapState } from 'vuex'
 
-  import Equipment from './Equipment'
+  import Equipment from '../components/Equipment'
 
   import AddStartingEquipmentModal from '../modals/AddStartingEquipmentModal'
   import { Pbta } from '../../../../../lib/Pbta'

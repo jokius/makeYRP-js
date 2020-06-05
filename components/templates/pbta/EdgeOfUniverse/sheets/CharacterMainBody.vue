@@ -145,15 +145,7 @@
                   <div :class="[{ enable: damage >= number }, 'box']" />
                 </div>
                 <div>
-                  <v-btn
-                    class="button-damage"
-                    raised
-                    color="black"
-                    dark
-                    @click="modalOpen = true"
-                  >
-                    Нанести урон
-                  </v-btn>
+                  <damage-button :as="asObj" :damage="damage" />
                 </div>
               </div>
               <div class="protection">
@@ -253,8 +245,7 @@
       />
     </div>
 
-    <roll-damage-modal v-if="modalOpen" v-model="obj" :damage="damage" />
-    <roll-modifier-modal v-if="modalModifierOpen" :obj="modifierObj" @roll="value => modifierObj = value" />
+    <roll-modifier-modal v-if="modalOpen" v-model="obj" />
   </div>
 </template>
 
@@ -262,16 +253,16 @@
   import { mapState } from 'vuex'
   import { get } from 'lodash'
 
-  import Avatar from './Avatar'
-  import Specials from './Specials'
+  import Avatar from '../components/Avatar'
+  import Specials from '../components/Specials'
 
-  import RollDamageModal from '../modals/RollDamageModal'
   import RollModifierModal from '../../HorrorMovieWorld/modals/RollModifierModal'
   import { Pbta } from '../../../../../lib/Pbta'
+  import DamageButton from '../components/DamageButton'
 
   export default {
     name: 'CharacterMainBody',
-    components: { RollModifierModal, RollDamageModal, Specials, Avatar },
+    components: { DamageButton, RollModifierModal, Specials, Avatar },
 
     props: {
       id: { type: Number, required: true },
@@ -280,7 +271,6 @@
     data() {
       return {
         modalOpen: false,
-        modalModifierOpen: false,
         currentState: {},
       }
     },
@@ -295,6 +285,17 @@
         get() {
           return this.sheets.find(sheet => sheet.id === this.id)
         },
+      },
+
+      asObj: {
+        get() {
+          return {
+            id: this.sheet.id,
+            name: this.sheet.name,
+            imgChat: this.sheet.imgChat,
+            damage: this.damage,
+          }
+        }
       },
 
       params: {
@@ -538,23 +539,12 @@
 
       obj: {
         get() {
-          return { open: this.modalOpen, dices: 1 }
-        },
-
-        set({ open, dices, isClose }) {
-          if (!isClose) this.rollDamage(parseInt(dices))
-          this.modalOpen = open
-        },
-      },
-
-      modifierObj: {
-        get() {
-          return { open: this.modalModifierOpen, modifier: 0 }
+          return { open: this.modalOpen, modifier: 0 }
         },
 
         set({ open, modifier, isClose }) {
           if (!isClose) this.roll(parseInt(modifier))
-          this.modalModifierOpen = open
+          this.modalOpen = open
         },
       },
     },
@@ -717,23 +707,7 @@
 
       openModifier(state) {
         this.currentState = state
-        this.modalModifierOpen = true
-      },
-
-      rollDamage(dices) {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: {
-            type: 'message',
-            body: {
-              as: this.sheet.id,
-              name: 'Урон',
-              dices: { d6: dices },
-              damage: true,
-            },
-          },
-        })
+        this.modalOpen = true
       },
 
       roll(modifier) {
