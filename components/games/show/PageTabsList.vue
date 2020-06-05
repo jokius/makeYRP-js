@@ -7,7 +7,7 @@
     <v-chip
       v-for="page in pages"
       :key="page.id"
-      close
+      :close="user.id === master.id"
       @click:close="deletePage(page.id)"
     >
       {{ page.name }}
@@ -30,6 +30,8 @@
     computed: {
       ...mapState({
         game: state => state.game.info,
+        master: state => state.game.info.master,
+        user: state => state.auth.user,
       }),
 
       pages() {

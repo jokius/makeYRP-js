@@ -2,6 +2,7 @@
   <div class="headMenus">
     <page-tabs-list />
     <v-btn
+      v-if="user.id === master.id"
       class="plusButton"
       color="indigo"
       fab
@@ -26,6 +27,8 @@
     computed: {
       ...mapState({
         openModals: state => state.game.openModals,
+        master: state => state.game.info.master,
+        user: state => state.auth.user,
       }),
     },
 
