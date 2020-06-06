@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",
-    "@nuxtjs/axios": "^5.10.3",
-    "actioncable-vue": "^2.2.0",
+    "@nuxtjs/axios": "^5.11.0",
+    "actioncable-vue": "^2.2.2",
     "dart-sass": "^1.25.0",
     "dotenv": "^8.2.0",
     "konva": "^6.0.0",
@@ -31,11 +31,11 @@
   "devDependencies": {
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/vuetify": "^1.11.2",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^4.19.1",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.2.0",
     "eslint-friendly-formatter": "^4.0.1",
-    "eslint-loader": "^2.1.1",
-    "eslint-plugin-vue": "^4.0.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-vue": "^6.2.2",
     "sass-loader": "^8.0.2"
   }
 }
