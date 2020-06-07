@@ -1,5 +1,5 @@
 <template>
-    <v-image :config="config"/>
+  <v-image :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
 </template>
 
 <script>
@@ -7,8 +7,9 @@
     name: 'KImage',
 
     props: {
-      url: { type: String, required: true },
-      size: { type: Object, required: true },
+      config: { type: Object, required: true },
+      draggable: { type: Boolean },
+      handleEventEnd: { type: Function },
     },
 
     data() {
@@ -18,28 +19,32 @@
     },
 
     computed: {
-      config: {
+      configKonva: {
         get() {
-          return {
-            image: this.image,
-            width: this.size.width,
-            height: this.size.height,
-          }
+          return { ...this.config, draggable: this.draggable, image: this.image }
         },
       },
     },
 
     created() {
       const image = new window.Image()
-      image.src = this.url
+      image.src = this.config.url
       image.onload = () => this.image = image
     },
 
     watch: {
-      url() {
+      config() {
         const image = new window.Image()
         image.src = this.url
         image.onload = () => this.image = image
+      },
+    },
+
+    methods: {
+      handleEvent(e){
+        if (!this.handleEventEnd) return
+
+        this.handleEventEnd(e)
       }
     }
   }

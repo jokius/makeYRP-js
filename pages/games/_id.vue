@@ -59,18 +59,6 @@
         },
       },
 
-      PageChannel: {
-        received(obj) {
-          if (obj.delete) {
-            this.deleteObj(obj)
-          } else if (obj.update) {
-            this.changeObj(obj)
-          } else {
-            this.addObj(obj)
-          }
-        },
-      },
-
       SheetChannel: {
         received(obj) {
           if (obj.delete) {

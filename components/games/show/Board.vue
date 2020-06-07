@@ -1,31 +1,59 @@
 <template>
-  <v-stage
-      ref="stage"
-      class="stage"
-      :config="configKonva"
-      @contextmenu="handler($event)"
-      @mousedown="stageMove"
-      @mouseup="stageMove"
-  >
-    <v-layer ref="map">
-      <k-image :url="backgroundUrl" v-if="backgroundUrl" :size="{ width, height }" />
-    </v-layer>
-  </v-stage>
+  <drop class="drop" @drop="handleDrop">
+    <right-click-menu :position="position" :current-obj="item" :replaced-items="menuItems">
+      <v-stage
+        ref="stage"
+        class="stage"
+        :config="configKonva"
+        @contextmenu="showMenu($event)"
+        @mousedown="stageClick"
+        @keydown="deletePress"
+      >
+        <v-layer ref="map">
+          <k-image v-if="backgroundUrl" :config="backgroundConfig" />
+        </v-layer>
+        <v-layer ref="tokens">
+          <k-image
+            v-for="token in tokens"
+            :key="`tokens-${token.id}`"
+            :config="token.params"
+            :handleEventEnd="handleEventEnd"
+            draggable
+          />
+          <v-transformer ref="transformer" />
+        </v-layer>
+      </v-stage>
+    </right-click-menu>
+  </drop>
 </template>
 
 <script>
   import { mapState } from 'vuex'
   import KImage from './konva/KImage'
+  import { loadTokens } from '../../../api/board'
+  import { TokenModel } from '../../../models/TokenModel'
+  import { mousePosition } from '../../../lib/mousePosition'
+  import RightClickMenu from './RightClickMenu'
 
   export default {
     name: 'Board',
-    components: { KImage },
+    components: { RightClickMenu, KImage },
+
+    data() {
+      return {
+        tokens: [],
+        selectedItemName: '',
+        position: { x: 0, y: 0 },
+        menuItems: [],
+        item: {},
+      }
+    },
 
     channels: {
       PageChannel: {
         received(obj) {
           if (obj.delete) {
-            this.deleteObj(obj)
+            this.removeObj(obj)
           } else if (obj.update) {
             this.changeObj(obj)
           } else {
@@ -39,11 +67,19 @@
       ...mapState({
         currentPage: state => state.game.currentPage,
         currentCursor: state => state.game.currentCursor,
+        master: state => state.game.info.master,
+        user: state => state.auth.user,
       }),
 
       params: {
         get() {
           return this.currentPage.params
+        },
+      },
+
+      pageId: {
+        get() {
+          return this.currentPage.id
         },
       },
 
@@ -88,11 +124,33 @@
           return this.currentPage.backgroundUrl
         },
       },
+
+      backgroundConfig: {
+        get() {
+          return {
+            name: 'background',
+            url: this.backgroundUrl,
+            width: this.width,
+            height: this.height,
+            x: 0,
+            y: 0,
+          }
+        },
+      },
+    },
+
+    created() {
+      this.loadTokens()
     },
 
     mounted() {
+      this.$cable.subscribe({ channel: 'PageChannel', page_id: this.pageId })
       this.scaleStage()
       this.setPosition()
+      const stage = this.$refs.stage
+      stage.$el.tabIndex = 1
+      stage.$el.focus()
+      stage.$el.addEventListener('keydown', this.deletePress)
     },
 
     watch: {
@@ -102,6 +160,21 @@
     },
 
     methods: {
+      handleDrop({ sheet }, e) {
+        const position = mousePosition(e)
+        this.add({
+          sheet_id: sheet.id,
+          params: {
+            url: sheet.imgUrl,
+            scaleX: 1,
+            scaleY: 1,
+            x: position.x,
+            y: position.y,
+          },
+          type: 'token',
+        })
+      },
+
       setPosition() {
         if (this.currentPage.backgroundUrl) {
           const map = this.$refs.map.getNode()
@@ -138,251 +211,149 @@
         })
       },
 
-      stageMove(event) {
-        const e = event.evt
+      stageClick(e) {
+        if (e.target === e.target.getStage()) {
+          this.selectedItemName = ''
+          this.updateTransformer()
+          this.changeStageDraggable(e)
+        } else {
+          this.showTransformer(e)
+        }
+      },
+
+      changeStageDraggable(e) {
+        const event = e.evt
         const stage = this.$refs.stage.getStage()
-        stage.draggable(this.currentCursor === 'pointer' || (e.button === 0 && e.altKey) || e.button === 2)
+        stage.draggable(this.currentCursor === 'pointer' || (event.button === 0 && event.altKey))
       },
 
-      handler(e) {
+      showTransformer(e) {
+        const clickedOnTransformer = e.target.getParent().className === 'Transformer'
+        if (clickedOnTransformer) return
+
+        const name = e.target.name()
+        const token = this.tokens.find(token => token.params.name === name)
+        this.selectedItemName = token ? name : ''
+
+        this.updateTransformer()
+      },
+
+      showMenu(e) {
         e.evt.preventDefault()
-      },
-    },
+        const target = e.target
+        const token = this.tokens.find(token => token.params.name === target.name())
+        if (!token) return
 
-    // data() {
-    //   return {
-    //     app: {},
-    //     playersContainer: {},
-    //     gmContainer: {},
-    //     mapContainer: {},
-    //     gridContainer: {},
-    //     tokens: {},
-    //     graphics: {},
-    //     position: { x: 0, y: 0 },
-    //     menuItems: [],
-    //     item: {},
-    //     loaded: false,
-    //     selectRect: {},
-    //     // observer: new EventObserver(),
-    //   }
-    // },
-    //
-    //
-    // computed: {
-    //   ...mapState({
-    //     currentPage: state => state.game.currentPage,
-    //     sheets: state => state.game.sheets,
-    //     currentLayer: state => state.game.currentLayer,
-    //     currentCursor: state => state.game.currentCursor,
-    //     borderSize: state => state.game.borderSize,
-    //     borderColor: state => state.game.borderColor,
-    //     bodyColor: state => state.game.bodyColor,
-    //   }),
-    //
-    //   params: {
-    //     get() {
-    //       return this.currentPage.params
-    //     },
-    //   },
-    //
-    //   gridWidth: {
-    //     get() {
-    //       return parseInt(this.grid.width, 10)
-    //     },
-    //   },
-    //
-    //
-    //   grid: {
-    //     get() {
-    //       return this.params.grid
-    //     },
-    //   },
-    //
-    //
-    //   layer: {
-    //     get() {
-    //       return `${this.currentLayer}Container`
-    //     },
-    //   },
-    // },
-    //
-    // // watch: {
-    // //   params() {
-    // //     this.mapContainer.changeBackground(this.backgroundUrl, this.width, this.height)
-    // //     this.gridContainer.drawGrid(this.grid, this.width, this.height)
-    // //   },
-    // //
-    // //   currentCursor() {
-    // //     this.containersBroadcast()
-    // //   },
-    // //
-    // //   currentLayer() {
-    // //     this.containersBroadcast()
-    // //   },
-    // //
-    // //   borderSize() {
-    // //     this.containersBroadcast()
-    // //   },
-    // //
-    // //   borderColor() {
-    // //     this.containersBroadcast()
-    // //   },
-    // //
-    // //   bodyColor() {
-    // //     this.containersBroadcast()
-    // //   },
-    // // },
-    //
-    // mounted() {
-    //   const pageId = this.currentPage.id
-    //   // this.$cable.subscribe({ channel: 'PageChannel', page_id: pageId })
-    //   // this.loadBoard()
-    //   // this.loadTokens(pageId)
-    //   // this.loadGraphics(pageId)
-    // },
-    //
-    // methods: {
-    //   // containersBroadcast() {
-    //   //   this.observer.broadcast({
-    //   //     layer: this.layer,
-    //   //     container: this[this.layer],
-    //   //     cursor: this.currentCursor,
-    //   //     borderSize: this.borderSize,
-    //   //     borderColor: this.borderColor,
-    //   //     bodyColor: this.bodyColor,
-    //   //   })
-    //   // },
-    //
-    //
-    //   checkMove(e) {
-    //     return !(e.button === 0 && e.altKey)
-    //   },
-    //
-    //   handler(e) {
-    //     this.position = mousePosition(e)
-    //     e.preventDefault()
-    //   },
-    //
-    //   addObj(obj) {
-    //     if (obj.token) this.tokens.add(obj.token)
-    //     if (obj.graphic) this.graphics.add(obj.graphic, this[obj.graphic.layer])
-    //   },
-    //
-    //   changeObj(obj) {
-    //     if (obj.token) this.tokens.change(obj.token)
-    //     if (obj.graphic) this.graphics.change(obj.graphic, this[obj.graphic.layer])
-    //   },
-    //
-    //   deleteObj(obj) {
-    //     if (obj.token) {
-    //       const sprite = this.playersContainer.getChildByName(`token_${obj.token.id}`)
-    //       this.playersContainer.removeChild(sprite)
-    //     }
-    //     if (obj.graphic) {
-    //       const container = this[obj.graphic.layer]
-    //       const sprite = container.getChildByName(`graphic_${obj.graphic.id}`)
-    //       container.removeChild(sprite)
-    //     }
-    //   },
-    //
-    //   add(params) {
-    //     this.$cable.perform({
-    //       channel: 'PageChannel',
-    //       action: 'add',
-    //       data: { ...params },
-    //     })
-    //   },
-    //
-    //   move(params) {
-    //     this.$cable.perform({
-    //       channel: 'PageChannel',
-    //       action: 'change',
-    //       data: { ...params },
-    //     })
-    //   },
-    //
-    //   remove(params) {
-    //     this.$cable.perform({
-    //       channel: 'PageChannel',
-    //       action: 'remove',
-    //       data: { ...params },
-    //     })
-    //   },
-    //
-    //   loadBoard() {
-    //     this.createApp()
-    //     this.initContainers()
-    //     this.showContainers()
-    //   },
-    //
-    //   tokenRightMenu(id) {
-    //     this.menuItems = [{ title: 'Удалить токен', callback: () => this.remove({ id, type: 'token' }) }]
-    //     this.item = { type: 'token', id }
-    //     this.$store.commit('game/updateCurrentRightClickMenu', `token-${id}`)
-    //   },
-    //
-    //   graphicRightMenu(id) {
-    //     this.menuItems = [{ title: 'Удалить рисунок', callback: () => this.remove({ id, type: 'graphic' }) }]
-    //     this.item = { type: 'graphic', id }
-    //     this.$store.commit('game/updateCurrentRightClickMenu', `graphic-${id}`)
-    //   },
-    //
-    //   createApp() {
-    //     this.app = new Application({
-    //       width: this.windowWidth,
-    //       height: this.windowHeight,
-    //       view: this.$refs.renderCanvas,
-    //       antialias: true,
-    //       transparent: true,
-    //       resolution: 1,
-    //       interactive: true,
-    //     })
-    //   },
-    //
-    //   initContainers() {
-    //     this.initContainer('mapContainer')
-    //     this.initContainer('gridContainer')
-    //     this.initContainer('gmContainer')
-    //     this.initContainer('playersContainer')
-    //
-    //     this.mapContainer.changeBackground(this.backgroundUrl, this.width, this.height)
-    //     this.gridContainer.drawGrid(this.grid, this.width, this.height)
-    //   },
-    //
-    //   initContainer(name) {
-    //     this[name] = new BoardContainer({
-    //       name,
-    //       observer: this.observer,
-    //       addEvents: name === this.layer,
-    //       sendGraphic: this.add,
-    //     })
-    //   },
-    //
-    //   showContainers() {
-    //     this.app.stage.addChild(this.mapContainer, this.gmContainer, this.playersContainer, this.gridContainer)
-    //   },
-    //
-    //   loadTokens(pageId) {
-    //     this.tokens = new Token(this.sheets, this.grid, this.tokenRightMenu, this.playersContainer, this.move)
-    //
-    //     loadTokens(pageId).then(tokens => {
-    //       tokens.forEach(token => this.tokens.add(token))
-    //       this.loaded = true
-    //     })
-    //   },
-    //
-    //   loadGraphics(pageId) {
-    //     this.graphics = new Graphic(this.graphicRightMenu, this.move)
-    //
-    //     loadGraphics(pageId).then(graphics => {
-    //       graphics.forEach(raw => {
-    //         const graphic = new GraphicModel().setInfo(raw)
-    //         this.graphics.add(graphic, this[graphic.layer])
-    //       })
-    //       this.loaded = true
-    //     })
-    //   },
-    // },
+        this.position = mousePosition(e.evt)
+        this.tokenRightMenu(token.id)
+      },
+
+      tokenRightMenu(id) {
+        this.menuItems = [{ title: 'Удалить токен', callback: () => this.remove({ id, type: 'token' }) }]
+        this.item = { type: 'token', id }
+        this.$store.commit('game/updateCurrentRightClickMenu', `token-${id}`)
+      },
+
+      loadTokens() {
+        loadTokens({ axios: this.$axios, page_id: this.pageId }).then(tokens => {
+          tokens.forEach(raw => this.addToken(raw))
+        })
+      },
+
+      add(params) {
+        this.$cable.perform({
+          channel: 'PageChannel',
+          action: 'add',
+          data: { ...params },
+        })
+      },
+
+      addObj(obj) {
+        if (obj.token) this.addToken(obj.token)
+      },
+
+      addToken(raw) {
+        const token = new TokenModel().setInfo(raw)
+        token.acl.currentUserId = this.user.id
+        token.acl.masterId = this.master.id
+        this.tokens = [...this.tokens, token]
+      },
+
+      change(params) {
+        this.$cable.perform({
+          channel: 'PageChannel',
+          action: 'change',
+          data: { ...params },
+        })
+      },
+
+      changeObj(obj) {
+        if (obj.token) this.changeToken(obj.token)
+      },
+
+      changeToken(token) {
+        const index = this.tokens.findIndex(item => item.id === token.id)
+        this.tokens[index] = token
+      },
+
+      remove(params) {
+        this.$cable.perform({
+          channel: 'PageChannel',
+          action: 'remove',
+          data: { ...params },
+        })
+      },
+
+      removeObj(obj) {
+        if (obj.token) this.removeToken(obj.token)
+      },
+
+      removeToken(token) {
+        const index = this.tokens.findIndex(item => item.id === token.id)
+        this.tokens.splice(index, 1)
+        this.selectedItemName = ''
+        this.updateTransformer()
+      },
+
+      handleEventEnd(e) {
+        const target = e.target
+        const token = this.tokens.find(token => token.params.name === target.name())
+        token.params.x = target.x()
+        token.params.y = target.y()
+        token.params.rotation = target.rotation()
+        token.params.scaleX = target.scaleX()
+        token.params.scaleY = target.scaleY()
+        this.change({
+          id: token.id,
+          params: { ...token.params },
+          type: 'token',
+        })
+      },
+
+      updateTransformer() {
+        const transformerNode = this.$refs.transformer.getNode()
+        const stage = transformerNode.getStage()
+
+        const selectedNode = stage.findOne(`.${this.selectedItemName}`)
+        if (selectedNode === transformerNode.node()) return
+
+        if (selectedNode) {
+          transformerNode.attachTo(selectedNode)
+        } else {
+          transformerNode.detach()
+        }
+
+        transformerNode.getLayer().batchDraw()
+      },
+
+      deletePress(e) {
+        if (e.code !== 'Delete' && e.code !== 'Backspace') return
+        if (this.selectedItemName === '') return
+
+        const [type, id] = this.selectedItemName.split('-')
+        this.remove({ id, type })
+      }
+    },
   }
 </script>
 
