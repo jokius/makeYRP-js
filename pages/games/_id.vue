@@ -164,7 +164,7 @@
   .menu-grid {
     display: grid;
     grid-template-columns: auto auto max-content;
-    grid-template-rows: max-content auto;
+    grid-template-rows: 57px auto;
     grid-gap: 0;
     position: fixed;
     width: 100vw;
