@@ -62,7 +62,7 @@
       },
 
       openFolder(id) {
-        this.$store.dispatch('game/loadFolder', { axios: this.$axios, params: { id } })
+        this.$store.dispatch('game/loadFolder', { axios: this.$axios, id })
       },
     },
   }

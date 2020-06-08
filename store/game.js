@@ -54,10 +54,10 @@ export const actions = {
     }
   },
 
-  async loadFolder({ commit }, { axios, params }) {
+  async loadFolder({ commit }, { axios, id }) {
     try {
       commit('foldersUnloaded')
-      commit('foldersLoaded', await loadFolder({ axios, params }))
+      commit('foldersLoaded', await loadFolder({ axios, id }))
     } catch (error) {
       handling(error)
     }

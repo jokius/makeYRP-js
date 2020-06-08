@@ -74,7 +74,7 @@
     <new-folder-modal
       v-if="openNewFolder"
       v-model="openNewFolder"
-      :parent-id="parentId"
+      :parent-id="folder.id"
     />
 
     <dropzone-modal
@@ -195,12 +195,12 @@
     },
 
     created() {
-      this.$store.dispatch('game/loadFolder', { axios: this.$axios, params: { id: this.folder.id } })
+      this.$store.dispatch('game/loadFolder', { axios: this.$axios, id: this.folder.id || null })
     },
 
     methods: {
       previousFolder() {
-        this.$store.dispatch('game/loadFolder', { axios: this.$axios, params: { parent_id: this.parentId } })
+        this.$store.dispatch('game/loadFolder', { axios: this.$axios, id: this.parentId })
       },
     },
   }

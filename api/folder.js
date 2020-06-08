@@ -2,17 +2,17 @@ import links from '../lib/links'
 
 export const createFolder = ({ axios, params }) =>
   axios
-    .post(links.base.folder, params)
+    .post(links.base.rootFolder, params)
     .then(response => response.data)
 
-export const loadFolder = ({ axios, params }) =>
+export const loadFolder = ({ axios, id }) =>
   axios
-    .get(links.json(links.base.folder, { params }))
+    .get(id ? links.dynamic(links.base.folder, { id }) : links.base.rootFolder)
     .then(response => response.data)
 
 export const updateFolder = ({ axios, params }) =>
   axios
-    .put(links.dynamic(links.base.folders, params), { ...params })
+    .put(links.dynamic(links.base.folder, params), { ...params })
     .then(response => response.data)
 
 export const updateImage = ({ axios, params }) =>
@@ -22,7 +22,7 @@ export const updateImage = ({ axios, params }) =>
 
 export const deleteFolder = ({ axios, id }) =>
   axios
-    .delete(links.dynamic(links.base.folders, { id }))
+    .delete(links.dynamic(links.base.folder, { id }))
 
 export const deleteImage = ({ axios, id }) =>
   axios
