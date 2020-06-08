@@ -1,8 +1,8 @@
 <template>
   <div class="list">
     <div v-for="sheet in sheets" :key="sheet.id" class="list-item">
-      <drag :transfer-data="{ sheet }">
-        <div class="pointer" @click="showSheet(sheet)">
+      <drag :transfer-data="{ sheet }" :draggable="sheet.acl.canWrite">
+        <div :class="sheet.acl.canWrite ? 'pointer' : null" @click="showSheet(sheet)">
           <right-click-menu :position="position" :current-obj="sheetObj(sheet)" :acl="sheet.acl">
             <div
               :style="baseStyle"

@@ -11,16 +11,16 @@
       >
         <v-layer ref="map">
           <k-image v-if="backgroundUrl" :config="backgroundConfig" />
+          <v-transformer ref="transformer" />
         </v-layer>
-        <v-layer ref="tokens">
+        <v-layer ref="images">
           <k-image
-            v-for="token in tokens"
-            :key="`tokens-${token.id}`"
+            v-for="(token, index) in tokens"
+            :key="`tokens-${token.id}-${index}`"
             :config="token.params"
             :handleEventEnd="handleEventEnd"
-            draggable
+            :draggable="token.acl.canWrite"
           />
-          <v-transformer ref="transformer" />
         </v-layer>
       </v-stage>
     </right-click-menu>
@@ -114,7 +114,7 @@
           return {
             width: window.innerWidth,
             height: window.innerHeight,
-            draggable: true,
+            draggable: false,
           }
         },
       },
@@ -212,7 +212,7 @@
       },
 
       stageClick(e) {
-        if (e.target === e.target.getStage()) {
+        if (e.target === e.target.getStage() || e.target.name() === 'background') {
           this.selectedItemName = ''
           this.updateTransformer()
           this.changeStageDraggable(e)
@@ -233,7 +233,11 @@
 
         const name = e.target.name()
         const token = this.tokens.find(token => token.params.name === name)
-        this.selectedItemName = token ? name : ''
+        if (token && token.acl.canWrite) {
+          this.selectedItemName = token.params.name
+        } else {
+          this.selectedItemName = ''
+        }
 
         this.updateTransformer()
       },
@@ -242,10 +246,11 @@
         e.evt.preventDefault()
         const target = e.target
         const token = this.tokens.find(token => token.params.name === target.name())
-        if (!token) return
 
-        this.position = mousePosition(e.evt)
-        this.tokenRightMenu(token.id)
+        if (token && token.acl.canWrite) {
+          this.position = mousePosition(e.evt)
+          this.tokenRightMenu(token.id)
+        }
       },
 
       tokenRightMenu(id) {
@@ -276,6 +281,8 @@
         const token = new TokenModel().setInfo(raw)
         token.acl.currentUserId = this.user.id
         token.acl.masterId = this.master.id
+        if (!token.acl.canRead) return
+
         this.tokens = [...this.tokens, token]
       },
 
@@ -291,9 +298,13 @@
         if (obj.token) this.changeToken(obj.token)
       },
 
-      changeToken(token) {
-        const index = this.tokens.findIndex(item => item.id === token.id)
-        this.tokens[index] = token
+      changeToken(raw) {
+        const index = this.tokens.findIndex(item => item.id === raw.id)
+        const token = this.tokens[index]
+        token.setInfo(raw)
+        token.acl.currentUserId = this.user.id
+        token.acl.masterId = this.master.id
+        this.$set(this.tokens, index, token)
       },
 
       remove(params) {
