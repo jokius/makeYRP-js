@@ -4,11 +4,7 @@
       <drag :transfer-data="{ sheet }" :draggable="sheet.acl.canWrite">
         <div :class="sheet.acl.canWrite ? 'pointer' : null" @click="showSheet(sheet)">
           <right-click-menu :position="position" :current-obj="sheetObj(sheet)" :acl="sheet.acl">
-            <div
-              :style="baseStyle"
-              class="drag-part"
-              @contextmenu="handler($event, sheet)"
-            >
+            <div class="drag-part" @contextmenu="handler($event, sheet)">
               <v-avatar color="indigo" size="32" tile>
                 <v-img
                   v-if="sheet.imgChat"
@@ -77,7 +73,7 @@
               break
           }
 
-          return { display: 'flex', flexDirection }
+          return { display: 'flex', flexDirection: 'row' }
         },
       },
     },
@@ -133,13 +129,14 @@
   .drag-part {
     display: grid;
     grid-template-columns: max-content 1fr;
+    grid-column-gap: 5px;
   }
 
   .sheet-name {
     font-size: 16px;
     text-align: center;
     line-height: 32px;
-    height: 32px;
+    min-height: 32px;
     width: 100%;
   }
 

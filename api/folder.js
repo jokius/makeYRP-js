@@ -17,7 +17,7 @@ export const updateFolder = ({ axios, params }) =>
 
 export const updateImage = ({ axios, params }) =>
   axios
-    .put(links.dynamic(links.base.images, { id: params.id, folder_id: 0 }), { ...params })
+    .put(links.dynamic(links.base.folderImage, { id: params.id, folder_id: 0 }), { ...params })
     .then(response => response.data)
 
 export const deleteFolder = ({ axios, id }) =>
@@ -26,4 +26,9 @@ export const deleteFolder = ({ axios, id }) =>
 
 export const deleteImage = ({ axios, id }) =>
   axios
-    .delete(links.dynamic(links.base.images, { id, folder_id: 0 }))
+    .delete(links.dynamic(links.base.folderImage, { id, folder_id: 0 }))
+
+export const loadTree = (axios) =>
+  axios
+    .get(links.base.folderTree)
+    .then(response => response.data)

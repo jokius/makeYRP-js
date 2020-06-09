@@ -11,16 +11,23 @@
       >
         <v-layer ref="map">
           <k-image v-if="backgroundUrl" :config="backgroundConfig" />
-          <v-transformer ref="transformer" />
         </v-layer>
         <v-layer ref="images">
           <k-image
-            v-for="(token, index) in tokens"
-            :key="`tokens-${token.id}-${index}`"
+            v-for="token in tokens"
+            :key="token.params.name"
             :config="token.params"
             :handleEventEnd="handleEventEnd"
             :draggable="token.acl.canWrite"
           />
+          <k-image
+            v-for="image in images"
+            :key="image.params.name"
+            :config="image.params"
+            :handleEventEnd="handleEventEnd"
+            :draggable="user.id === master.id"
+          />
+          <v-transformer ref="transformer" />
         </v-layer>
       </v-stage>
     </right-click-menu>
@@ -30,10 +37,11 @@
 <script>
   import { mapState } from 'vuex'
   import KImage from './konva/KImage'
-  import { loadTokens } from '../../../api/board'
+  import { loadImages, loadTokens } from '../../../api/board'
   import { TokenModel } from '../../../models/TokenModel'
   import { mousePosition } from '../../../lib/mousePosition'
   import RightClickMenu from './RightClickMenu'
+  import { ImageModel } from '../../../models/ImageModel'
 
   export default {
     name: 'Board',
@@ -42,6 +50,7 @@
     data() {
       return {
         tokens: [],
+        images: [],
         selectedItemName: '',
         position: { x: 0, y: 0 },
         menuItems: [],
@@ -141,6 +150,7 @@
 
     created() {
       this.loadTokens()
+      this.loadImages()
     },
 
     mounted() {
@@ -160,8 +170,13 @@
     },
 
     methods: {
-      handleDrop({ sheet }, e) {
+      handleDrop({ sheet, image }, e) {
         const position = mousePosition(e)
+        if (sheet) return this.sendToken(sheet, position)
+        if (image) return this.sendImage(image, position)
+      },
+
+      sendToken(sheet, position) {
         this.add({
           sheet_id: sheet.id,
           params: {
@@ -170,8 +185,25 @@
             scaleY: 1,
             x: position.x,
             y: position.y,
+            width: 200,
+            height: 150,
           },
           type: 'token',
+        })
+      },
+
+      sendImage(image, position) {
+        this.add({
+          params: {
+            url: image.imgUrl,
+            scaleX: 1,
+            scaleY: 1,
+            x: position.x,
+            y: position.y,
+            width: 200,
+            height: 150,
+          },
+          type: 'image',
         })
       },
 
@@ -231,10 +263,12 @@
         const clickedOnTransformer = e.target.getParent().className === 'Transformer'
         if (clickedOnTransformer) return
 
-        const name = e.target.name()
-        const token = this.tokens.find(token => token.params.name === name)
-        if (token && token.acl.canWrite) {
-          this.selectedItemName = token.params.name
+        const [type, _id, index] = e.target.name().split('-')
+        console.log('type', type)
+        if (type === 'token') {
+          this.selectedItemName = this.tokens[index].params.name
+        } else if (type === 'image') {
+          this.selectedItemName = this.images[index].params.name
         } else {
           this.selectedItemName = ''
         }
@@ -244,12 +278,12 @@
 
       showMenu(e) {
         e.evt.preventDefault()
-        const target = e.target
-        const token = this.tokens.find(token => token.params.name === target.name())
-
-        if (token && token.acl.canWrite) {
-          this.position = mousePosition(e.evt)
-          this.tokenRightMenu(token.id)
+        this.position = mousePosition(e.evt)
+        const [type, _id, index] = e.target.name().split('-')
+        if (type === 'token') {
+          this.tokenRightMenu(this.tokens[index].id)
+        } else if (type === 'image') {
+          this.imageRightMenu(this.images[index].id)
         }
       },
 
@@ -259,9 +293,21 @@
         this.$store.commit('game/updateCurrentRightClickMenu', `token-${id}`)
       },
 
+      imageRightMenu(id) {
+        this.menuItems = [{ title: 'Удалить изображение', callback: () => this.remove({ id, type: 'image' }) }]
+        this.item = { type: 'image', id }
+        this.$store.commit('game/updateCurrentRightClickMenu', `image-${id}`)
+      },
+
       loadTokens() {
         loadTokens({ axios: this.$axios, page_id: this.pageId }).then(tokens => {
           tokens.forEach(raw => this.addToken(raw))
+        })
+      },
+
+      loadImages() {
+        loadImages({ axios: this.$axios, page_id: this.pageId }).then(images => {
+          images.forEach(raw => this.addImage(raw))
         })
       },
 
@@ -275,15 +321,21 @@
 
       addObj(obj) {
         if (obj.token) this.addToken(obj.token)
+        if (obj.image) this.addImage(obj.image)
       },
 
       addToken(raw) {
-        const token = new TokenModel().setInfo(raw)
+        const token = new TokenModel().setInfo(raw, this.tokens.length)
         token.acl.currentUserId = this.user.id
         token.acl.masterId = this.master.id
         if (!token.acl.canRead) return
 
         this.tokens = [...this.tokens, token]
+      },
+
+      addImage(raw) {
+        const image = new ImageModel().setInfo(raw, this.images.length)
+        this.images = [...this.images, image]
       },
 
       change(params) {
@@ -296,15 +348,23 @@
 
       changeObj(obj) {
         if (obj.token) this.changeToken(obj.token)
+        if (obj.image) this.changeImage(obj.image)
       },
 
       changeToken(raw) {
         const index = this.tokens.findIndex(item => item.id === raw.id)
         const token = this.tokens[index]
-        token.setInfo(raw)
+        token.setInfo(raw, index, true)
         token.acl.currentUserId = this.user.id
         token.acl.masterId = this.master.id
         this.$set(this.tokens, index, token)
+      },
+
+      changeImage(raw) {
+        const index = this.images.findIndex(item => item.id === raw.id)
+        const image = this.images[index]
+        image.setInfo(raw, index)
+        this.$set(this.images, index, image)
       },
 
       remove(params) {
@@ -317,6 +377,7 @@
 
       removeObj(obj) {
         if (obj.token) this.removeToken(obj.token)
+        if (obj.image) this.removeImage(obj.image)
       },
 
       removeToken(token) {
@@ -326,18 +387,32 @@
         this.updateTransformer()
       },
 
+      removeImage(image) {
+        const index = this.images.findIndex(item => item.id === image.id)
+        this.images.splice(index, 1)
+        this.selectedItemName = ''
+        this.updateTransformer()
+      },
+
       handleEventEnd(e) {
         const target = e.target
         const token = this.tokens.find(token => token.params.name === target.name())
-        token.params.x = target.x()
-        token.params.y = target.y()
-        token.params.rotation = target.rotation()
-        token.params.scaleX = target.scaleX()
-        token.params.scaleY = target.scaleY()
+        if (token) return this.handleEventObject(token, target, 'token')
+
+        const image = this.images.find(image => image.params.name === target.name())
+        if (image) this.handleEventObject(image, target, 'image')
+      },
+
+      handleEventObject(object, target, type) {
+        object.params.x = target.x()
+        object.params.y = target.y()
+        object.params.rotation = target.rotation()
+        object.params.scaleX = target.scaleX()
+        object.params.scaleY = target.scaleY()
         this.change({
-          id: token.id,
-          params: { ...token.params },
-          type: 'token',
+          id: object.id,
+          params: { ...object.params },
+          type,
         })
       },
 

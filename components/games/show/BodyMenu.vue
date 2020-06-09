@@ -24,6 +24,7 @@
         <tab-chat v-if="currentItem.type === 'chat'" />
         <tab-sheets v-else-if="currentItem.type === 'sheets'" />
         <tab-notes v-else-if="currentItem.type === 'notes'" />
+        <tab-images v-else-if="currentItem.type === 'images'" />
         <tab-settings v-else-if="currentItem.type === 'settings'" />
         <bid-tab-clock v-else-if="currentItem.type === 'bid-clock'" />
         <eou-tab-counters v-else-if="currentItem.type === 'eou-clock'" />
@@ -80,10 +81,11 @@
   import BidTabClock from '../../templates/BladeInTheDarck/menus/BidTabClock'
   import EouTabCounters from '../../templates/pbta/EdgeOfUniverse/menus/EouTabCounters'
   import EouTabPlanets from '../../templates/pbta/EdgeOfUniverse/menus/EouTabPlanets'
+  import TabImages from './TabImages'
 
   export default {
     name: 'BodyMenu',
-    components: { EouTabPlanets, EouTabCounters, TabNotes, BidTabClock, TabSettings, TabSheets, TabChat },
+    components: { TabImages, EouTabPlanets, EouTabCounters, TabNotes, BidTabClock, TabSettings, TabSheets, TabChat },
 
     data() {
       return {
@@ -115,6 +117,7 @@
 
           if (this.user.id === this.master.id) {
             afterSystem =  [
+              { label: 'Изображения', icon: 'mdi-image-multiple', type: 'images', mark: null },
               { label: 'Настройки страници', icon: 'mdi-cog', type: 'settings', mark: null },
             ]
           }
