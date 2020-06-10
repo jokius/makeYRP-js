@@ -2,7 +2,7 @@
   <div>
     <div class="grid">
       <v-btn
-        v-if="currentUser.id === master.id"
+        v-if="user.id === master.id"
         class="selectButton"
         color="indigo"
         tile
@@ -34,7 +34,7 @@
     computed: {
       ...mapState({
         menus: state => state.game.info.menus,
-        currentUser: state => state.game.currentUser,
+        user: state => state.auth.user,
         master: state => state.game.info.master,
       }),
 

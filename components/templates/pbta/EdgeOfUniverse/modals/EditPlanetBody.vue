@@ -27,32 +27,35 @@
           :value="ucg.name"
           color="indigo"
           class="input"
+          label="название"
           flat
-          @input="input(`ucgs.${index}.name`, value)"
-        />
-        <v-text-field
-          :value="ucg.value"
-          color="indigo"
-          class="input"
-          flat
-          @input="input(`ucgs.${index}.value`, value)"
+          @input="value => inputUcg(index, 'name', value)"
         />
         <v-btn
           class="button-random"
-          raised
-          color="black"
-          dark
-          @click="randomUcg(`ucgs.${index}.value`)"
-        >
-          Случайное
-        </v-btn>
-        <v-btn
           color="red darken-4"
           dark
           text
           @click="deleteUcg"
         >
           <v-icon>mdi-delete</v-icon>
+        </v-btn>
+        <v-text-field
+          :value="ucg.value"
+          color="indigo"
+          class="input"
+          label="значение"
+          flat
+          @input="inputUcg(index, 'value', value)"
+        />
+        <v-btn
+          class="button-random"
+          raised
+          color="black"
+          dark
+          @click="randomUcg(index)"
+        >
+          Случайное
         </v-btn>
       </div>
       <v-btn
@@ -247,8 +250,14 @@
         this.input('name', names[Math.floor(Math.random() * names.length)])
       },
 
-      randomUcg(path) {
-        this.input(path, this.tables.ucg[d6roll()])
+      randomUcg(index) {
+        this.inputUcg(index, 'value', this.tables.ucg[d6roll()].name)
+      },
+
+      inputUcg(index, path, value) {
+        const list = this.ucgs.slice()
+        list[0][path] = value
+        this.input('ucgs', list)
       },
 
       randomPlanetFeature() {
@@ -289,7 +298,8 @@
       },
 
       addUcg() {
-
+        const usg = { name: '', value: '' }
+        this.input('ucgs', [...this.ucgs, usg])
       },
 
       deleteUcg() {
@@ -302,9 +312,20 @@
 <style scoped lang="scss">
   .edit-planet-grid {
     overflow: auto;
+    padding-left: 2px;
+    padding-right: 5px;
   }
 
   .name-grid {
+    display: grid;
+    grid-template-columns: 270px max-content;
+    justify-content: space-between;
+    .button-random {
+      margin-top: 14px;
+    }
+  }
+
+  .ucg-grid {
     display: grid;
     grid-template-columns: 270px max-content;
     justify-content: space-between;

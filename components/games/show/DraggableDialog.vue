@@ -53,6 +53,7 @@
       height: { type: Number, default: 200 },
       resizable: { type: Boolean, default: false },
       disableActions: { type: Boolean, default: false },
+      backgroundColor: { type: String },
     },
 
     data() {
@@ -83,8 +84,10 @@
         get() {
           const width = this.dataWidth || this.width
           const height = this.dataHeight || this.height
+          const style = { width: `${width}px`, height: `${height}px` }
+          if (this.backgroundColor) style.backgroundColor = this.backgroundColor
 
-          return { width: `${width}px`, height: `${height}px` }
+          return style
         },
       },
     },

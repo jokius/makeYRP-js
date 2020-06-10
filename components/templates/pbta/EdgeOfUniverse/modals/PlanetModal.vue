@@ -2,15 +2,16 @@
   <draggable-dialog
     v-model="size"
     :on-close="onClose"
-    title="Планета"
+    :title="isNew ? 'Планета' : planet.params.name"
     :width="size.width"
     :height="size.height"
     :disable-actions="!isEdit"
     resizable
+    background-color="#c5c5c5"
   >
     <template v-slot:body>
       <edit-planet-body v-if="isEdit" :planet="isNew ? privatePlanet : planet" :is-new="isNew" :size="size" />
-      <view-planet-body v-else />
+      <view-planet-body v-else :planet="planet" :size="size" />
     </template>
     <template v-slot:actions>
       <v-btn
