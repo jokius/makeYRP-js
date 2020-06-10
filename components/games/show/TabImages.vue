@@ -132,8 +132,10 @@
   .grid {
     display: grid;
     grid-template-columns: 1fr;
-    grid-auto-rows: auto;
+    grid-auto-rows: max-content;
     grid-row-gap: 5px;
+    height: 93vh;
+    overflow: auto;
   }
 
   .selectButton {
@@ -148,10 +150,10 @@
   }
 
   .image-name {
-    font-size: 16px;
     text-align: center;
     line-height: 32px;
-    min-height: 32px;
-    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>
