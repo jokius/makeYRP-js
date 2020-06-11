@@ -1,3 +1,4 @@
+import * as short from 'short-uuid'
 import { AclModel } from './AclModel'
 
 export class TokenModel {
@@ -6,10 +7,10 @@ export class TokenModel {
   params = {}
   acl = {}
 
-  setInfo(raw, index, changeAcl = true) {
+  setInfo(raw, changeAcl = true) {
     this.id = raw.id
     this.sheetId = raw.sheet_id
-    this.params = { ...raw.params, name: `token-${this.id}-${index}` }
+    this.params = { ...raw.params, name: `token-${this.id}-${short.generate()}` }
     if (changeAcl) this.acl = new AclModel().setInfo(raw.acl)
     return this
   }

@@ -25,7 +25,7 @@
             :key="image.params.name"
             :config="image.params"
             :handleEventEnd="handleEventEnd"
-            :draggable="user.id === master.id"
+            :draggable="isMaster"
           />
           <v-transformer ref="transformer" />
         </v-layer>
@@ -146,6 +146,12 @@
           }
         },
       },
+
+      isMaster: {
+        get() {
+          return this.user.id === this.master.id
+        }
+      }
     },
 
     created() {
@@ -263,12 +269,12 @@
         const clickedOnTransformer = e.target.getParent().className === 'Transformer'
         if (clickedOnTransformer) return
 
-        const [type, _id, index] = e.target.name().split('-')
-        console.log('type', type)
+        const name = e.target.name()
+        const [type] = name.split('-')
         if (type === 'token') {
-          this.selectedItemName = this.tokens[index].params.name
-        } else if (type === 'image') {
-          this.selectedItemName = this.images[index].params.name
+          this.selectedItemName = this.tokens.find(item => item.params.name === name).params.name
+        } else if (type === 'image' && this.isMaster) {
+          this.selectedItemName = this.images.find(item => item.params.name === name).params.name
         } else {
           this.selectedItemName = ''
         }
@@ -279,11 +285,12 @@
       showMenu(e) {
         e.evt.preventDefault()
         this.position = mousePosition(e.evt)
-        const [type, _id, index] = e.target.name().split('-')
+        const name = e.target.name()
+        const [type] = name.split('-')
         if (type === 'token') {
-          this.tokenRightMenu(this.tokens[index].id)
+          this.tokenRightMenu(this.tokens.find(item => item.params.name === name).id)
         } else if (type === 'image') {
-          this.imageRightMenu(this.images[index].id)
+          this.imageRightMenu(this.images.find(item => item.params.name === name).id)
         }
       },
 
@@ -325,7 +332,7 @@
       },
 
       addToken(raw) {
-        const token = new TokenModel().setInfo(raw, this.tokens.length)
+        const token = new TokenModel().setInfo(raw)
         token.acl.currentUserId = this.user.id
         token.acl.masterId = this.master.id
         if (!token.acl.canRead) return
@@ -334,7 +341,7 @@
       },
 
       addImage(raw) {
-        const image = new ImageModel().setInfo(raw, this.images.length)
+        const image = new ImageModel().setInfo(raw)
         this.images = [...this.images, image]
       },
 
