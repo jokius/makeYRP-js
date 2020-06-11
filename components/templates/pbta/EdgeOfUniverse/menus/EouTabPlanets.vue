@@ -40,7 +40,7 @@
 
       menu: {
         get() {
-          return this.menus.find(item => item.type === 'eou-clock')
+          return this.menus.find(item => item.type === 'eou-planet')
         },
       },
     },
