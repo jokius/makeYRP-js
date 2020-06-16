@@ -85,20 +85,6 @@
           this.privateHeight = height
         },
       },
-
-      width: {
-        get() {
-          const width = this.size.width
-          return typeof width === 'number' ? `${width}px` : width
-        },
-      },
-
-      height: {
-        get() {
-          const height = this.size.height
-          return typeof height === 'number' ? `${height - this.bodyOffsetH}px` : `calc(${height} - 112px)`
-        },
-      },
     },
 
     methods: {
