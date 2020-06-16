@@ -147,6 +147,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-column-gap: 15px;
+    margin-left: 5px;
   }
 
   .actions {
