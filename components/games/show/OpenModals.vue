@@ -40,6 +40,12 @@
         :is-new="modal.isNew"
         :planet="modal.planet"
       />
+      <eou-item-modal
+        v-else-if="modal.name === 'item'"
+        :key="`item_${modal.key}`"
+        :uniq-key="modal.key"
+        :item="modal.item"
+      />
       <v-alert
         v-else
         :key="modal.key"
@@ -64,10 +70,11 @@
   import PageModal from './PageModal'
 
   import PlanetModal from '../../templates/pbta/EdgeOfUniverse/modals/PlanetModal'
+  import EouItemModal from '../../templates/pbta/EdgeOfUniverse/modals/EouItemModal'
 
   export default {
     name: 'OpenModals',
-    components: { PlanetModal, NoteModal, InfoModal, SheetModal, ColorPickerModal, PageModal },
+    components: { EouItemModal, PlanetModal, NoteModal, InfoModal, SheetModal, ColorPickerModal, PageModal },
     data () {
       return {
         alert: true,

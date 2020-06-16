@@ -29,6 +29,7 @@
         <bid-tab-clock v-else-if="currentItem.type === 'bid-clock'" />
         <eou-tab-counters v-else-if="currentItem.type === 'eou-clock'" />
         <eou-tab-planets v-else-if="currentItem.type === 'eou-planet'" />
+        <eou-tab-items v-else-if="currentItem.type === 'eou-items'" />
         <span v-else>В разработке</span>
       </keep-alive>
     </v-navigation-drawer>
@@ -82,10 +83,21 @@
   import EouTabCounters from '../../templates/pbta/EdgeOfUniverse/menus/EouTabCounters'
   import EouTabPlanets from '../../templates/pbta/EdgeOfUniverse/menus/EouTabPlanets'
   import TabImages from './TabImages'
+  import EouTabItems from '../../templates/pbta/EdgeOfUniverse/menus/EouTabItems'
 
   export default {
     name: 'BodyMenu',
-    components: { TabImages, EouTabPlanets, EouTabCounters, TabNotes, BidTabClock, TabSettings, TabSheets, TabChat },
+    components: {
+      EouTabItems,
+      TabImages,
+      EouTabPlanets,
+      EouTabCounters,
+      TabNotes,
+      BidTabClock,
+      TabSettings,
+      TabSheets,
+      TabChat
+    },
 
     data() {
       return {
@@ -111,7 +123,6 @@
           const beforeSystem = [
             { label: 'Чат', icon: 'mdi-chat', type: 'chat', mark: 'chat' },
             { label: 'Персонажи', icon: 'mdi-account', type: 'sheets', mark: 'sheet' },
-            // { label: 'Карты', icon: 'mdi-map', type: 'maps' },
           ]
           let afterSystem = []
 
