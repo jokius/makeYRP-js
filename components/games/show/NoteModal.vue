@@ -69,7 +69,7 @@
       return {
         privateTitle: 'Новая заметка',
         privateText: '',
-        minWidth: '516px',
+        minWidth: '514px',
         privateWidth: 516,
         privateHeight: 450,
         editorOffsetH: 217,
@@ -120,7 +120,7 @@
       width: {
         get() {
           const width = this.size.width
-          return typeof width === 'number' ? `${width}px` : width
+          return typeof width === 'number' ? `${width - 2}px` : width
         },
       },
 
@@ -171,7 +171,7 @@
   }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
   .editr {
     border: 1px solid #e4e4e4;
     width: 100%;
