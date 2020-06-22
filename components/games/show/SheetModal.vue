@@ -41,6 +41,12 @@
         :key="key"
         :size="size"
       />
+      <eou-companion-sheet
+        v-else-if="sheetName === 'edge_of_universe-companion'"
+        :id="id"
+        :key="key"
+        :size="size"
+      />
       <v-alert
         v-else
         :key="key"
@@ -68,6 +74,7 @@
   import EouCharacterSheet from '../../templates/pbta/EdgeOfUniverse/sheets/CharacterSheet'
   import EouEnemySheet from '../../templates/pbta/EdgeOfUniverse/sheets/EnemySheet'
   import EouShipSheet from '../../templates/pbta/EdgeOfUniverse/sheets/ShipSheet'
+  import EouCompanionSheet from '../../templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'
 
   export default {
     name: 'SheetModal',
@@ -81,6 +88,7 @@
       HmwMonsterSheet,
       EouCharacterSheet,
       EouShipSheet,
+      EouCompanionSheet,
     },
 
     props: {
@@ -136,6 +144,10 @@
             case 'edge_of_universe-character':
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
             case 'edge_of_universe-enemy':
+              return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
+            case 'edge_of_universe-sheep':
+              return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
+            case 'edge_of_universe-companion':
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
             default:
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
