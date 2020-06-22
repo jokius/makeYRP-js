@@ -235,7 +235,7 @@
             y: (pointer.y - stage.y()) / oldScale,
           }
 
-          const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy
+          const newScale = e.evt.deltaY <= 0 ? oldScale * scaleBy : oldScale / scaleBy
 
           stage.scale({ x: newScale, y: newScale })
 
