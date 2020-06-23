@@ -6,9 +6,10 @@
   "description": "Стол для настольных ролевых игр",
   "scripts": {
     "dev": "nuxt --port 8080",
-    "build": "DOTENV_CONFIG_PATH=.env.production  nuxt build",
+    "build": "nuxt build --dotenv .env.production",
     "start": "nuxt start",
-    "generate": "DOTENV_CONFIG_PATH=.env.production nuxt generate",
+    "generate": "nuxt generate --dotenv .env.production",
+    "export": "nuxt build --dotenv .env.production && nuxt export --dotenv .env.production",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "precommit": "npm run lint"
   },
@@ -17,7 +18,6 @@
     "@nuxtjs/axios": "^5.11.0",
     "actioncable-vue": "^2.2.2",
     "dart-sass": "^1.25.0",
-    "dotenv": "^8.2.0",
     "konva": "^6.0.0",
     "lodash": "^4.17.19",
     "nuxt": "^2.13.0",

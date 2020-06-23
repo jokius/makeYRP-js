@@ -1,8 +1,5 @@
-require("dotenv").config({
-  path: process.env.DOTENV_CONFIG_PATH || null,
-})
-
 module.exports = {
+  target: 'static',
   mode: 'spa',
   /*
   ** Headers of the page
