@@ -66,29 +66,20 @@
 
   import DraggableDialog from './DraggableDialog'
 
-  import MutantSheet from '../../templates/MYZ/sheets/MutantSheet'
-  import BidCharacterSheet from '../../templates/BladeInTheDarck/sheets/CharacterSheet'
-  import BidTeamSheet from '../../templates/BladeInTheDarck/sheets/TeamSheet'
-  import HmwCharacterSheet from '../../templates/pbta/HorrorMovieWorld/sheets/CharacterSheet'
-  import HmwMonsterSheet from '../../templates/pbta/HorrorMovieWorld/sheets/MonsterSheet'
-  import EouCharacterSheet from '../../templates/pbta/EdgeOfUniverse/sheets/CharacterSheet'
-  import EouEnemySheet from '../../templates/pbta/EdgeOfUniverse/sheets/EnemySheet'
-  import EouShipSheet from '../../templates/pbta/EdgeOfUniverse/sheets/ShipSheet'
-  import EouCompanionSheet from '../../templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'
-
   export default {
     name: 'SheetModal',
+
     components: {
-      EouEnemySheet,
-      MutantSheet,
-      BidCharacterSheet,
-      BidTeamSheet,
       DraggableDialog,
-      HmwCharacterSheet,
-      HmwMonsterSheet,
-      EouCharacterSheet,
-      EouShipSheet,
-      EouCompanionSheet,
+      EouEnemySheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/EnemySheet'),
+      MutantSheet: () => import('../../templates/MYZ/sheets/MutantSheet'),
+      BidCharacterSheet: () => import('../../templates/BladeInTheDarck/sheets/CharacterSheet'),
+      BidTeamSheet: () => import('../../templates/BladeInTheDarck/sheets/TeamSheet'),
+      HmwCharacterSheet: () => import('../../templates/pbta/HorrorMovieWorld/sheets/CharacterSheet'),
+      HmwMonsterSheet: () => import('../../templates/pbta/HorrorMovieWorld/sheets/MonsterSheet'),
+      EouCharacterSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/CharacterSheet'),
+      EouShipSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/ShipSheet'),
+      EouCompanionSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'),
     },
 
     props: {

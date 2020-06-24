@@ -78,25 +78,21 @@
   import TabSheets from './TabSheets'
   import TabSettings from './TabSettings'
   import TabNotes from './notes/TabNotes'
-
-  import BidTabClock from '../../templates/BladeInTheDarck/menus/BidTabClock'
-  import EouTabCounters from '../../templates/pbta/EdgeOfUniverse/menus/EouTabCounters'
-  import EouTabPlanets from '../../templates/pbta/EdgeOfUniverse/menus/EouTabPlanets'
   import TabImages from './TabImages'
-  import EouTabItems from '../../templates/pbta/EdgeOfUniverse/menus/EouTabItems'
 
   export default {
     name: 'BodyMenu',
+
     components: {
-      EouTabItems,
       TabImages,
-      EouTabPlanets,
-      EouTabCounters,
       TabNotes,
-      BidTabClock,
       TabSettings,
       TabSheets,
-      TabChat
+      TabChat,
+      EouTabItems: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabItems'),
+      EouTabPlanets: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabPlanets'),
+      EouTabCounters: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabCounters'),
+      BidTabClock: () => import('../../templates/BladeInTheDarck/menus/BidTabClock'),
     },
 
     data() {

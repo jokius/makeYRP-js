@@ -69,12 +69,18 @@
   import NoteModal from './NoteModal'
   import PageModal from './PageModal'
 
-  import PlanetModal from '../../templates/pbta/EdgeOfUniverse/modals/PlanetModal'
-  import EouItemModal from '../../templates/pbta/EdgeOfUniverse/modals/EouItemModal'
-
   export default {
     name: 'OpenModals',
-    components: { EouItemModal, PlanetModal, NoteModal, InfoModal, SheetModal, ColorPickerModal, PageModal },
+
+    components: {
+      EouItemModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/EouItemModal'),
+      PlanetModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/PlanetModal'),
+      NoteModal,
+      InfoModal,
+      SheetModal,
+      ColorPickerModal,
+      PageModal
+    },
     data () {
       return {
         alert: true,
