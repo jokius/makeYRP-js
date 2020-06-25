@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
     <client-only>
-      <v-content v-if="loaded">
+      <v-main v-if="loaded">
         <left-menu />
         <div class="menu-grid">
           <head-menu class="head-menu" />
@@ -9,7 +9,7 @@
           <body-content class="body-content" :size="bodySize" />
         </div>
         <open-modals />
-      </v-content>
+      </v-main>
       <loader v-else />
 
       <v-overlay :value="overlay">

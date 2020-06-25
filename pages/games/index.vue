@@ -1,6 +1,6 @@
 <template>
   <v-app id="inspire">
-    <v-content v-if="user">
+    <v-main v-if="user">
       <v-container class="fill-height" fluid>
         <div class="user-grid">
           <v-avatar :key="user.id" size="36" color="indigo">
@@ -35,7 +35,7 @@
           </v-col>
         </v-row>
       </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
