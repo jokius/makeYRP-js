@@ -45,12 +45,12 @@
     props: {
       uniqKey: { type: Number, required: true },
       target: { type: Object, required: true },
-      startColor: { type: Object, default: () => ({}) },
+      startColor: { type: [Object, String] },
     },
 
     data() {
       return {
-        color: this.startColor.hex ? this.startColor.hex : this.startColor,
+        color: this.startColor,
       }
     },
 
@@ -64,17 +64,17 @@
         get() {
           return this.color
         },
+
         set(value) {
           this.color = value
-          // this.$store.commit(CHANGE_TARGET_COLOR, { ...this.target, color: value })
         },
       },
     },
 
     methods: {
       onClose() {
-        this.color = null
-        this.save()
+        this.color = this.startColor
+        this.$store.commit('game/removeOpenModal', this.uniqKey)
       },
 
       onSave() {

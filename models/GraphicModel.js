@@ -1,12 +1,17 @@
+import short from "short-uuid"
+import { AclModel } from './AclModel'
+
 export class GraphicModel {
   id = null
-  layer = ''
+  kind = ''
   params = {}
+  acl = {}
 
-  setInfo(raw) {
+  setInfo(raw, changeAcl = true) {
     this.id = raw.id
-    this.layer = raw.layer
-    this.params = raw.params
+    this.kind = raw.kind
+    this.params = { ...raw.params, name: `graphic-${this.id}-${short.generate()}` }
+    if (changeAcl) this.acl = new AclModel().setInfo(raw.acl)
     return this
   }
 }

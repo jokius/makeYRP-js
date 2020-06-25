@@ -1,7 +1,7 @@
 <template>
   <div class="left-menu-actions">
     <cursor-button />
-    <!--    <drawing-button />-->
+    <drawing-button />
     <layer-button v-if="user.id === master.id"/>
     <dice-button />
   </div>
@@ -13,10 +13,11 @@
   import DiceButton from './leftMenuButtons/DiceButton'
   import LayerButton from './leftMenuButtons/LayerButton'
   import CursorButton from './leftMenuButtons/CursorButton'
+  import DrawingButton from './leftMenuButtons/DrawingButton'
 
   export default {
     name: 'LeftMenu',
-    components: { CursorButton, LayerButton, DiceButton },
+    components: { DrawingButton, CursorButton, LayerButton, DiceButton },
 
     computed: {
       ...mapState({

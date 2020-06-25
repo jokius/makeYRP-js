@@ -1,14 +1,17 @@
 <template>
-  <v-image :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
+  <v-line v-if="kind === 'line'" :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
+  <v-rect v-else-if="kind === 'rect'" :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
+  <v-ellipse v-else-if="kind === 'circle'" :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
 </template>
 
 <script>
   import { mapState } from 'vuex'
 
   export default {
-    name: 'KImage',
+    name: 'KGraphic',
 
     props: {
+      kind: { type: String, required: true },
       config: { type: Object, required: true },
       draggable: { type: Boolean },
       handleEventEnd: { type: Function },
@@ -27,26 +30,8 @@
 
       configKonva: {
         get() {
-          return {
-            ...this.config,
-            image: this.image,
-            draggable: this.draggable && this.currentCursor === 'default',
-          }
+          return { ...this.config, draggable: this.draggable && this.currentCursor === 'default' }
         },
-      },
-    },
-
-    created() {
-      const image = new window.Image()
-      image.src = this.config.url
-      image.onload = () => this.image = image
-    },
-
-    watch: {
-      config() {
-        const image = new window.Image()
-        image.src = this.url
-        image.onload = () => this.image = image
       },
     },
 

@@ -12,7 +12,16 @@
         <v-layer ref="map">
           <k-image v-if="backgroundUrl" :config="backgroundConfig" />
         </v-layer>
-        <v-layer ref="images">
+        <v-layer ref="graphic">
+          <k-graphic
+            v-for="graphic in graphics"
+            :key="graphic.params.name"
+            :kind="graphic.kind"
+            :config="graphic.params"
+            :handleEventEnd="handleEventEnd"
+            draggable
+          />
+
           <k-image
             v-for="token in tokens"
             :key="token.params.name"
@@ -37,20 +46,23 @@
 <script>
   import { mapState } from 'vuex'
   import KImage from './konva/KImage'
-  import { loadImages, loadTokens } from '../../../api/board'
+  import { loadGraphics, loadImages, loadTokens } from '../../../api/board'
   import { TokenModel } from '../../../models/TokenModel'
   import { mousePosition } from '../../../lib/mousePosition'
   import RightClickMenu from './RightClickMenu'
   import { ImageModel } from '../../../models/ImageModel'
+  import { GraphicModel } from '../../../models/GraphicModel'
+  import KGraphic from './konva/KGraphic'
 
   export default {
     name: 'Board',
-    components: { RightClickMenu, KImage },
+    components: { KGraphic, RightClickMenu, KImage },
 
     data() {
       return {
         tokens: [],
         images: [],
+        graphics: [],
         selectedItemName: '',
         position: { x: 0, y: 0 },
         menuItems: [],
@@ -76,9 +88,18 @@
       ...mapState({
         currentPage: state => state.game.currentPage,
         currentCursor: state => state.game.currentCursor,
+        borderSize: state => state.game.borderSize,
+        borderColor: state => state.game.borderColor,
+        bodyColor: state => state.game.bodyColor,
         master: state => state.game.info.master,
         user: state => state.auth.user,
       }),
+
+      cursor: {
+        get() {
+          return this.currentCursor
+        },
+      },
 
       params: {
         get() {
@@ -157,12 +178,14 @@
     created() {
       this.loadTokens()
       this.loadImages()
+      this.loadGraphics()
     },
 
     mounted() {
       this.$cable.subscribe({ channel: 'PageChannel', page_id: this.pageId })
       this.scaleStage()
       this.setPosition()
+      this.setDrawing()
       const stage = this.$refs.stage
       stage.$el.tabIndex = 1
       stage.$el.focus()
@@ -220,6 +243,95 @@
         }
       },
 
+      setDrawing() {
+        let graphic = null
+        let isPaint = false
+        const stage = this.$refs.stage.getStage()
+        const layer = this.$refs.graphic.getNode()
+        let pos = {}
+
+        stage.on('mousedown touchstart', () => {
+          pos = stage.getPointerPosition()
+          isPaint = ['brush', 'rect', 'circle'].includes(this.cursor)
+
+          if (this.cursor === 'brush') {
+            graphic = new Konva.Line({
+              stroke: this.borderColor,
+              strokeWidth: this.borderSize,
+              points: [pos.x, pos.y],
+            })
+
+            layer.add(graphic)
+          } else if (this.cursor === 'rect') {
+            graphic = new Konva.Rect({
+              stroke: this.borderColor,
+              strokeWidth: this.borderSize,
+              fill: this.bodyColor,
+              x: pos.x,
+              y: pos.y,
+              width: 0,
+              height: 0
+            })
+
+            layer.add(graphic)
+          } else if (this.cursor === 'circle') {
+            graphic = new Konva.Ellipse({
+              stroke: this.borderColor,
+              strokeWidth: this.borderSize,
+              fill: this.bodyColor,
+              x: pos.x,
+              y: pos.y,
+              radiusX: 0,
+              radiusY: 0
+            })
+
+            layer.add(graphic)
+          }
+        })
+
+        stage.on('mouseup touchend', () => {
+          isPaint = false
+          if (this.cursor === 'brush') {
+            this.add({
+              params: graphic.attrs,
+              kind: 'line',
+              type: 'graphic',
+            })
+            graphic.destroy()
+          } else if (this.cursor === 'rect') {
+            this.add({
+              params: graphic.attrs,
+              kind: 'rect',
+              type: 'graphic',
+            })
+            graphic.destroy()
+          } else if (this.cursor === 'circle') {
+            this.add({
+              params: graphic.attrs,
+              kind: 'circle',
+              type: 'graphic',
+            })
+            graphic.destroy()
+          }
+        })
+
+        stage.on('mousemove touchmove', () => {
+          if (!isPaint) return
+          const newPos = stage.getPointerPosition()
+
+          if (this.cursor === 'brush') {
+            const newPoints = graphic.points().concat([newPos.x, newPos.y])
+            graphic.points(newPoints)
+          }  else if (this.cursor === 'rect') {
+            graphic.size({ width: newPos.x - pos.x, height: newPos.y - pos.y })
+          }  else if (this.cursor === 'circle') {
+            graphic.radius({ x: Math.abs(newPos.x - pos.x), y: Math.abs(newPos.y - pos.y) })
+          }
+
+          layer.batchDraw()
+        })
+      },
+
       scaleStage() {
         const stage = this.$refs.stage.getStage()
 
@@ -266,6 +378,11 @@
       },
 
       showTransformer(e) {
+        if (this.cursor !== 'default') {
+          this.selectedItemName = ''
+          return
+        }
+
         const clickedOnTransformer = e.target.getParent().className === 'Transformer'
         if (clickedOnTransformer) return
 
@@ -275,6 +392,8 @@
           this.selectedItemName = this.tokens.find(item => item.params.name === name).params.name
         } else if (type === 'image' && this.isMaster) {
           this.selectedItemName = this.images.find(item => item.params.name === name).params.name
+        } else if (type === 'graphic') {
+          this.selectedItemName = this.graphics.find(item => item.params.name === name).params.name
         } else {
           this.selectedItemName = ''
         }
@@ -318,6 +437,12 @@
         })
       },
 
+      loadGraphics() {
+        loadGraphics({ axios: this.$axios, page_id: this.pageId }).then(graphics => {
+          graphics.forEach(raw => this.addGraphic(raw))
+        })
+      },
+
       add(params) {
         this.$cable.perform({
           channel: 'PageChannel',
@@ -329,6 +454,7 @@
       addObj(obj) {
         if (obj.token) this.addToken(obj.token)
         if (obj.image) this.addImage(obj.image)
+        if (obj.graphic) this.addGraphic(obj.graphic)
       },
 
       addToken(raw) {
@@ -345,6 +471,15 @@
         this.images = [...this.images, image]
       },
 
+      addGraphic(raw) {
+        const graphic = new GraphicModel().setInfo(raw)
+        // graphic.acl.currentUserId = this.user.id
+        // graphic.acl.masterId = this.master.id
+        // if (!graphic.acl.canRead) return
+
+        this.graphics = [...this.graphics, graphic]
+      },
+
       change(params) {
         this.$cable.perform({
           channel: 'PageChannel',
@@ -356,6 +491,7 @@
       changeObj(obj) {
         if (obj.token) this.changeToken(obj.token)
         if (obj.image) this.changeImage(obj.image)
+        if (obj.graphic) this.changeGraphic(obj.graphic)
       },
 
       changeToken(raw) {
@@ -374,6 +510,15 @@
         this.$set(this.images, index, image)
       },
 
+      changeGraphic(raw) {
+        const index = this.graphics.findIndex(item => item.id === raw.id)
+        const graphic = this.graphics[index]
+        graphic.setInfo(raw, index, true)
+        // graphic.acl.currentUserId = this.user.id
+        // graphic.acl.masterId = this.master.id
+        this.$set(this.graphics, index, graphic)
+      },
+
       remove(params) {
         this.$cable.perform({
           channel: 'PageChannel',
@@ -385,6 +530,7 @@
       removeObj(obj) {
         if (obj.token) this.removeToken(obj.token)
         if (obj.image) this.removeImage(obj.image)
+        if (obj.graphic) this.removeGraphic(obj.graphic)
       },
 
       removeToken(token) {
@@ -401,13 +547,23 @@
         this.updateTransformer()
       },
 
+      removeGraphic(graphic) {
+        const index = this.graphics.findIndex(item => item.id === graphic.id)
+        this.graphics.splice(index, 1)
+        this.selectedItemName = ''
+        this.updateTransformer()
+      },
+
       handleEventEnd(e) {
         const target = e.target
         const token = this.tokens.find(token => token.params.name === target.name())
         if (token) return this.handleEventObject(token, target, 'token')
 
         const image = this.images.find(image => image.params.name === target.name())
-        if (image) this.handleEventObject(image, target, 'image')
+        if (image) return this.handleEventObject(image, target, 'image')
+
+        const graphic = this.graphics.find(graphic => graphic.params.name === target.name())
+        if (graphic) this.handleEventObject(graphic, target, 'graphic')
       },
 
       handleEventObject(object, target, type) {

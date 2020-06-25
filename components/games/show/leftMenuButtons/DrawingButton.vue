@@ -1,12 +1,21 @@
 <template>
   <div class="grid">
-    <div :class="[{ selected }, 'button']" @click="cursor = 'rect'">
-      <v-icon class="icon">mdi-brush</v-icon>
+    <div :class="[{ selected }, 'button']" @click="cursor = 'brush'">
+      <v-icon v-if="cursor === 'rect'" class="icon">mdi-checkbox-blank-outline</v-icon>
+      <v-icon v-else-if="cursor === 'circle'" class="icon">mdi-checkbox-blank-circle-outline</v-icon>
+      <v-icon v-else class="icon">mdi-brush</v-icon>
     </div>
 
     <div v-if="selected" class="drawing-item">
+      <v-select
+        v-model="kind"
+        :items="kinds"
+        color="indigo"
+        class="select kind"
+        flat
+      />
       <div :style="styleBorder" class="color-current" @click="openBorderColorSelect" />
-      <div :style="styleBody" class="color-current" @click="openBodyColorSelect" />
+      <div v-if="cursor !== 'brush'" :style="styleBody" class="color-current" @click="openBodyColorSelect" />
       <v-select
         v-model="size"
         :items="sizes"
@@ -21,19 +30,22 @@
 <script>
   import { mapState } from 'vuex'
 
-  import { ADD_OPEN_MODAL, CHANGE_BORDER_SIZE, CHANGE_CURRENT_CURSOR } from '../../../stores/mutation-types'
-
   export default {
     name: 'DrawingButton',
 
     data() {
       return {
+        kinds: [
+          { text: 'Отруки', value: 'brush' },
+          { text: 'Квадрат', value: 'rect' },
+          { text: 'Круг', value: 'circle' },
+        ],
         sizes: [
-          { text: 'Очень тонкие граници 1px', value: 1 },
-          { text: 'Тонкие граници 2px', value: 2 },
-          { text: 'Обычные граници 3px', value: 3 },
-          { text: 'Широкие граници 4px', value: 4 },
-          { text: 'Очень широкие граници 5px', value: 5 },
+          { text: 'Очень тонкие граници 3px', value: 3 },
+          { text: 'Тонкие граници 4px', value: 4 },
+          { text: 'Обычные граници 5px', value: 5 },
+          { text: 'Широкие граници 6px', value: 6 },
+          { text: 'Очень широкие граници 7px', value: 7 },
         ],
         targetBorder: { type: 'borderColor' },
         targetBody: { type: 'bodyColor' },
@@ -60,7 +72,17 @@
 
       selected: {
         get() {
-          return this.cursor === 'rect'
+          return ['brush', 'rect', 'circle'].includes(this.cursor)
+        },
+      },
+
+      kind: {
+        get() {
+          return this.currentCursor
+        },
+
+        set(value) {
+          this.$store.commit('game/changeCurrentCursor', value)
         },
       },
 
@@ -76,22 +98,17 @@
 
       styleBorder: {
         get() {
-          const color = this.borderColor
-          const rgb = `rgb(${color.r}, ${color.g}, ${color.b}, ${color.a})`
           return {
-            backgroundImage: color.a > 0 ? 'none' : 'url("/img/transparent.png")',
-            backgroundColor: rgb,
+            backgroundColor: this.borderColor,
           }
         },
       },
 
       styleBody: {
         get() {
-          const color = this.bodyColor
-          const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`
           return {
-            backgroundImage: color.a > 0 ? 'none' : 'url("/img/transparent.png")',
-            backgroundColor: rgba,
+            backgroundImage: this.bodyColor !== '#00000000' ? 'none' : 'url("/images/transparent.png")',
+            backgroundColor: this.bodyColor,
           }
         },
       },
@@ -100,7 +117,7 @@
     methods: {
       openBorderColorSelect() {
         const key = Date.now()
-        this.$store.commit(ADD_OPEN_MODAL, {
+        this.$store.commit('game/addOpenModal', {
           key,
           name: 'color-picker',
           target: this.targetBorder,
@@ -110,7 +127,7 @@
 
       openBodyColorSelect() {
         const key = Date.now()
-        this.$store.commit(ADD_OPEN_MODAL, {
+        this.$store.commit('game/addOpenModal', {
           key,
           name: 'color-picker',
           target: this.targetBody,
@@ -122,7 +139,7 @@
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colorss';
+  @import '~assets/css/colors';
 
   $border: 1px solid $black;
 
@@ -169,5 +186,10 @@
     padding: 0;
     width: 271px;
     height: 33px;
+  }
+
+  .kind {
+    width: 130px;
+    margin-right: 5px;
   }
 </style>
