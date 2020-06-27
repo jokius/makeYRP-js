@@ -10,6 +10,8 @@ export class SheetModel {
   acl = {}
 
   setInfo(raw, changeAcl = true) {
+    if (!raw.id) return
+
     this.id = raw.id
     this.sheetType = raw.sheet_type
     this.name = raw.name

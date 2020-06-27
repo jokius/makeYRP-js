@@ -3,6 +3,7 @@
     <client-only>
       <v-main v-if="loaded">
         <left-menu />
+        <users />
         <div class="menu-grid">
           <head-menu class="head-menu" />
           <body-menu class="body-menu" />
@@ -32,10 +33,11 @@
   import BodyContent from '../../components/games/show/BodyContent'
   import OpenModals from '../../components/games/show/OpenModals'
   import Loader from '../../components/Loader'
+  import Users from '../../components/games/show/Users'
 
   export default {
     name: 'ShowGame',
-    components: { Loader, OpenModals, BodyContent, BodyMenu, HeadMenu, LeftMenu },
+    components: { Users, Loader, OpenModals, BodyContent, BodyMenu, HeadMenu, LeftMenu },
     data() {
       return {
         overlay: false,
@@ -115,6 +117,7 @@
 
     methods: {
       addObj(obj) {
+        if (obj.user) this.$store.commit('game/addUser', obj.user)
         if (obj.sheet) this.$store.commit('game/addSheet', { user: this.user, raw: obj.sheet })
         if (obj.page) this.$store.commit('game/addPage', obj.page)
         if (obj.menu_item) this.$store.commit('game/addMenuItem', obj.menu_item)
@@ -122,12 +125,14 @@
       },
 
       updateObj(obj) {
+        if (obj.user) this.$store.commit('game/updateUser', obj.user)
         if (obj.sheet) this.$store.commit('game/updateSheets', obj.sheet)
         if (obj.page) this.$store.commit('game/updatePage', obj.page)
         if (obj.menu_item) this.$store.commit('game/updateMenuItem', obj.menu_item)
       },
 
       deleteObj(obj) {
+        if (obj.user) this.$store.commit('game/deleteUser', obj.user)
         if (obj.sheet) this.$store.commit('game/deleteSheet', obj.sheet)
         if (obj.page) this.$store.commit('game/deletePage', obj.page)
         if (obj.menu_item) this.$store.commit('game/deleteMenuItem', obj)

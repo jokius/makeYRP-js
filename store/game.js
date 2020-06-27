@@ -3,9 +3,10 @@ import { FolderModel } from '../models/FolderModel'
 import { createFolder, deleteFolder, deleteImage, loadFolder, updateFolder, updateImage } from '../api/folder'
 import { handling } from '../lib/errorsHandling'
 import { GameModel } from '../models/GameModel'
-import { loadGame, loadMessages, loadSheets } from '../api/game'
+import { loadGame, loadMessages, loadSheets, loadUsers } from '../api/game'
 import { SheetModel } from '../models/SheetModel'
 import { MessageModel } from '../models/MessageModel'
+import { UserModel } from '../models/UserModel'
 
 export const state = () => ({
   info: null,
@@ -29,12 +30,14 @@ export const state = () => ({
   pageColor: {},
   specialTabs: [],
   altPressed: false,
+  users: [],
 })
 
 export const actions = {
   async load({ commit }, { axios, id, user }) {
     try {
       commit('gameLoaded', await loadGame({ axios, id }))
+      commit('usersLoaded', await loadUsers({ axios, id }))
       const list = await loadSheets({ axios, id })
       commit('sheetsLoaded', { user, list })
       commit('messagesLoaded', await loadMessages({ axios, id }))
@@ -232,9 +235,19 @@ export const mutations = {
     deleteSheet(state, id)
   },
 
+  deleteUser(state, id) {
+    state.users = state.users.filter(user => user.id !== id)
+  },
+
   updateSheet(state, raw) {
     const sheet = state.sheets.find(item => item.id === raw.id)
     sheet.setInfo(raw)
+  },
+
+  usersLoaded(state, users) {
+    state.users = users.map(user => (
+      new UserModel().setInfo(user)
+    ))
   },
 
   messagesLoaded(state, messages) {
@@ -250,6 +263,11 @@ export const mutations = {
   addSheet(state, params) {
     addSheet(state, params)
     if (state.currentItem.mark !== 'sheet') state.marks = { ...state.marks, sheet: state.marks.sheet + 1 }
+  },
+
+  addUser(state, user) {
+    if (state.users.find(item => item.id === user.id)) return
+    state.users = [...state.users, new UserModel().setInfo(user)]
   },
 
   addPage(state, page) {
@@ -268,6 +286,11 @@ export const mutations = {
   updateSheets(state, sheet) {
     const index = state.sheets.findIndex(item => item.id === sheet.id)
     state.sheets[index] = state.sheets[index].setInfo(sheet, false)
+  },
+
+  updateUser(state, user) {
+    const index = state.users.findIndex(item => item.id === user.id)
+    state.users[index] = state.users[index].setInfo(user)
   },
 
   updatePage(state, page) {
@@ -325,5 +348,5 @@ export const mutations = {
 
   altIsPressed(state, value) {
     state.altPressed = value
-  }
+  },
 }

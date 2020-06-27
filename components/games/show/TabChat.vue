@@ -27,6 +27,7 @@
 </template>
 
 <script>
+  import { get } from 'lodash'
   import { mapState } from 'vuex'
 
   import ChatMessage from './chat/ChatMessage'
@@ -44,6 +45,7 @@
     computed: {
       ...mapState({
         messages: state => state.game.messages,
+        user: state => state.auth.user,
       }),
     },
 
@@ -82,8 +84,15 @@
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'add',
-          data: { body: { text: this.text }, type: 'message' },
+          data: {
+            body: {
+              as: get(this.user, 'sheet.id', null),
+              text: this.text,
+            },
+            type: 'message'
+          },
         })
+
         this.text = ''
       },
     },
