@@ -14,3 +14,7 @@ export const joinGame = ({ axios, id }) =>
   axios
     .post(links.dynamic(links.base.joinGame, { id }))
     .then(response => response.data)
+
+export const switchStatus = ({ axios, id }) =>
+  axios
+    .put(links.dynamic(links.base.gameSwitchStatus, { id }))

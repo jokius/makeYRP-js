@@ -1,11 +1,15 @@
 <template>
   <v-list three-line>
     <template v-for="game in games">
-      <v-list-item :key="game.id" class="border-bottom">
+      <v-list-item :key="`game-${game.id}`" class="border-bottom">
         <v-list-item-content>
           <div class="title-grid">
             <v-list-item-title v-html="game.name" />
             <v-btn color="success" max-width="150" @click="openGame(game.id)">Загрузить</v-btn>
+            <template v-if="game.master.id === user.id">
+              <v-btn v-if="isOpen" color="error" max-width="150" @click="endGame(game.id)">Завешить</v-btn>
+              <v-btn v-else color="success" max-width="150" @click="startGame(game.id)">Открыть</v-btn>
+            </template>
           </div>
           <v-list-item-subtitle>
             <span>Мастер: </span>
@@ -28,7 +32,7 @@
             <span>Игроки: </span>
             <span v-if="game.users.length === 0">Нет</span>
             <template v-for="user in game.users">
-              <v-avatar :key="user.id" size="24" color="indigo">
+              <v-avatar :key="`user-${user.id}`" size="24" color="indigo">
                 <img
                   v-if="user.avatar.thumb"
                   :src="user.avatar.thumb"
@@ -45,18 +49,38 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
 
   import { joinGame } from '../../api/games'
   import links from '../../lib/links'
 
   export default {
     name: 'GamesList',
-    props: { games: { type: Array, required: true } },
+
+    props: {
+      games: { type: Array, required: true },
+      isOpen: { type: Boolean, default: false },
+    },
+
+    computed: {
+      ...mapState({
+        user: state => state.auth.user,
+      }),
+    },
+
     methods: {
       openGame(id) {
         joinGame({ axios: this.$axios, id }).then(() =>
           this.$router.push(links.dynamic(links.base.game, { id }))
         )
+      },
+
+      endGame(id) {
+        this.$store.dispatch('games/endGame', { axios: this.$axios, id })
+      },
+
+      startGame(id) {
+        this.$store.dispatch('games/startGame', { axios: this.$axios, id })
       },
     },
   }
@@ -67,7 +91,8 @@
 
   .title-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 2px;
   }
 
   .border-bottom {

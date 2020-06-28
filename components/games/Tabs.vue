@@ -8,7 +8,7 @@
     </v-tab>
 
     <v-tab-item>
-      <games-list :games="open" />
+      <games-list :games="open" is-open />
     </v-tab-item>
     <v-tab-item>
       <games-list :games="close" />

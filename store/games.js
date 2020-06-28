@@ -1,5 +1,5 @@
 import { handling } from '../lib/errorsHandling'
-import { createGame, loadGames } from '../api/games'
+import { createGame, loadGames, switchStatus } from '../api/games'
 import { GameModel } from '../models/GameModel'
 
 export const state = () => ({
@@ -28,7 +28,25 @@ export const actions = {
     } catch (error) {
       handling(commit, error)
     }
-  }
+  },
+
+  async endGame({ commit }, params) {
+    try {
+      await switchStatus(params)
+      commit('endGame', params.id)
+    } catch (error) {
+      handling(commit, error)
+    }
+  },
+
+  async startGame({ commit }, params) {
+    try {
+      await switchStatus(params)
+      commit('startGame', params.id)
+    } catch (error) {
+      handling(commit, error)
+    }
+  },
 }
 
 export const mutations = {
@@ -40,5 +58,17 @@ export const mutations = {
 
   updateGameId(state, id) {
     state.id = id
+  },
+
+  endGame(state, id) {
+    const game = state.open.find(item => item.id === id)
+    state.close = [...state.close, game]
+    state.open = state.open.filter(item => item.id !== id)
+  },
+
+  startGame(state, id) {
+    const game = state.close.find(item => item.id === id)
+    state.open = [...state.open, game]
+    state.close = state.close.filter(item => item.id !== id)
   },
 }
