@@ -147,7 +147,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.sheet.id,
+              sheet: this.sheet.toChat,
               name: this.dicesProps.name,
               dices,
             },

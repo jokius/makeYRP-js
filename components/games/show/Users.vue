@@ -23,7 +23,6 @@
   import { mapState } from 'vuex'
 
   import SelectSheetModal from './SelectSheetModal'
-  import { get } from 'lodash'
 
   export default {
     name: 'Users',

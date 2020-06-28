@@ -508,7 +508,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.sheet.id,
+              sheet: this.sheet.toChat,
               name: this.currentCharacteristic.name,
               dices: { d6: 2 },
               characteristic: this.currentCharacteristic,

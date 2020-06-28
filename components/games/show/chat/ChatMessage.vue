@@ -30,7 +30,7 @@
       <span v-if="body.text" class="chat-text">{{ body.text }}</span>
       <myz-roll
         v-if="!body.noSystem && body.dices && system === 'mutant_year_zero'"
-        :as="character.id || -1"
+        :sheet="character || {}"
         :roll="body.dices"
         :prev-success="body.prevSuccess || 0"
         :prev-attribute-fails="body.prevAttributeFails || 0"
@@ -87,14 +87,16 @@
 
       character: {
         get() {
-          let character = {}
+          let character = this.body.sheet
+          if (character) return character
+
           if (this.body.as && this.body.as.id) {
             character = this.body.as
           } else if (this.body.as) {
             character = this.sheets.find(sheet => sheet.id === this.body.as) || {}
           }
 
-          return character
+          return character || {}
         },
       },
 

@@ -145,7 +145,7 @@
                   <div :class="[{ enable: damage >= number }, 'box']" />
                 </div>
                 <div>
-                  <damage-button :as="asObj" :damage="damage" />
+                  <damage-button :sheet="sheet.toChat" :damage="damage" />
                 </div>
               </div>
               <div class="protection">
@@ -717,7 +717,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.sheet.id,
+              sheet: this.sheet.toChat,
               name: this.currentState.name,
               dices: { d6: 2 },
               state: this.currentState,

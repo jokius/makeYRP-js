@@ -22,7 +22,7 @@
             @change="saveSheet"
           />
         </div>
-        <dices-pool :id="id" />
+        <dices-pool :sheet="sheet" />
       </div>
     </div>
     <div class="main-row2">

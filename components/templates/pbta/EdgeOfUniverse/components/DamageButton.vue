@@ -21,7 +21,7 @@
     name: 'DamageButton',
     components: { RollDamageModal },
     props: {
-      as: { type: Object, required: true },
+      sheet: { type: Object, required: true },
       damage: { type: Number, required: true },
     },
 
@@ -52,7 +52,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.as,
+              sheet: this.sheet,
               name: 'Урон',
               dices: { d6: dices },
               damage: true,

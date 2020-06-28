@@ -16,7 +16,7 @@
     </div>
 
     <div v-if="body.damageButton && result > 6" class="damage-button">
-      <damage-button :as="body.as" :damage="body.as.damage" />
+      <damage-button :sheet="body.sheet" :damage="body.damage" />
     </div>
   </div>
 </template>

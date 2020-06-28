@@ -136,17 +136,6 @@
         tables: state => state.game.info.template.tables,
       }),
 
-      asObj: {
-        get() {
-          return {
-            id: this.sheet.id,
-            name: this.sheet.name,
-            imgChat: this.sheet.imgChat,
-            damage: this.sheet.params.damage,
-          }
-        }
-      },
-
       type: {
         get() {
           return this.privateType
@@ -270,7 +259,8 @@
           data: {
             type: 'message',
             body: {
-              as: this.asObj,
+              sheet: this.sheet.toChat,
+              damage: this.sheet.params.damage,
               name: this.move.name,
               autoFull: true,
               results: this.results,
@@ -289,7 +279,8 @@
           data: {
             type: 'message',
             body: {
-              as: this.asObj,
+              as: this.sheet.toChat,
+              damage: this.sheet.params.damage,
               name: this.move.name,
               autoPart: true,
               results: this.results,
@@ -315,7 +306,8 @@
           data: {
             type: 'message',
             body: {
-              as: this.asObj,
+              sheet: this.sheet.toChat,
+              damage: this.sheet.params.damage,
               name: this.move.name,
               dices: { d6: 2 },
               state,

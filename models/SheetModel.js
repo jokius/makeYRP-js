@@ -35,4 +35,11 @@ export class SheetModel {
   get imgLazy() {
     return get(this.params.img, 'versions.lazy', '/images/default/blank_char_10.png')
   }
+
+  get toChat() {
+    return {
+      name: this.name,
+      imgChat: this.imgChat
+    }
+  }
 }

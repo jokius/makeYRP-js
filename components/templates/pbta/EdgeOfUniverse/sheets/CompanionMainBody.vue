@@ -83,7 +83,7 @@
                   <div :class="[{ enable: damage >= number }, 'box']" />
                 </div>
                 <div>
-                  <damage-button :as="asObj" :damage="damage" />
+                  <damage-button :sheet="sheet.toChat" :damage="damage" />
                 </div>
               </div>
               <div class="protection">
@@ -156,17 +156,6 @@
         get() {
           return this.sheets.find(sheet => sheet.id === this.id)
         },
-      },
-
-      asObj: {
-        get() {
-          return {
-            id: this.sheet.id,
-            name: this.sheet.name,
-            imgChat: this.sheet.imgChat,
-            damage: this.damage,
-          }
-        }
       },
 
       params: {
@@ -393,7 +382,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.sheet.id,
+              sheet: this.sheet.toChat,
               name: this.currentState.name,
               dices: { d6: 2 },
               state: this.currentState,

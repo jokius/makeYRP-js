@@ -3,7 +3,7 @@
     <div class="main-row1">
       <div class="main-row1-col1">
         <avatar :sheet="sheet" />
-        <damage-button :as="asObj" :damage="damage" />
+        <damage-button :sheet="sheet.toChat" :damage="damage" />
       </div>
       <div class="main-row1-col2">
         <div class="main-row1-col2-base-info">
@@ -153,17 +153,6 @@
         get() {
           return this.sheets.find(sheet => sheet.id === this.id)
         },
-      },
-
-      asObj: {
-        get() {
-          return {
-            id: this.sheet.id,
-            name: this.sheet.name,
-            imgChat: this.sheet.imgChat,
-            damage: this.damage,
-          }
-        }
       },
 
       params: {

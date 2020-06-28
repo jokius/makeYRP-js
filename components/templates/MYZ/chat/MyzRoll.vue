@@ -53,7 +53,7 @@
 
     props: {
       roll: { type: Object, required: true },
-      as: { type: Number, required: true },
+      sheet: { type: Object, required: true },
       prevSuccess: { type: Number, required: true },
       prevAttributeFails: { type: Number, required: true },
       prevGearFails: { type: Number, required: true },
@@ -136,7 +136,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.as,
+              sheet: this.sheet,
               dices,
               prevSuccess: this.success,
               prevAttributeFails: this.attributeFails,

@@ -61,7 +61,7 @@
     name: 'DicesPool',
 
     props: {
-      id: { type: Number, required: true },
+      sheet: { type: Object, required: true },
     },
 
     data() {
@@ -128,7 +128,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.id,
+              sheet: this.sheet.toChat,
               dices: this.pool,
             },
           },

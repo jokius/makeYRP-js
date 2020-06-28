@@ -27,7 +27,6 @@
 </template>
 
 <script>
-  import { get } from 'lodash'
   import { mapState } from 'vuex'
 
   import ChatMessage from './chat/ChatMessage'
@@ -45,7 +44,8 @@
     computed: {
       ...mapState({
         messages: state => state.game.messages,
-        user: state => state.auth.user,
+        users: state => state.game.users,
+        currentUser: state => state.auth.user,
       }),
     },
 
@@ -81,12 +81,14 @@
       sendMessage() {
         if (this.text === '') return
 
+        const user = this.users.find(item => item.id === this.currentUser.id)
+
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'add',
           data: {
             body: {
-              as: get(this.user, 'sheet.id', null),
+              sheet: user.sheet.toChat,
               text: this.text,
             },
             type: 'message'

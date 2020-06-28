@@ -60,7 +60,7 @@
               type="number"
               @change="saveSheet"
             />
-            <damage-button :as="asObj" :damage="damage" />
+            <damage-button :sheet="sheet.toChat" :damage="damage" />
           </div>
         </div>
       </div>
@@ -122,17 +122,6 @@
         get() {
           return this.sheets.find(sheet => sheet.id === this.id)
         },
-      },
-
-      asObj: {
-        get() {
-          return {
-            id: this.sheet.id,
-            name: this.sheet.name,
-            imgChat: this.sheet.imgChat,
-            damage: this.damage,
-          }
-        }
       },
 
       params: {
