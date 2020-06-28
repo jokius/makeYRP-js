@@ -70,8 +70,8 @@
 
 <style scoped lang="scss">
   .user-grid {
-    align-self: end;
     position: absolute;
     right: 5px;
+    top: 5px;
   }
 </style>
