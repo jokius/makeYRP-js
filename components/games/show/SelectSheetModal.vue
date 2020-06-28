@@ -1,9 +1,13 @@
 <template>
   <v-dialog :value="obj.open" max-width="300" persistent>
     <v-card>
-      <v-card-title class="headline grey lighten-2" primary-title>
-        Выбор персонажа
-      </v-card-title>
+      <v-toolbar height="40" dark color="indigo" class="draggable-dialog-header drag-handle">
+        <v-toolbar-title>Выбор персонажа</v-toolbar-title>
+        <v-spacer />
+        <v-btn icon dark @click="onClose">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-toolbar>
       <div class="list">
         <div v-for="sheet in sheets" :key="sheet.id" class="list-item pointer" @click="select(sheet)">
           <v-avatar color="indigo" size="32" tile>
@@ -50,6 +54,10 @@
       select(sheet) {
         this.$emit('selectSheet', { open: false, sheet })
       },
+
+      onClose() {
+        this.$emit('selectSheet', { open: false, isClose: true })
+      },
     },
   }
 </script>
@@ -64,6 +72,7 @@
   .list {
     display: grid;
     grid-row-gap: 2px;
+    margin-top: 5px;
   }
 
   .list-item {

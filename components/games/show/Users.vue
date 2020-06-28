@@ -15,7 +15,7 @@
       <div class="name">{{ name(user) }}</div>
     </div>
 
-    <select-sheet-modal v-if="modalOpen" v-model="obj" />
+    <select-sheet-modal v-model="obj" />
   </div>
 </template>
 
@@ -47,6 +47,7 @@
         },
 
         set({ open, sheet, isClose }) {
+          this.modalOpen = open
           if (isClose) return
 
           this.$cable.perform({
@@ -57,8 +58,6 @@
               type: 'user',
             },
           })
-
-          this.modalOpen = open
         },
       },
     },
