@@ -25,3 +25,7 @@ export const loadItems = ({ axios, id }) =>
   axios
     .get(links.json(links.dynamic(links.base.items, { game_id: id })))
     .then(response => response.data)
+
+export const updateGame = ({ axios, params }) =>
+  axios
+    .put(links.dynamic(links.base.game, { id: params.id }), params)

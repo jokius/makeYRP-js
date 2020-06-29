@@ -3,7 +3,7 @@ import { FolderModel } from '../models/FolderModel'
 import { createFolder, deleteFolder, deleteImage, loadFolder, updateFolder, updateImage } from '../api/folder'
 import { handling } from '../lib/errorsHandling'
 import { GameModel } from '../models/GameModel'
-import { loadGame, loadMessages, loadSheets, loadUsers } from '../api/game'
+import { loadGame, loadMessages, loadSheets, loadUsers, updateGame } from '../api/game'
 import { SheetModel } from '../models/SheetModel'
 import { MessageModel } from '../models/MessageModel'
 import { UserModel } from '../models/UserModel'
@@ -94,6 +94,15 @@ export const actions = {
         break
       default:
         break
+    }
+  },
+
+  async updateGame({ commit }, params) {
+    try {
+      console.log('params', params)
+      await updateGame(params)
+    } catch (error) {
+      handling(commit, error)
     }
   },
 }
@@ -348,5 +357,16 @@ export const mutations = {
 
   altIsPressed(state, value) {
     state.altPressed = value
+  },
+
+  updateGame(state, { path, value, remove = false }) {
+    const game = state.info
+    let mutVal = value
+    if (remove) {
+      mutVal = get(game, path, []).slice()
+      mutVal.splice(value, 1)
+    }
+    set(game, path, mutVal)
+    // state.info = game
   },
 }
