@@ -7,8 +7,13 @@
             <v-list-item-title v-html="game.name" />
             <v-btn color="success" max-width="150" @click="openGame(game.id)">Загрузить</v-btn>
             <template v-if="game.master.id === user.id">
-              <v-btn v-if="isOpen" color="error" max-width="150" @click="endGame(game.id)">Завешить</v-btn>
-              <v-btn v-else color="success" max-width="150" @click="startGame(game.id)">Открыть</v-btn>
+              <v-btn color="grey lighten-1" max-width="50" link :to="configGame(game.id)">
+                <v-icon dark>mdi-cog</v-icon>
+              </v-btn>
+              <v-btn v-if="isOpen" color="red darken-4" dark max-width="150" @click="endGame(game.id)">
+                <v-icon dark>mdi-delete</v-icon>
+              </v-btn>
+              <v-btn v-else color="success" max-width="150" @click="startGame(game.id)">Востановить</v-btn>
             </template>
           </div>
           <v-list-item-subtitle>
@@ -75,6 +80,10 @@
         )
       },
 
+      configGame(id) {
+        return links.dynamic(links.base.gameConfig, { id })
+      },
+
       endGame(id) {
         this.$store.dispatch('games/endGame', { axios: this.$axios, id })
       },
@@ -91,7 +100,7 @@
 
   .title-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr repeat(3, max-content);
     grid-column-gap: 2px;
   }
 
