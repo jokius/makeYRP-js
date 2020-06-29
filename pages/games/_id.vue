@@ -1,27 +1,25 @@
 <template>
   <v-app id="inspire">
-    <client-only>
-      <v-main v-if="loaded">
-        <left-menu />
-        <users />
-        <div class="menu-grid">
-          <head-menu class="head-menu" />
-          <body-menu class="body-menu" />
-          <body-content class="body-content" :size="bodySize" />
-        </div>
-        <open-modals />
-      </v-main>
-      <loader v-else />
+    <v-main v-if="loaded">
+      <left-menu />
+      <users />
+      <div class="menu-grid">
+        <head-menu class="head-menu" />
+        <body-menu class="body-menu" />
+        <body-content class="body-content" :size="bodySize" />
+      </div>
+      <open-modals />
+    </v-main>
+    <loader v-else />
 
-      <v-overlay :value="overlay">
-        <v-card>
-          <v-card-text class="disconnect-message">
-            <h1>Соединение с сервером потерено</h1>
-            <p>Обновите страницу либо подождите востонавления соеденения</p>
-          </v-card-text>
-        </v-card>
-      </v-overlay>
-    </client-only>
+    <v-overlay :value="overlay">
+      <v-card>
+        <v-card-text class="disconnect-message">
+          <h1>Соединение с сервером потерено</h1>
+          <p>Обновите страницу либо подождите востонавления соеденения</p>
+        </v-card-text>
+      </v-card>
+    </v-overlay>
   </v-app>
 </template>
 
