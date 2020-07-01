@@ -38,7 +38,7 @@
           return this.game.name
         },
         set(value) {
-          this.$store.commit('game/updateGame', { path: 'name', value })
+          this.$store.commit('gameConfig/update', { path: 'name', value })
         },
       },
     },
@@ -46,7 +46,7 @@
     methods: {
       save() {
         if (this.isValid) {
-          this.$store.dispatch('game/updateGame', { axios: this.$axios, params: { ...this.game } })
+          this.$store.dispatch('gameConfig/update', { axios: this.$axios, params: { ...this.game } })
         }
       },
     },

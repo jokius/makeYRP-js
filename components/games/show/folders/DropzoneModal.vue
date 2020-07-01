@@ -39,7 +39,6 @@
 <script>
   import VueDropzone from 'vue2-dropzone'
   import 'vue2-dropzone/dist/vue2Dropzone.min.css'
-  import links from '../../../../lib/links'
 
   export default {
     name: 'DropzoneModal',
@@ -58,7 +57,7 @@
     computed: {
       dropzoneOptions() {
         return {
-          url: process.env.baseUrl + links.dynamic(links.base.folderImages, { folder_id: this.folderId }),
+          url: `${process.env.baseUrl}/folders/${this.folderId}/images`,
           acceptedFiles: 'image/*',
           headers: { Authorization: this.$auth.getToken('local') }
         }

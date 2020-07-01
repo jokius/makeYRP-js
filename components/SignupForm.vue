@@ -58,13 +58,11 @@
 
 <script>
   import { emailRules, requiredRules } from '../lib/validationRules'
-  import links from '../lib/links'
 
   export default {
     data: () => ({
       emailRules,
       requiredRules,
-      logIn: links.base.signIn,
       isValid: false,
       user: {
         email: '',
@@ -133,7 +131,7 @@
 
           this.$axios.post('/users', { user: this.user }).then(response => {
             this.$auth.setToken('local', response.data)
-            if (this.isValid) this.$router.push(links.base.home)
+            if (this.isValid) this.$router.push('/')
           }).catch(error => {
             this.errors = error.response.data.errors
           }).finally(() => this.sending = false)

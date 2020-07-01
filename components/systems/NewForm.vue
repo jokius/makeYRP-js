@@ -46,7 +46,7 @@
               </v-form>
             </v-card-text>
             <v-card-actions>
-              <nuxt-link :to="games">К списку игр</nuxt-link>
+              <nuxt-link to="index">К списку игр</nuxt-link>
               <v-spacer />
               <v-btn
                 :disabled="!isValid"
@@ -64,11 +64,8 @@
 </template>
 
 <script>
-  import links from '../../lib/links'
-
   export default {
     data: () => ({
-      games: links.base.home,
       system: {
         name: '',
         file: null,
@@ -129,7 +126,7 @@
       save() {
         if (this.isValid) {
           this.$store.dispatch('systems/create', { axios: this.$axios, params: { ...this.system } }).then(() => {
-            this.$router.push(links.base.home)
+            this.$router.push('/')
           })
         }
       },

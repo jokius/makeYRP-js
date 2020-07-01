@@ -17,7 +17,6 @@
   import { mapState } from 'vuex'
   import Loader from '../../../components/Loader'
   import GamesList from '../../../components/admin/games/GamesList'
-  import links from '../../../lib/links'
 
   export default {
     name: 'Games',
@@ -35,7 +34,7 @@
     },
 
     created() {
-      if (!this.user.admin) return this.$router.push(links.base.home)
+      if (!this.user.admin) return this.$router.push('/')
 
       this.$store.dispatch('admin/games/load', this.$axios)
     },

@@ -1,34 +1,32 @@
-import links from '../lib/links'
-
 export const createFolder = ({ axios, params }) =>
   axios
-    .post(links.base.rootFolder, params)
+    .post('folder', params)
     .then(response => response.data)
 
 export const loadFolder = ({ axios, id }) =>
   axios
-    .get(id ? links.dynamic(links.base.folder, { id }) : links.base.rootFolder)
+    .get(id ? `folders/${id}.json` : 'folder.json')
     .then(response => response.data)
 
 export const updateFolder = ({ axios, params }) =>
   axios
-    .put(links.dynamic(links.base.folder, params), { ...params })
+    .put(`folders/${params.id}`, params)
     .then(response => response.data)
 
 export const updateImage = ({ axios, params }) =>
   axios
-    .put(links.dynamic(links.base.folderImage, { id: params.id, folder_id: 0 }), { ...params })
+    .put(`folders/0/images/${params.id}`, params)
     .then(response => response.data)
 
 export const deleteFolder = ({ axios, id }) =>
   axios
-    .delete(links.dynamic(links.base.folder, { id }))
+    .delete(`folders/${id}`)
 
 export const deleteImage = ({ axios, id }) =>
   axios
-    .delete(links.dynamic(links.base.folderImage, { id, folder_id: 0 }))
+    .delete(`folders/0/images/${id}`)
 
 export const loadTree = (axios) =>
   axios
-    .get(links.base.folderTree)
+    .get('folders/tree.json')
     .then(response => response.data)

@@ -21,6 +21,9 @@
         <v-tab-item>
           <main-config />
         </v-tab-item>
+        <v-tab-item>
+          <system-config />
+        </v-tab-item>
       </v-tabs-items>
     </v-main>
     <loader v-else />
@@ -31,11 +34,12 @@
   import { mapState } from 'vuex'
   import Loader from '../../../components/Loader'
   import MainConfig from '../../../components/games/config/MainConfig'
+  import SystemConfig from '../../../components/games/config/SystemConfig'
 
   export default {
     name: 'ConfigGame',
 
-    components: { MainConfig, Loader },
+    components: { SystemConfig, MainConfig, Loader },
 
     data() {
       return {
@@ -55,7 +59,7 @@
     },
 
     created() {
-      this.$store.dispatch('game/load', { axios: this.$axios, id: this.$route.params.id, user: this.user })
+      this.$store.dispatch('gameConfig/load', { axios: this.$axios, id: this.$route.params.id, user: this.user })
     },
   }
 </script>

@@ -22,13 +22,12 @@
 
 <script>
   import { mapState } from 'vuex'
-  import links from '../../lib/links'
 
   export default {
     name: 'Actions',
     data: () => ({
-      newSystem: links.base.newSystem,
-      createGame: links.base.createGame,
+      newSystem: '/systems/new',
+      createGame: '/games/new',
     }),
 
     computed: {

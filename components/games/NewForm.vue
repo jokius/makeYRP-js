@@ -26,7 +26,7 @@
               </v-form>
             </v-card-text>
             <v-card-actions>
-              <nuxt-link :to="gamesLink">К списку игр</nuxt-link>
+              <nuxt-link to="index">К списку игр</nuxt-link>
               <v-spacer />
               <v-btn
                 :disabled="!isValid"
@@ -46,14 +46,12 @@
 
 <script>
   import { mapState } from 'vuex'
-  import links from '../../lib/links'
 
   export default {
 
     props: { list: { type: Array, required: true } },
 
     data: () => ({
-      gamesLink: links.base.home,
       game: {
         system_id: null,
         name: null,
@@ -98,7 +96,7 @@
           this.$store.commit('games/updateGameId', null)
           this.$store.dispatch('games/create', { axios: this.$axios, params: { ...this.game } }).then(() => {
             if (this.games.id) {
-              this.$router.push(links.dynamic(links.base.game, { id: this.games.id }))
+              this.$router.push(`games/${this.games.id}`)
             }
           })
         }

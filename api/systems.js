@@ -1,5 +1,3 @@
-import links from '../lib/links'
-
 export const addSystem = ({ axios, params }) => {
   const formData = new FormData()
   formData.append('name', params.name)
@@ -8,10 +6,10 @@ export const addSystem = ({ axios, params }) => {
   formData.append('private_data_file', params.privateDataFile)
 
   return axios
-    .post(links.base.systems, formData)
+    .post('systems', formData)
 }
 
 export const loadSystems = (axios) =>
   axios
-    .get(links.json(links.base.systems))
+    .get('systems.json')
     .then(response => response.data)

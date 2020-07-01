@@ -1,31 +1,24 @@
-import links from '../lib/links'
-
 export const loadGame = ({ axios, id }) =>
   axios
-    .get(links.json(links.dynamic(links.base.game, { id })))
+    .get(`games/${id}.json`)
     .then(response => response.data)
-
 
 export const loadSheets = ({ axios, id }) =>
   axios
-    .get(links.json(links.dynamic(links.base.sheets, { game_id: id })))
+    .get(`games/${id}/sheets.json`)
     .then(response => response.data)
 
 export const loadUsers = ({ axios, id }) =>
   axios
-    .get(links.json(links.dynamic(links.base.gameUsers, { game_id: id })))
+    .get(`games/${id}/users.json`)
     .then(response => response.data)
 
 export const loadMessages = ({ axios, id }) =>
   axios
-    .get(links.json(links.dynamic(links.base.messages, { game_id: id })))
+    .get(`games/${id}/messages.json`)
     .then(response => response.data)
 
 export const loadItems = ({ axios, id }) =>
   axios
-    .get(links.json(links.dynamic(links.base.items, { game_id: id })))
+    .get(`games/${id}/items.json`)
     .then(response => response.data)
-
-export const updateGame = ({ axios, params }) =>
-  axios
-    .put(links.dynamic(links.base.game, { id: params.id }), params)
