@@ -11,16 +11,19 @@ export class GameModel {
   pages = []
   system = ''
   template = {}
+  customTemplate = {}
 
   setInfo(raw) {
+
     this.id = raw.id
     this.name = raw.name
-    this.master = new UserModel().setInfo(raw.master)
+    this.master = raw.master ? new UserModel().setInfo(raw.master) : {}
     this.users = (raw.users || []).map(user => new UserModel().setInfo(user))
     this.menus = (raw.menus || []).map(menu => new MenuModel().setInfo(menu))
     this.pages = (raw.pages || []).map(page => new PageModel().setInfo(page))
     this.system = raw.system
     this.template = raw.template || {}
+    this.customTemplate = raw.custom_template || {}
 
     return this
   }
@@ -70,5 +73,13 @@ export class GameModel {
       types.push({ value: key, text: value.name || key })
     }
     return types
+  }
+
+  get params() {
+    return {
+      id: this.id,
+      name: this.name,
+      custom_template: this.customTemplate
+    }
   }
 }

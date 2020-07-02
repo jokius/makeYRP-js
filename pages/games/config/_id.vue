@@ -24,6 +24,9 @@
         <v-tab-item>
           <system-config />
         </v-tab-item>
+        <v-tab-item>
+          <json-result />
+        </v-tab-item>
       </v-tabs-items>
     </v-main>
     <loader v-else />
@@ -35,11 +38,12 @@
   import Loader from '../../../components/Loader'
   import MainConfig from '../../../components/games/config/MainConfig'
   import SystemConfig from '../../../components/games/config/SystemConfig'
+  import JsonResult from '../../../components/games/config/JsonResult'
 
   export default {
     name: 'ConfigGame',
 
-    components: { SystemConfig, MainConfig, Loader },
+    components: { JsonResult, SystemConfig, MainConfig, Loader },
 
     data() {
       return {
@@ -49,7 +53,7 @@
 
     computed: {
       ...mapState({
-        game: state => state.game,
+        game: state => state.gameConfig,
         user: state => state.auth.user,
       }),
 

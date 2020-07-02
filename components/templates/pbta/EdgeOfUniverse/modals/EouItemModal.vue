@@ -25,7 +25,7 @@
           </v-chip-group>
         </div>
 
-        <div class="equipment-description">{{ description }}</div>
+        <textarea disabled class="description" :value="description" />
       </div>
     </template>
     <template v-slot:actions>
@@ -198,6 +198,8 @@
 </script>
 
 <style scoped lang="scss">
+  @import '~assets/css/colors';
+
   .edit-planet-grid {
     overflow: auto;
     padding-left: 2px;
@@ -227,5 +229,12 @@
   .select-input {
     margin-left: 15px;
     margin-right: 15px;
+  }
+
+  .description {
+    color: $black;
+    resize: none;
+    width: 100%;
+    height: 70%;
   }
 </style>

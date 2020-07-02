@@ -26,7 +26,7 @@
 
     computed: {
       ...mapState({
-        game: state => state.game.info,
+        game: state => state.gameConfig.info,
       }),
 
       isValid() {
@@ -46,7 +46,7 @@
     methods: {
       save() {
         if (this.isValid) {
-          this.$store.dispatch('gameConfig/update', { axios: this.$axios, params: { ...this.game } })
+          this.$store.dispatch('gameConfig/update', { axios: this.$axios, params: this.game.params })
         }
       },
     },

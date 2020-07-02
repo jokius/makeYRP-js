@@ -34,8 +34,9 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
 
-  import { loadItems } from '../../../../../api/game'
+  import { uniq } from 'lodash'
 
   export default {
     name: 'EouTabItems',
@@ -43,24 +44,37 @@
     data() {
       return {
         openModal: false,
+        types: [],
         open: [],
         tree: [],
-        items: [],
+      }
+    },
+
+    computed: {
+      ...mapState({
+        template: state => state.game.info.template
+      }),
+
+      items() {
+        return this.types.map(type => {
+          const children = this.template.items
+            .filter(item => item.type === type)
+            .map((item, index) => ({ id: index + 1, params: item }))
+
+          return {
+            name: type,
+            children
+          }
+        })
       }
     },
 
     created() {
-      this.loadItems()
+      this.types = uniq(this.template.items.map(item => item.type))
+      this.open = this.types.slice()
     },
 
     methods: {
-      loadItems() {
-        loadItems({ axios: this.$axios, id: this.$route.params.id }).then(items => {
-          this.open = items.map(item => item.name)
-          this.items = items
-        })
-      },
-
       showModal(item) {
         const key = Date.now()
         this.$store.commit('game/addOpenModal', { name: 'item', key, item })

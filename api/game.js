@@ -17,8 +17,3 @@ export const loadMessages = ({ axios, id }) =>
   axios
     .get(`games/${id}/messages.json`)
     .then(response => response.data)
-
-export const loadItems = ({ axios, id }) =>
-  axios
-    .get(`games/${id}/items.json`)
-    .then(response => response.data)
