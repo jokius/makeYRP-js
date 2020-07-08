@@ -47,6 +47,12 @@
         :key="key"
         :size="size"
       />
+      <dw-character-sheet
+        v-else-if="sheetName === 'dungeon_world-character'"
+        :id="id"
+        :key="key"
+        :size="size"
+      />
       <v-alert
         v-else
         :key="key"
@@ -80,6 +86,7 @@
       EouCharacterSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/CharacterSheet'),
       EouShipSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/ShipSheet'),
       EouCompanionSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'),
+      DwCharacterSheet: () => import('../../templates/pbta/DungeonWorld/sheets/CharacterSheet'),
     },
 
     props: {
@@ -139,6 +146,8 @@
             case 'edge_of_universe-sheep':
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
             case 'edge_of_universe-companion':
+              return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
+            case 'dungeon_world-character':
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
             default:
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }

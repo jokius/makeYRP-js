@@ -1,6 +1,7 @@
 <template>
   <div class="main">
     <eou-select-template v-if="system === 'edge_of_universe'" />
+    <dw-select-template v-else-if="system === 'dungeon_world'" />
   </div>
 </template>
 
@@ -12,6 +13,7 @@
 
     components: {
       EouSelectTemplate: () => import('../../templates/pbta/EdgeOfUniverse/config/SelectTemplate'),
+      DwSelectTemplate: () => import('../../templates/pbta/DungeonWorld/config/SelectTemplate'),
     },
 
     computed: {
