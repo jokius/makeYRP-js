@@ -96,7 +96,7 @@
           this.$store.commit('games/updateGameId', null)
           this.$store.dispatch('games/create', { axios: this.$axios, params: { ...this.game } }).then(() => {
             if (this.games.id) {
-              this.$router.push(`games/${this.games.id}`)
+              this.$router.push(`/games/${this.games.id}`)
             }
           })
         }

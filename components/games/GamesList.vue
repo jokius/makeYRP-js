@@ -7,7 +7,7 @@
             <span class="game-title">{{ game.name }}</span>
             <v-btn color="success" max-width="150" @click="openGame(game.id)">Загрузить</v-btn>
             <template v-if="game.master.id === user.id">
-              <v-btn color="grey lighten-1" max-width="50" link :to="`games/config/${game.id}`">
+              <v-btn color="grey lighten-1" max-width="50" link :to="`/games/config/${game.id}`">
                 <v-icon dark>mdi-cog</v-icon>
               </v-btn>
               <v-btn v-if="isOpen" color="red darken-4" dark max-width="150" @click="endGame(game.id)">
@@ -74,7 +74,7 @@
     methods: {
       openGame(id) {
         joinGame({ axios: this.$axios, id }).then(() =>
-          this.$router.push(`games/${id}`)
+          this.$router.push(`/games/${id}`)
         )
       },
 
