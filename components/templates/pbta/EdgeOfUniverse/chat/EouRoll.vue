@@ -1,7 +1,7 @@
 <template>
   <auto-full v-if="body.autoFull" :body="body" />
   <auto-part v-else-if="body.autoPart" :body="body" />
-  <damage-roll v-else-if="body.damage" :body="body" />
+  <damage-roll v-else-if="body.damage && !body.isMove" :body="body" />
   <dice-roll v-else :body="body" />
 </template>
 

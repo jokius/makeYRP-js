@@ -316,6 +316,7 @@
               detailsAlways: this.move.detailsAlways || false,
               details: this.move.details,
               damageButton: this.move.damageButton || false,
+              isMove: true,
             },
           },
         })
