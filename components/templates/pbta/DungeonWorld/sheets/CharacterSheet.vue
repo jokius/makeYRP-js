@@ -19,6 +19,10 @@
       <v-tab-item>
         <character-main-body :id="id" />
       </v-tab-item>
+
+      <v-tab-item>
+        <character-move-body :id="id" />
+      </v-tab-item>
     </v-tabs-items>
   </div>
   <div v-else class="sheet-body" :style="{ width, height }">
@@ -31,10 +35,12 @@
 
   import CharacterMainBody from './CharacterMainBody'
   import CharacterReadOnly from './CharacterReadOnly'
+  import CharacterMoveBody from './CharacterMoveBody'
 
   export default {
     name: 'CharacterSheet',
     components: {
+      CharacterMoveBody,
       CharacterReadOnly,
       CharacterMainBody,
     },

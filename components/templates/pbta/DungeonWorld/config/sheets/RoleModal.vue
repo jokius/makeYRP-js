@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="obj.open" persistent>
+  <v-dialog :value="obj.open" persistent fullscreen>
     <v-card>
       <v-card-title class="headline grey lighten-2" primary-title>
         Добавить или Изменить класс

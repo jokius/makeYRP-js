@@ -26,6 +26,9 @@
             <v-btn color="indigo" dark @click="showModal({ ...role, restore: true })">
               <span>Изменить</span>
             </v-btn>
+            <v-btn color="indigo" dark @click="showMovesModal(role.key)">
+              <span>Изменить ходы</span>
+            </v-btn>
             <v-btn
               v-if="role.remove || role.restore"
               color="red darken-4"
@@ -44,6 +47,7 @@
     </v-simple-table>
 
     <role-modal v-if="modalOpen" v-model="obj" :roles="roles" />
+    <role-moves-modal v-if="moveModalOpen" v-model="moveObj" :roleKey="roleKey" />
   </div>
 </template>
 
@@ -51,16 +55,19 @@
   import { mapState } from 'vuex'
   import { uniqBy } from 'lodash'
   import RoleModal from './RoleModal'
+  import RoleMovesModal from './RoleMoveModal'
 
   export default {
     name: 'SheetsList',
 
-    components: { RoleModal },
+    components: { RoleMovesModal, RoleModal },
 
     data() {
       return {
         modalOpen: false,
+        moveModalOpen: false,
         role: {},
+        roleKey: '',
         emptyRole: {
           key: null,
           name: null,
@@ -104,6 +111,16 @@
           this.modalOpen = open
         },
       },
+
+      moveObj: {
+        get() {
+          return { open: this.moveModalOpen }
+        },
+
+        set({ open }) {
+          this.moveModalOpen = open
+        },
+      },
     },
 
     created() {
@@ -119,7 +136,12 @@
     methods: {
       showModal(role) {
         this.role = role
-        this.modalOpen = open
+        this.modalOpen = true
+      },
+
+      showMovesModal(key) {
+        this.roleKey = key
+        this.moveModalOpen = true
       },
 
       changeRole(role) {
@@ -168,6 +190,7 @@
     margin-top: 5px;
 
     &.cell {
+      grid-template-columns: repeat(3, max-content);
       justify-content: normal;
     }
   }

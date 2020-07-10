@@ -10,13 +10,21 @@
         <span :class="[{ 'white--text': tab !== 0 }, 'xolonium-font']">Листы персонажей</span>
       </v-tab>
       <v-tab class="tab" active-class="tab-active">
-        <span :class="[{ 'white--text': tab !== 1 }, 'xolonium-font']">Предметы</span>
+        <span :class="[{ 'white--text': tab !== 1 }, 'xolonium-font']">Ходы</span>
+      </v-tab>
+      <v-tab class="tab" active-class="tab-active">
+        <span :class="[{ 'white--text': tab !== 2 }, 'xolonium-font']">Предметы</span>
       </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab" continuous>
       <v-tab-item>
         <sheets-list />
       </v-tab-item>
+
+      <v-tab-item>
+        <moves-list />
+      </v-tab-item>
+
       <v-tab-item>
 <!--        <items-list />-->
       </v-tab-item>
@@ -25,13 +33,13 @@
 </template>
 
 <script>
-  import ItemsList from './items/ItemsList'
   import SheetsList from './sheets/SheetsList'
+  import MovesList from './moves/MovesList'
 
   export default {
     name: 'SelectTemplate',
 
-    components: { SheetsList, ItemsList },
+    components: { MovesList, SheetsList },
 
     data() {
       return {
