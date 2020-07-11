@@ -27,7 +27,7 @@
               <div class="cube-title">
                 Урон
               </div>
-              <div class="damage-cube">
+              <div class="damage-cube button" @click="damageModalOpen = true">
                 <div class="damage-text">
                   {{ damage }}
                 </div>
@@ -206,7 +206,6 @@
   import RollModifierModal from '../modals/RollModifierModal'
   import { Pbta } from '../../../../../lib/Pbta'
   import { Dw } from '../../../../../lib/Dw'
-  import DamageRoll from '../../EdgeOfUniverse/chat/DamageRoll'
   import RollDamageModal from '../modals/RollDamageModal'
 
   export default {
@@ -371,12 +370,12 @@
 
       damageObj: {
         get() {
-          return { open: this.modalOpen, modifier: this.damageMod }
+          return { open: this.damageModalOpen, modifier: this.damageMod }
         },
 
         set({ open, modifier, isClose }) {
           if (!isClose) this.rollDamage(parseInt(modifier))
-          this.modalOpen = open
+          this.damageModalOpen = open
         },
       },
 
@@ -595,7 +594,7 @@
             type: 'message',
             body: {
               sheet: this.sheet.toChat,
-              name: this.currentStat.name,
+              name: 'Урон',
               dices,
               modifier,
               isDamage: true,

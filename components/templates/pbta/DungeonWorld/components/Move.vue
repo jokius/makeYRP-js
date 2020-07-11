@@ -133,6 +133,10 @@
         tables: state => state.game.info.template.tables,
       }),
 
+      params() {
+        return this.sheet.params
+      },
+
       type: {
         get() {
           return this.privateType
@@ -197,6 +201,11 @@
           this.modalOpen = open
         },
       },
+
+      damageMod() {
+        const damages = this.params.equipment.filter(item => item.enable && item.damage).map(item => item.damage)
+        return Math.max(0, ...damages)
+      },
     },
 
     created() {
@@ -258,10 +267,10 @@
             body: {
               sheet: this.sheet.toChat,
               damage: this.sheet.params.damage,
+              damageMod: this.damageMod,
               name: this.move.name,
               autoFull: true,
               results: this.results,
-              detailsAlways: this.move.detailsAlways || false,
               details: this.move.details,
               damageButton: this.move.damageButton || false,
             },
@@ -278,6 +287,7 @@
             body: {
               as: this.sheet.toChat,
               damage: this.sheet.params.damage,
+              damageMod: this.damageMod,
               name: this.move.name,
               autoPart: true,
               results: this.results,
@@ -290,13 +300,7 @@
       },
 
       roll(modifier) {
-        const state = { name: this.tables.stats[this.type], value: this.sheet.params.stats[this.type] }
-        if (typeof state.value === 'undefined') {
-          const specialsStat = this.specialsStats.find(item => item.key === this.type)
-          state.name = specialsStat.name.toUpperCase()
-          state.value = specialsStat.current
-        }
-
+        const stat = this.sheet.params.stats.find(item => item.type === this.type)
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'add',
@@ -305,9 +309,10 @@
             body: {
               sheet: this.sheet.toChat,
               damage: this.sheet.params.damage,
+              damageMod: this.damageMod,
               name: this.move.name,
               dices: { d6: 2 },
-              state,
+              stat,
               modifier,
               results: this.results,
               detailsAlways: this.move.detailsAlways || false,

@@ -49,6 +49,10 @@
         v-else-if="(!body.noSystem && body.dices || body.autoFull || body.autoPart) && system === 'edge_of_universe'"
         :body="body"
       />
+      <dw-roll
+        v-else-if="(!body.noSystem && body.dices || body.autoFull || body.autoPart) && system === 'dungeon_world'"
+        :body="body"
+      />
       <default-roll v-else-if="body.dices" :roll="body.dices" />
     </div>
   </div>
@@ -64,10 +68,11 @@
   import HmwRoll from '../../../templates/pbta/HorrorMovieWorld/chat/HmwRoll'
   import EouRoll from '../../../templates/pbta/EdgeOfUniverse/chat/EouRoll'
   import * as dateTime from '../../../../lib/dateTime'
+  import DwRoll from '../../../templates/pbta/DungeonWorld/chat/DwRoll'
 
   export default {
     name: 'ChatMessage',
-    components: { EouRoll, HmwRoll, BidRoll, DefaultRoll, MyzRoll },
+    components: { DwRoll, EouRoll, HmwRoll, BidRoll, DefaultRoll, MyzRoll },
 
     props: {
       message: { type: Object, required: true },
