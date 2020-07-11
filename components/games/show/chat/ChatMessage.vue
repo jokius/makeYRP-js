@@ -46,11 +46,11 @@
         :body="body"
       />
       <eou-roll
-        v-else-if="(!body.noSystem && body.dices || body.autoFull || body.autoPart) && system === 'edge_of_universe'"
+        v-else-if="(!body.noSystem && body.dices || body.showDescription || body.autoFull || body.autoPart) && system === 'edge_of_universe'"
         :body="body"
       />
       <dw-roll
-        v-else-if="(!body.noSystem && body.dices || body.autoFull || body.autoPart) && system === 'dungeon_world'"
+        v-else-if="(!body.noSystem && body.dices || body.showDescription || body.autoFull || body.autoPart) && system === 'dungeon_world'"
         :body="body"
       />
       <default-roll v-else-if="body.dices" :roll="body.dices" />

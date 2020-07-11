@@ -26,8 +26,9 @@
       <summary class="pointer">
         Подробнее
       </summary>
-      <div v-if="typeof move.full === 'string'" class="actions">
+      <div class="actions">
         <v-btn
+          v-if="typeof move.full === 'string'"
           class="button-add"
           raised
           color="black"
@@ -38,6 +39,7 @@
           Авто полный успех
         </v-btn>
         <v-btn
+          v-if="typeof move.full === 'string'"
           class="button-add"
           raised
           color="black"
@@ -46,6 +48,16 @@
           @click="autoPart"
         >
           Авто частичный успех
+        </v-btn>
+        <v-btn
+          class="button-add"
+          raised
+          color="black"
+          small
+          dark
+          @click="showDescription"
+        >
+          Показать описание
         </v-btn>
         <div class="select-grid">
           <span class="select-title">Способ</span>
@@ -285,7 +297,7 @@
           data: {
             type: 'message',
             body: {
-              as: this.sheet.toChat,
+              sheet: this.sheet.toChat,
               damage: this.sheet.params.damage,
               damageMod: this.damageMod,
               name: this.move.name,
@@ -294,6 +306,22 @@
               detailsAlways: this.move.detailsAlways || false,
               details: this.move.details,
               damageButton: this.move.damageButton || false,
+            },
+          },
+        })
+      },
+
+      showDescription() {
+        this.$cable.perform({
+          channel: 'GameChannel',
+          action: 'add',
+          data: {
+            type: 'message',
+            body: {
+              sheet: this.sheet.toChat,
+              name: this.move.name,
+              description: this.move.description,
+              showDescription: true,
             },
           },
         })
