@@ -260,16 +260,6 @@
         this.$store.commit('gameConfig/update',
           { path: `customTemplate.tables.selectEquipment.${this.roleKey}`, value: [] })
       }
-
-      // this.selects.forEach(select => {
-      //   if (!this.customTables.selectEquipment[this.roleKey][select.index]) {
-      //     this.$store.commit('gameConfig/update',
-      //       { path: `customTemplate.tables.selectEquipment.${this.roleKey}[${select.index}]`, value: {} })
-      //
-      //     // this.$store.commit('gameConfig/update',
-      //     //   { path: `customTemplate.tables.selectEquipment.${this.roleKey}[${select.index}].items`, value: [] })
-      //   }
-      // })
     },
 
     methods: {

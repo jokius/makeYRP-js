@@ -32,6 +32,9 @@
             <v-btn color="indigo" dark @click="showEquipmentModal(role.key)">
               <span>пердметы</span>
             </v-btn>
+            <v-btn color="indigo" dark @click="showRelationshipModal(role.key)">
+              <span>связи</span>
+            </v-btn>
             <v-btn
               v-if="role.remove || role.restore"
               color="red darken-4"
@@ -52,6 +55,7 @@
     <role-modal v-if="modalOpen" v-model="obj" :roles="roles" />
     <role-moves-modal v-if="moveModalOpen" v-model="moveObj" :roleKey="roleKey" />
     <role-items-modal v-if="equipmentModalOpen" v-model="itemObj" :roleKey="roleKey" />
+    <role-relationship-modal v-if="relationshipModalOpen" v-model="relationshipObj" :roleKey="roleKey" />
   </div>
 </template>
 
@@ -61,17 +65,19 @@
   import RoleModal from './RoleModal'
   import RoleMovesModal from './RoleMoveModal'
   import RoleItemsModal from './RoleItemsModal'
+  import RoleRelationshipModal from './RoleRelationshipModal'
 
   export default {
     name: 'SheetsList',
 
-    components: { RoleItemsModal, RoleMovesModal, RoleModal },
+    components: { RoleRelationshipModal, RoleItemsModal, RoleMovesModal, RoleModal },
 
     data() {
       return {
         modalOpen: false,
         moveModalOpen: false,
         equipmentModalOpen: false,
+        relationshipModalOpen: false,
         role: {},
         roleKey: '',
         emptyRole: {
@@ -137,6 +143,16 @@
           this.equipmentModalOpen = open
         },
       },
+
+      relationshipObj: {
+        get() {
+          return { open: this.relationshipModalOpen }
+        },
+
+        set({ open }) {
+          this.relationshipModalOpen = open
+        },
+      },
     },
 
     created() {
@@ -163,6 +179,11 @@
       showEquipmentModal(key) {
         this.roleKey = key
         this.equipmentModalOpen = true
+      },
+
+      showRelationshipModal(key) {
+        this.roleKey = key
+        this.relationshipModalOpen = true
       },
 
       changeRole(role) {
