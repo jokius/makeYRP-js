@@ -29,6 +29,13 @@
             />
 
             <v-text-field
+              v-model.number="quantity"
+              label="количество"
+              color="indigo"
+              type="number"
+            />
+
+            <v-text-field
               v-model.number="use"
               label="количество использований"
               color="indigo"
@@ -139,7 +146,6 @@
         },
 
         set(value) {
-          console.log('value', value)
           Object.keys(value).forEach(key => this.$set(this.item, key, value[key]))
         }
       },
@@ -161,6 +167,16 @@
 
         set(value) {
           this.$set(this.item, 'damage', value)
+        }
+      },
+
+      quantity: {
+        get() {
+          return this.item.quantity
+        },
+
+        set(value) {
+          this.$set(this.item, 'quantity', value)
         }
       },
 

@@ -194,6 +194,7 @@
     </div>
 
     <roll-modifier-modal v-if="modalOpen" v-model="obj" />
+    <roll-damage-modal v-if="damageModalOpen" v-model="damageObj" />
   </div>
 </template>
 
@@ -204,10 +205,13 @@
 
   import RollModifierModal from '../modals/RollModifierModal'
   import { Pbta } from '../../../../../lib/Pbta'
+  import { Dw } from '../../../../../lib/Dw'
+  import DamageRoll from '../../EdgeOfUniverse/chat/DamageRoll'
+  import RollDamageModal from '../modals/RollDamageModal'
 
   export default {
     name: 'CharacterMainBody',
-    components: { RollModifierModal, Avatar },
+    components: { RollDamageModal, RollModifierModal, Avatar },
 
     props: {
       id: { type: Number, required: true },
@@ -216,6 +220,7 @@
     data() {
       return {
         modalOpen: false,
+        damageModalOpen: false,
         currentStat: {},
       }
     },
@@ -302,8 +307,25 @@
         },
       },
 
+      equipment() {
+        return this.params.equipment
+      },
+
       protection() {
-        return this.params.protection
+        const protections = this.equipment
+          .filter(item => item.enable && item.protection && !item.protectionAdd)
+          .map(item => item.protection)
+
+        const addProducts = this.equipment
+          .filter(item => item.enable && item.protection && item.protectionAdd)
+          .map(item => item.protection)
+
+        return Math.max(0, ...protections) + Math.max(0, ...addProducts)
+      },
+
+      damageMod() {
+        const damages = this.equipment.filter(item => item.enable && item.damage).map(item => item.damage)
+        return Math.max(0, ...damages)
       },
 
       level: {
@@ -343,6 +365,17 @@
 
         set({ open, modifier, isClose }) {
           if (!isClose) this.roll(parseInt(modifier))
+          this.modalOpen = open
+        },
+      },
+
+      damageObj: {
+        get() {
+          return { open: this.modalOpen, modifier: this.damageMod }
+        },
+
+        set({ open, modifier, isClose }) {
+          if (!isClose) this.rollDamage(parseInt(modifier))
           this.modalOpen = open
         },
       },
@@ -414,14 +447,15 @@
       changeRole(roleKey) {
         const role = this.roles.find(item => item.key === roleKey)
         this.input('role', role)
-        this.changeAttrs(role)
-        // this.changeRelationship(roleName)
-        // this.changeMoves(roleName)
+        this.changeAttrs()
+        this.changeMoves()
+        this.changeEquipment()
+        this.changeRelationship()
       },
 
-      changeAttrs(role) {
+      changeAttrs() {
         const constitution = this.stats.find(item => item.type === 'constitution') || {}
-        const hp = role.hp.max + (constitution.value || 0)
+        const hp = this.role.hp.max + (constitution.value || 0)
 
         this.$store.commit('game/updateSheetParams',
                            {
@@ -434,43 +468,39 @@
                            {
                              id: this.sheet.id,
                              path: 'damage',
-                             value: role.damage,
+                             value: this.role.damage,
                            })
       },
 
-      // changeRelationship(role) {
-      //   const roleRelationship = this.tables.relationship[role] || []
-      //   this.$store.commit('game/updateSheetParams',
-      //                      {
-      //                        id: this.sheet.id,
-      //                        path: 'relationship',
-      //                        value: roleRelationship,
-      //                      })
-      // },
-      //
-      // changeMoves(role) {
-      //   const roleMoves = this.tables.moves[role] || []
-      //   this.$store.commit('game/updateSheetParams',
-      //                      {
-      //                        id: this.sheet.id,
-      //                        path: 'moves',
-      //                        value: roleMoves,
-      //                      })
-      //
-      //   this.$store.commit('game/updateSheetParams',
-      //                      {
-      //                        id: this.sheet.id,
-      //                        path: 'fearMove',
-      //                        value: this.tables.fearMove[role] || "",
-      //                      })
-      //
-      //   this.$store.commit('game/updateSheetParams',
-      //                      {
-      //                        id: this.sheet.id,
-      //                        path: 'deadMove',
-      //                        value: this.tables.deadMove[role] || "",
-      //                      })
-      // },
+      changeMoves() {
+        let moves = this.tables.startMoves[this.role.key] || []
+        this.$store.commit('game/updateSheetParams',
+          {
+            id: this.sheet.id,
+            path: 'moves',
+            value: moves,
+          })
+      },
+
+      changeEquipment() {
+        let equipment = this.tables.startingEquipment[this.role.key] || []
+        this.$store.commit('game/updateSheetParams',
+          {
+            id: this.sheet.id,
+            path: 'equipment',
+            value: equipment,
+          })
+      },
+
+      changeRelationship() {
+        const relationship = this.tables.relationship[this.role.key] || []
+        this.$store.commit('game/updateSheetParams',
+          {
+            id: this.sheet.id,
+            path: 'relationship',
+            value: relationship,
+          })
+      },
 
       changeInjury(index, value) {
         this.$store.commit('game/updateSheetParams',
@@ -484,13 +514,7 @@
       },
 
       statShortValue(value) {
-        if (value >= 18) return 3
-        else if (value >= 16) return 2
-        else if (value >= 13) return 1
-        else if (value >= 9) return 0
-        else if (value >= 6) return -1
-        else if (value >= 4) return -2
-        return -3
+        return Dw.statShortValue(value)
       },
 
       input(target, value) {
@@ -556,6 +580,25 @@
               dices: { d6: 2 },
               stat: this.currentStat,
               modifier,
+            },
+          },
+        })
+      },
+
+      rollDamage(modifier) {
+        const dices = {}
+        dices[this.damage] = 1
+        this.$cable.perform({
+          channel: 'GameChannel',
+          action: 'add',
+          data: {
+            type: 'message',
+            body: {
+              sheet: this.sheet.toChat,
+              name: this.currentStat.name,
+              dices,
+              modifier,
+              isDamage: true,
             },
           },
         })
