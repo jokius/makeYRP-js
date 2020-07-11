@@ -14,11 +14,11 @@
     "precommit": "npm run lint"
   },
   "dependencies": {
-    "actioncable-vue": "^2.2.2",
+    "actioncable-vue": "^2.3.0",
     "dart-sass": "^1.25.0",
-    "konva": "^7.0.0",
+    "konva": "^7.0.3",
     "lodash": "^4.17.19",
-    "nuxt": "^2.13.2",
+    "nuxt": "^2.13.3",
     "short-uuid": "^3.1.1",
     "slugify": "^1.4.4",
     "vue-drag-drop": "^1.1.4",
@@ -26,18 +26,18 @@
     "vue-konva": "^2.1.3",
     "vue-wysiwyg": "^1.7.2",
     "vue2-dropzone": "^3.6.0",
-    "vuetify": "2.3.2"
+    "vuetify": "2.3.4"
   },
   "devDependencies": {
     "@nuxtjs/auth": "^4.9.1",
-    "@nuxtjs/axios": "^5.11.0",
+    "@nuxtjs/axios": "^5.12.0",
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/vuetify": "^1.11.2",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.3.1",
+    "eslint": "^7.4.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-vue": "^6.2.2",
-    "sass-loader": "^8.0.2"
+    "sass-loader": "^9.0.2"
   }
 }
