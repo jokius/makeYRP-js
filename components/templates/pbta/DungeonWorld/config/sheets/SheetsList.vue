@@ -27,7 +27,10 @@
               <span>Изменить</span>
             </v-btn>
             <v-btn color="indigo" dark @click="showMovesModal(role.key)">
-              <span>Изменить ходы</span>
+              <span>ходы</span>
+            </v-btn>
+            <v-btn color="indigo" dark @click="showEquipmentModal(role.key)">
+              <span>пердметы</span>
             </v-btn>
             <v-btn
               v-if="role.remove || role.restore"
@@ -48,6 +51,7 @@
 
     <role-modal v-if="modalOpen" v-model="obj" :roles="roles" />
     <role-moves-modal v-if="moveModalOpen" v-model="moveObj" :roleKey="roleKey" />
+    <role-items-modal v-if="equipmentModalOpen" v-model="itemObj" :roleKey="roleKey" />
   </div>
 </template>
 
@@ -56,16 +60,18 @@
   import { uniqBy } from 'lodash'
   import RoleModal from './RoleModal'
   import RoleMovesModal from './RoleMoveModal'
+  import RoleItemsModal from './RoleItemsModal'
 
   export default {
     name: 'SheetsList',
 
-    components: { RoleMovesModal, RoleModal },
+    components: { RoleItemsModal, RoleMovesModal, RoleModal },
 
     data() {
       return {
         modalOpen: false,
         moveModalOpen: false,
+        equipmentModalOpen: false,
         role: {},
         roleKey: '',
         emptyRole: {
@@ -121,6 +127,16 @@
           this.moveModalOpen = open
         },
       },
+
+      itemObj: {
+        get() {
+          return { open: this.equipmentModalOpen }
+        },
+
+        set({ open }) {
+          this.equipmentModalOpen = open
+        },
+      },
     },
 
     created() {
@@ -142,6 +158,11 @@
       showMovesModal(key) {
         this.roleKey = key
         this.moveModalOpen = true
+      },
+
+      showEquipmentModal(key) {
+        this.roleKey = key
+        this.equipmentModalOpen = true
       },
 
       changeRole(role) {
@@ -190,7 +211,7 @@
     margin-top: 5px;
 
     &.cell {
-      grid-template-columns: repeat(3, max-content);
+      grid-template-columns: repeat(4, max-content);
       justify-content: normal;
     }
   }

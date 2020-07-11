@@ -26,7 +26,7 @@
       </v-tab-item>
 
       <v-tab-item>
-<!--        <items-list />-->
+        <items-list />
       </v-tab-item>
     </v-tabs-items>
   </div>
@@ -35,11 +35,12 @@
 <script>
   import SheetsList from './sheets/SheetsList'
   import MovesList from './moves/MovesList'
+  import ItemsList from './items/ItemsList'
 
   export default {
     name: 'SelectTemplate',
 
-    components: { MovesList, SheetsList },
+    components: { ItemsList, MovesList, SheetsList },
 
     data() {
       return {
