@@ -102,7 +102,7 @@
           :items="select.items"
           class="other-select"
           color="black"
-          :multiple="select.limit > 1"
+          :multiple="select.multiple"
           flat
           :value="select.value"
           :label="select.label"

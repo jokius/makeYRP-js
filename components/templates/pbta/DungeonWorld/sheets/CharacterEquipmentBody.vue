@@ -88,7 +88,7 @@
 
       maxWeight() {
         const value = this.params.stats.find(stat => stat.type === 'strength').value
-        return Dw.statShortValue(value) + 9
+        return Dw.statShortValue(value) + this.params.weight
       },
 
       startingObj: {

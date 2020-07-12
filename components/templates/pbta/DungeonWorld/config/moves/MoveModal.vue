@@ -40,6 +40,57 @@
               v-model="damageButton"
               label="Кнопка урона"
             />
+            <div v-for="(select, index) in selects" :key="`select-${index}`">
+              <v-text-field
+                label="название группы"
+                color="indigo"
+                :value="select.label"
+                @input="value => changeLabel(index, value)"
+              />
+
+              <v-checkbox
+                :value="select.multiple"
+                @change="value => changeMultiple(index, value)"
+                label="множоственный выбор"
+              />
+              <div v-for="(item, itemIndex) in select.items" :key="`select-item-${index}-${itemIndex}`">
+                <div class="item-grid">
+                  <v-text-field
+                    label="элемент"
+                    color="indigo"
+                    :value="item"
+                    @input="value => changeItem(index, itemIndex, value)"
+                  />
+                  <v-btn
+                    color="red darken-4"
+                    fab
+                    x-small
+                    dark
+                    @click="removeItem(index, itemIndex)"
+                  >
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </div>
+              </div>
+
+              <v-btn
+                class="button"
+                color="indigo"
+                @click="addItem(index)"
+                dark
+              >
+                <span>Добавить элемент</span>
+              </v-btn>
+            </div>
+
+            <v-btn
+              class="button"
+              color="indigo"
+              @click="addSelect"
+              dark
+            >
+              <span>Добавить выбор</span>
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -203,9 +254,54 @@
           this.input('damageButton', value)
         },
       },
+
+      selects() {
+        return this.move.selects || []
+      }
     },
 
     methods: {
+      addSelect() {
+        const list = this.selects.slice()
+        list.push({ label: '', items: [], multiple: false })
+        this.input('selects', list)
+      },
+
+      changeLabel(index, value) {
+        const list = this.selects.slice()
+        list[index].label = value
+        this.input('selects', list)
+      },
+
+      changeMultiple(index, value) {
+        const list = this.selects.slice()
+        list[index].multiple = value
+        this.input('selects', list)
+      },
+
+      addItem(index) {
+        const list = this.selects.slice()
+        list[index].items = list[index].items.slice() || []
+        list[index].items.push("")
+        this.input('selects', list)
+      },
+
+      changeItem(index, itemIndex, value) {
+        const list = this.selects.slice()
+        const items = this.selects[index].items.slice()
+        items[itemIndex] = value
+        list[index].items = items
+        this.input('selects', list)
+      },
+
+      removeItem(index, itemIndex) {
+        const list = this.selects.slice()
+        const items = this.selects[index].items.slice()
+        items.splice(itemIndex, 1)
+        list[index].items = items
+        this.input('selects', list)
+      },
+
       typesByIndexes(indexes) {
         return indexes.map(index => {
           const item = this.statesList[index]
@@ -235,4 +331,13 @@
 
 <style lang="scss">
   @import '~assets/css/wysiwyg';
+
+  .button {
+    margin-bottom: 5px;
+  }
+
+  .item-grid {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+  }
 </style>

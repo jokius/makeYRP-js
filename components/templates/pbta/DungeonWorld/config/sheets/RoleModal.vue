@@ -38,6 +38,13 @@
               label="Стартовые ОЗ"
               color="indigo"
             />
+
+            <v-text-field
+              v-model.number="weight"
+              type="number"
+              label="Базловая грузоподъемность"
+              color="indigo"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -97,6 +104,7 @@
         return (this.name && this.name !== '' &&
           this.key && this.key !== '' &&
           this.hp && this.hp !== '' &&
+          this.weight && this.weight !== '' &&
           this.damage && this.damage !== '' && this.damage.search(dicesRegx) >= 0)
       },
 
@@ -154,6 +162,16 @@
 
         set(value) {
           this.input('hp', { current: value, max: value })
+        },
+      },
+
+        weight: {
+        get() {
+          return this.role.weight
+        },
+
+        set(value) {
+          this.input('weight', value)
         },
       },
     },

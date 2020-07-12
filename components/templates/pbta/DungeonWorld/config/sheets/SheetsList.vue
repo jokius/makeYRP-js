@@ -88,6 +88,7 @@
             current: null,
           },
           damage: null,
+          weight: null,
           remove: true,
         },
       }
@@ -232,7 +233,7 @@
     margin-top: 5px;
 
     &.cell {
-      grid-template-columns: repeat(4, max-content);
+      grid-template-columns: repeat(5, max-content);
       justify-content: normal;
     }
   }
