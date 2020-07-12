@@ -271,7 +271,7 @@
 
       showSelectModal(index) {
         this.index = index
-        this.select = this.selectEquipment[index] || { title: '', multiple: false, items: [] }
+        this.select = { ...(this.selectEquipment[index] || { title: '', multiple: false, items: [] }) }
         this.selectModalOpen = true
       },
 
