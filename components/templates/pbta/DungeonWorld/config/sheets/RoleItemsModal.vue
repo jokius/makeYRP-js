@@ -200,8 +200,6 @@
       selectEquipment() {
         const list = this.customTables.selectEquipment[this.roleKey].slice()
 
-        console.log('list', list)
-        console.log('this.tables.selectEquipment[this.roleKey]', this.tables.selectEquipment[this.roleKey])
         return uniqBy(list.concat((this.tables.selectEquipment[this.roleKey] || []).slice()), item => item.title)
       },
 
