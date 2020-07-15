@@ -32,6 +32,9 @@
             <v-btn color="indigo" dark @click="showEquipmentModal(role.key)">
               <span>пердметы</span>
             </v-btn>
+            <v-btn color="indigo" dark @click="showSpellsModal(role.key)">
+              <span>заклинания</span>
+            </v-btn>
             <v-btn color="indigo" dark @click="showRelationshipModal(role.key)">
               <span>связи</span>
             </v-btn>
@@ -55,6 +58,7 @@
     <role-modal v-if="modalOpen" v-model="obj" :roles="roles" />
     <role-moves-modal v-if="moveModalOpen" v-model="moveObj" :roleKey="roleKey" />
     <role-items-modal v-if="equipmentModalOpen" v-model="itemObj" :roleKey="roleKey" />
+    <role-spells-modal v-if="spellsModalOpen" v-model="spellObj" :roleKey="roleKey" />
     <role-relationship-modal v-if="relationshipModalOpen" v-model="relationshipObj" :roleKey="roleKey" />
   </div>
 </template>
@@ -66,17 +70,19 @@
   import RoleMovesModal from './RoleMoveModal'
   import RoleItemsModal from './RoleItemsModal'
   import RoleRelationshipModal from './RoleRelationshipModal'
+  import RoleSpellsModal from './RoleSpellsModal'
 
   export default {
     name: 'SheetsList',
 
-    components: { RoleRelationshipModal, RoleItemsModal, RoleMovesModal, RoleModal },
+    components: { RoleSpellsModal, RoleRelationshipModal, RoleItemsModal, RoleMovesModal, RoleModal },
 
     data() {
       return {
         modalOpen: false,
         moveModalOpen: false,
         equipmentModalOpen: false,
+        spellsModalOpen: false,
         relationshipModalOpen: false,
         role: {},
         roleKey: '',
@@ -145,6 +151,16 @@
         },
       },
 
+      spellObj: {
+        get() {
+          return { open: this.spellsModalOpen }
+        },
+
+        set({ open }) {
+          this.spellsModalOpen = open
+        },
+      },
+
       relationshipObj: {
         get() {
           return { open: this.relationshipModalOpen }
@@ -180,6 +196,11 @@
       showEquipmentModal(key) {
         this.roleKey = key
         this.equipmentModalOpen = true
+      },
+
+      showSpellsModal(key) {
+        this.roleKey = key
+        this.spellsModalOpen = true
       },
 
       showRelationshipModal(key) {
@@ -233,7 +254,7 @@
     margin-top: 5px;
 
     &.cell {
-      grid-template-columns: repeat(5, max-content);
+      grid-template-columns: repeat(6, max-content);
       justify-content: normal;
     }
   }
