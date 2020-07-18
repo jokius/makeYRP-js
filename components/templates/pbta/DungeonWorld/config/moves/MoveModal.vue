@@ -49,7 +49,7 @@
               />
 
               <v-checkbox
-                :value="select.multiple"
+                :input-value="select.multiple"
                 @change="value => changeMultiple(index, value)"
                 label="множоственный выбор"
               />
@@ -275,7 +275,7 @@
 
       changeMultiple(index, value) {
         const list = this.selects.slice()
-        list[index].multiple = value
+        list[index] = { ...list[index], multiple: value }
         this.input('selects', list)
       },
 
