@@ -21,9 +21,5 @@
     props: {
       body: { type: Object, required: true },
     },
-
-    created() {
-      console.log('this.body', this.body)
-    }
   }
 </script>

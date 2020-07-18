@@ -97,7 +97,10 @@
       },
 
       movesGroups() {
-        return this.tables.movesGroups
+        return this.tables.movesGroups.filter(item => {
+          const group = this.tables.specialMoves[this.role][item.value] || []
+          return group.length > 0
+        })
       },
 
       group: {
