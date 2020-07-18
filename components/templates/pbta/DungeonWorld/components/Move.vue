@@ -59,17 +59,29 @@
         >
           Показать описание
         </v-btn>
-        <div class="select-grid">
-          <span class="select-title">Способ</span>
-          <v-select
-            v-if="typeof move.type === 'object'"
-            v-model="type"
-            :items="move.type"
-            class="type-select"
-            color="black"
-            flat
-            hide-details
-          />
+        <div class="selects-grid">
+          <div v-if="typeof move.type === 'object'" class="type-select-grid">
+            <span class="select-title">Способ</span>
+            <v-select
+              v-model="type"
+              :items="move.type"
+              class="type-select"
+              color="black"
+              flat
+              hide-details
+            />
+          </div>
+          <div  class="type-select-grid">
+            <span class="select-title">Альтернативный способ</span>
+            <v-select
+              v-model="altType"
+              :items="altTypes"
+              class="type-select"
+              color="black"
+              flat
+              hide-details
+            />
+          </div>
         </div>
       </div>
 
@@ -137,6 +149,7 @@
         privateType: {},
         modalOpen: false,
         enable: false,
+        privateAltType: null,
       }
     },
 
@@ -157,6 +170,20 @@
         set(value) {
           this.privateType = value
         },
+      },
+
+      altType: {
+        get() {
+          return this.privateAltType || this.privateType
+        },
+
+        set(value) {
+          this.privateAltType = value
+        },
+      },
+
+      altTypes() {
+        return this.params.stats.map(item => ({ text: item.short, value: item.type }))
       },
 
       texField: {
@@ -197,7 +224,7 @@
 
       specialsStats: {
         get() {
-          return this.sheet.params.specials.map(item => {
+          return this.params.specials.map(item => {
             if (item && item.type === 'stats') return item
           }).filter(Boolean)
         }
@@ -278,7 +305,7 @@
             type: 'message',
             body: {
               sheet: this.sheet.toChat,
-              damage: this.sheet.params.damage,
+              damage: this.params.damage,
               damageMod: this.damageMod,
               name: this.move.name,
               autoFull: true,
@@ -298,7 +325,7 @@
             type: 'message',
             body: {
               sheet: this.sheet.toChat,
-              damage: this.sheet.params.damage,
+              damage: this.params.damage,
               damageMod: this.damageMod,
               name: this.move.name,
               autoPart: true,
@@ -328,7 +355,7 @@
       },
 
       roll(modifier) {
-        const stat = this.sheet.params.stats.find(item => item.type === this.type)
+        const stat = this.params.stats.find(item => item.type === (this.altType || this.type))
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'add',
@@ -336,7 +363,7 @@
             type: 'message',
             body: {
               sheet: this.sheet.toChat,
-              damage: this.sheet.params.damage,
+              damage: this.params.damage,
               damageMod: this.damageMod,
               name: this.move.name,
               dices: { d6: 2 },
@@ -411,17 +438,22 @@
     font-weight: 600;
   }
 
+  .selects-grid {
+    display: grid;
+    grid-row-gap: 10px;
+  }
+
+  .type-select-grid {
+    display: grid;
+    grid-template-columns: 1fr 135px;
+    grid-column-gap: 10px;
+    height: 35px;
+  }
+
   .type-select {
     padding: 0;
     margin: 0;
     background-color: $white;
-  }
-
-  .select-grid {
-    display: grid;
-    grid-template-columns: max-content 135px;
-    grid-column-gap: 10px;
-    height: 35px;
   }
 
   .selects {

@@ -64,17 +64,29 @@
         >
           Показать описание
         </v-btn>
-        <div class="select-grid">
-          <span class="select-title">Способ</span>
-          <v-select
-            v-if="typeof move.type === 'object'"
-            v-model="type"
-            :items="move.type"
-            class="type-select"
-            color="black"
-            flat
-            hide-details
-          />
+        <div class="selects-grid">
+          <div v-if="typeof move.type === 'object'" class="type-select-grid">
+            <span class="select-title">Способ</span>
+            <v-select
+              v-model="type"
+              :items="move.type"
+              class="type-select"
+              color="black"
+              flat
+              hide-details
+            />
+          </div>
+          <div  class="type-select-grid">
+            <span class="select-title">Альтернативный способ</span>
+            <v-select
+              v-model="altType"
+              :items="altTypes"
+              class="type-select"
+              color="black"
+              flat
+              hide-details
+            />
+          </div>
         </div>
       </div>
 
@@ -140,6 +152,7 @@
         privateType: {},
         modalOpen: false,
         enable: false,
+        privateAltType: null,
       }
     },
 
@@ -156,6 +169,23 @@
         set(value) {
           this.privateType = value
         },
+      },
+
+      altType: {
+        get() {
+          return this.privateAltType || this.privateType
+        },
+
+        set(value) {
+          this.privateAltType = value
+        },
+      },
+
+      altTypes() {
+        console.log('1234')
+        const stats = this.tables.stats
+        const list = Object.keys(stats).map(key => ({ text: stats[key], value: key }))
+        return list.concat(this.specialsStats.map(item => ({ text: item.name, value: item.key })))
       },
 
       texField: {
@@ -321,9 +351,10 @@
       },
 
       roll(modifier) {
-        const state = { name: this.tables.stats[this.type], value: this.sheet.params.stats[this.type] }
+        const type = this.altType || this.type
+        const state = { name: this.tables.stats[type], value: this.sheet.params.stats[type] }
         if (typeof state.value === 'undefined') {
-          const specialsStat = this.specialsStats.find(item => item.key === this.type)
+          const specialsStat = this.specialsStats.find(item => item.key === type)
           state.name = specialsStat.name.toUpperCase()
           state.value = specialsStat.current
         }
