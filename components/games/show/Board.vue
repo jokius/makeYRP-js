@@ -24,7 +24,7 @@
 
           <k-image
             v-for="token in tokens"
-            :key="token.params.name"
+            :key="token.name"
             :config="token.params"
             :handleEventEnd="handleEventEnd"
             :draggable="token.acl.canWrite"
@@ -199,6 +199,14 @@
     },
 
     methods: {
+      mousePosition() {
+        const stage = this.$refs.stage.getStage()
+        const pos = stage.getPointerPosition()
+        const transform = stage.getAbsoluteTransform().copy()
+        transform.invert()
+        return transform.point(pos)
+      },
+
       handleDrop({ sheet, image }, e) {
         const position = mousePosition(e)
         if (sheet) return this.sendToken(sheet, position)
@@ -251,7 +259,7 @@
         let pos = {}
 
         stage.on('mousedown touchstart', () => {
-          pos = stage.getPointerPosition()
+          pos = this.mousePosition()
           isPaint = ['brush', 'rect', 'circle'].includes(this.cursor)
 
           if (this.cursor === 'brush') {
@@ -317,7 +325,7 @@
 
         stage.on('mousemove touchmove', () => {
           if (!isPaint) return
-          const newPos = stage.getPointerPosition()
+          let newPos = this.mousePosition()
 
           if (this.cursor === 'brush') {
             const newPoints = graphic.points().concat([newPos.x, newPos.y])
@@ -389,9 +397,15 @@
         const name = e.target.name()
         const [type] = name.split('-')
         if (type === 'token') {
-          this.selectedItemName = this.tokens.find(item => item.params.name === name).params.name
+          const token = this.tokens.find(item => item.name === name)
+          if (!token.acl.canWrite) return
+
+          this.selectedItemName = token.name
         } else if (type === 'image' && this.isMaster) {
-          this.selectedItemName = this.images.find(item => item.params.name === name).params.name
+          const image = this.images.find(item => item.params.name === name)
+          if (!this.isMaster) return
+
+          this.selectedItemName = image.params.name
         } else if (type === 'graphic') {
           this.selectedItemName = this.graphics.find(item => item.params.name === name).params.name
         } else {
@@ -407,7 +421,7 @@
         const name = e.target.name()
         const [type] = name.split('-')
         if (type === 'token') {
-          this.tokenRightMenu(this.tokens.find(item => item.params.name === name).id)
+          this.tokenRightMenu(this.tokens.find(item => item.name === name).id)
         } else if (type === 'image') {
           this.imageRightMenu(this.images.find(item => item.params.name === name).id)
         }
@@ -489,18 +503,22 @@
       },
 
       changeObj(obj) {
-        if (obj.token) this.changeToken(obj.token)
+        if (obj.token) this.changeToken(obj.token, obj.by)
         if (obj.image) this.changeImage(obj.image)
         if (obj.graphic) this.changeGraphic(obj.graphic)
       },
 
-      changeToken(raw) {
+      changeToken(raw, by) {
         const index = this.tokens.findIndex(item => item.id === raw.id)
         const token = this.tokens[index]
         token.setInfo(raw, index, true)
         token.acl.currentUserId = this.user.id
         token.acl.masterId = this.master.id
         this.$set(this.tokens, index, token)
+        if (this.user.id !== by && this.selectedItemName === token.name) {
+          this.selectedItemName = ''
+          this.updateTransformer()
+        }
       },
 
       changeImage(raw) {
@@ -556,7 +574,7 @@
 
       handleEventEnd(e) {
         const target = e.target
-        const token = this.tokens.find(token => token.params.name === target.name())
+        const token = this.tokens.find(token => token.name === target.name())
         if (token) return this.handleEventObject(token, target, 'token')
 
         const image = this.images.find(image => image.params.name === target.name())
