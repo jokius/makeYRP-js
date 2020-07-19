@@ -97,7 +97,8 @@
 
   .name {
     margin-top: 5px;
-    background: white;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
     text-align: center;
     word-break: break-word;
     width: 72px;
