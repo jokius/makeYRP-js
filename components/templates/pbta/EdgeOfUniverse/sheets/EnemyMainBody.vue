@@ -95,7 +95,7 @@
           raised
           color="black"
           dark
-          @click="movesOpen = true"
+          @click="modalOpen = true"
         >
           Добавить ход
         </v-btn>
