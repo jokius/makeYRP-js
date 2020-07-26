@@ -94,17 +94,29 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
+
   export default {
     name: 'DiceButton',
 
+    computed: {
+      ...mapState({
+        users: state => state.game.users,
+        currentUser: state => state.auth.user,
+      }),
+    },
+
     methods: {
       roll(dices) {
+        const user = this.users.find(item => item.id === this.currentUser.id)
+
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'add',
           data: {
             type: 'message',
             body: {
+              sheet: user.sheet.toChat,
               dices,
               noSystem: true,
             },
