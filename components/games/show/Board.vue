@@ -95,84 +95,62 @@
         user: state => state.auth.user,
       }),
 
-      cursor: {
-        get() {
-          return this.currentCursor
-        },
+      cursor() {
+        return this.currentCursor
       },
 
-      params: {
-        get() {
-          return this.currentPage.params
-        },
+      params() {
+        return this.currentPage.params
       },
 
-      pageId: {
-        get() {
-          return this.currentPage.id
-        },
+      pageId() {
+        return this.currentPage.id
       },
 
-      width: {
-        get() {
-          return parseInt(this.params.width, 10)
-        },
+      width() {
+        return parseInt(this.params.width, 10)
       },
 
-      height: {
-        get() {
-          return parseInt(this.params.height, 10)
-        },
+      height() {
+        return parseInt(this.params.height, 10)
       },
 
-      xOffset: {
-        get() {
-          const width = document.getElementsByClassName('body-content')[0].clientWidth
-          return (width - this.width) / 2
-        },
+      xOffset() {
+        const width = window.screen.width
+        return (width - this.width) / 2
       },
 
-      yOffset: {
-        get() {
-          const height = document.getElementsByClassName('body-content')[0].clientHeight
-          return (height - this.height) / 2
-        },
+      yOffset() {
+        const height = window.screen.height
+        return (height - this.height) / 2
       },
 
-      configKonva: {
-        get() {
-          return {
-            width: window.innerWidth,
-            height: window.innerHeight,
-            draggable: false,
-          }
-        },
-      },
-
-      backgroundUrl: {
-        get() {
-          return this.currentPage.backgroundUrl
-        },
-      },
-
-      backgroundConfig: {
-        get() {
-          return {
-            name: 'background',
-            url: this.backgroundUrl,
-            width: this.width,
-            height: this.height,
-            x: 0,
-            y: 0,
-          }
-        },
-      },
-
-      isMaster: {
-        get() {
-          return this.user.id === this.master.id
+      configKonva() {
+        return {
+          width: this.width,
+          height: this.height,
+          draggable: false,
         }
-      }
+      },
+
+      backgroundUrl() {
+        return this.currentPage.backgroundUrl
+      },
+
+      backgroundConfig() {
+        return {
+          name: 'background',
+          url: this.backgroundUrl,
+          width: this.width,
+          height: this.height,
+          x: 0,
+          y: 0,
+        }
+      },
+
+      isMaster() {
+        return this.user.id === this.master.id
+      },
     },
 
     created() {
@@ -201,14 +179,14 @@
     methods: {
       mousePosition() {
         const stage = this.$refs.stage.getStage()
-        const pos = stage.getPointerPosition()
         const transform = stage.getAbsoluteTransform().copy()
         transform.invert()
+        const pos = stage.getPointerPosition()
         return transform.point(pos)
       },
 
-      handleDrop({ sheet, image }, e) {
-        const position = mousePosition(e)
+      handleDrop({ sheet, image }) {
+        const position = this.mousePosition()
         if (sheet) return this.sendToken(sheet, position)
         if (image) return this.sendImage(image, position)
       },
@@ -245,10 +223,8 @@
       },
 
       setPosition() {
-        if (this.currentPage.backgroundUrl) {
-          const map = this.$refs.map.getNode()
-          map.absolutePosition({ x: this.xOffset, y: this.yOffset })
-        }
+        const stage = this.$refs.stage.getStage()
+        stage.setPosition({ x: this.xOffset, y: this.yOffset })
       },
 
       setDrawing() {
