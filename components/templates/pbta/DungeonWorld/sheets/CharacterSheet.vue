@@ -8,9 +8,12 @@
         <span class="xolonium-font">Ходы</span>
       </v-tab>
       <v-tab :class="[{ 'white--text': tab !== 2 }, 'tab']" active-class="tab-active">
-        <span class="xolonium-font">Снаряжение</span>
+        <span class="xolonium-font">Заклинания</span>
       </v-tab>
       <v-tab :class="[{ 'white--text': tab !== 3 }, 'tab']" active-class="tab-active">
+        <span class="xolonium-font">Снаряжение</span>
+      </v-tab>
+      <v-tab :class="[{ 'white--text': tab !== 4 }, 'tab']" active-class="tab-active">
         <span class="xolonium-font">Отношения</span>
       </v-tab>
     </v-tabs>
@@ -22,6 +25,10 @@
 
       <v-tab-item>
         <character-move-body :id="id" />
+      </v-tab-item>
+
+      <v-tab-item>
+        <character-spells-body :id="id" />
       </v-tab-item>
 
       <v-tab-item>
@@ -46,10 +53,12 @@
   import CharacterMoveBody from './CharacterMoveBody'
   import CharacterEquipmentBody from './CharacterEquipmentBody'
   import CharacterRelationshipBody from './CharacterRelationshipBody'
+  import CharacterSpellsBody from './CharacterSpellsBody'
 
   export default {
     name: 'CharacterSheet',
     components: {
+      CharacterSpellsBody,
       CharacterRelationshipBody,
       CharacterEquipmentBody,
       CharacterMoveBody,

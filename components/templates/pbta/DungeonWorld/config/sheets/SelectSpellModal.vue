@@ -12,6 +12,10 @@
               label="название"
               color="indigo"
             />
+            <v-checkbox
+              v-model="isDefault"
+              label="Все на старте"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -73,13 +77,13 @@
         }
       },
 
-      multiple: {
+      isDefault: {
         get() {
-          return this.item.multiple
+          return this.item.isDefault
         },
 
         set(value) {
-          this.$set(this.item, 'multiple', value)
+          this.$set(this.item, 'isDefault', value)
         }
       },
     },

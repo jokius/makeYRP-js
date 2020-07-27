@@ -448,6 +448,7 @@
         this.input('role', role)
         this.changeAttrs()
         this.changeMoves()
+        this.changeSpells()
         this.changeEquipment()
         this.changeRelationship()
       },
@@ -469,6 +470,13 @@
                              path: 'damage',
                              value: this.role.damage,
                            })
+
+        this.$store.commit('game/updateSheetParams',
+                           {
+                             id: this.sheet.id,
+                             path: 'weight',
+                             value: this.role.weight,
+                           })
       },
 
       changeMoves() {
@@ -478,6 +486,21 @@
             id: this.sheet.id,
             path: 'moves',
             value: moves,
+          })
+      },
+
+      changeSpells() {
+        console.log('this.tables.spells[this.role.key]', this.tables.spells[this.role.key])
+        let spells = (this.tables.spells[this.role.key] || []).map(group => ({
+          title: group.title,
+          items: group.isDefault ? group.items : []
+        }))
+
+        this.$store.commit('game/updateSheetParams',
+          {
+            id: this.sheet.id,
+            path: 'spells',
+            value: spells,
           })
       },
 

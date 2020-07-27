@@ -86,5 +86,9 @@ module.exports = {
     { src: '~/plugins/wysiwyg', ssr: false },
     { src: '~/plugins/konva', ssr: false },
   ],
+  vue: {
+    config: ({ isDev }) => ({
+      devtools: isDev
+    })
+  }
 }
-
