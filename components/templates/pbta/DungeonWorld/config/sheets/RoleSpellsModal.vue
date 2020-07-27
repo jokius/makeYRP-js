@@ -50,7 +50,7 @@
                 <v-btn
                   color="indigo"
                   dark
-                  @click="showModal({ ...spell, restore: true }, `selectEquipment.${roleKey}[${select.index}].items`)">
+                  @click="showModal({ ...item, restore: true }, `selectEquipment.${roleKey}[${select.index}].items`)">
                   <span>Изменить</span>
                 </v-btn>
                 <v-btn

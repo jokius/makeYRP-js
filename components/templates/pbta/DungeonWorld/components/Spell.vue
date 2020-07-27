@@ -82,7 +82,7 @@
       },
 
       description() {
-        return this.spell.name
+        return this.spell.description
       },
     },
 
