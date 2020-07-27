@@ -87,7 +87,7 @@
       result: {
         get() {
           const dices = this.dices.reduce((accumulator, dice) => accumulator + dice)
-          let characteristicResult = Dw.statShortValue(this.stat.value)
+          let characteristicResult = this.stat?.value ? Dw.statShortValue(this.stat.value) : 0
           return dices + characteristicResult + this.modifier
         },
       },
@@ -104,7 +104,7 @@
       fullResult: {
         get() {
           let message = `<div>бросок: ${this.dices.join('+')}</div>`
-          message += `<div>${this.stat.short}: ${Dw.statShortValue(this.stat.value)}</div>`
+          if (this.stat) message += `<div>${this.stat.short}: ${Dw.statShortValue(this.stat.value)}</div>`
           message += `<div>модификатор: ${this.modifier}</div>`
 
           return message
