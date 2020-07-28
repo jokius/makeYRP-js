@@ -152,7 +152,7 @@
       },
 
       removeItem(index) {
-        this.$store.commit('gameConfig/update', { path: `customTemplate.table.items`, value: index, remove: true })
+        this.$store.commit('gameConfig/update', { path: `customTemplate.tables.items`, value: index, remove: true })
       },
 
       save() {
