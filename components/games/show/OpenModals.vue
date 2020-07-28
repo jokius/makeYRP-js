@@ -41,7 +41,13 @@
         :planet="modal.planet"
       />
       <eou-item-modal
-        v-else-if="modal.name === 'item'"
+        v-else-if="modal.name === 'eou-item'"
+        :key="`item_${modal.key}`"
+        :uniq-key="modal.key"
+        :item="modal.item"
+      />
+      <dw-item-modal
+        v-else-if="modal.name === 'dw-item'"
         :key="`item_${modal.key}`"
         :uniq-key="modal.key"
         :item="modal.item"
@@ -75,6 +81,7 @@
     components: {
       EouItemModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/EouItemModal'),
       PlanetModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/PlanetModal'),
+      DwItemModal: () => import('../../templates/pbta/DungeonWorld/modals/DwItemModal'),
       NoteModal,
       InfoModal,
       SheetModal,

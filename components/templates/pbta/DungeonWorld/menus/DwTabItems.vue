@@ -23,8 +23,8 @@
           <div class="item-name">
             {{ item.params.name }}
           </div>
-          <div class="item-level">
-            ур. {{ item.params.level }}
+          <div class="item-price">
+            цена {{ item.params.price || 0 }}з.
           </div>
         </div>
       </template>
@@ -38,7 +38,7 @@
   import { uniq } from 'lodash'
 
   export default {
-    name: 'EouTabItems',
+    name: 'DwTabItems',
 
     data() {
       return {
@@ -56,7 +56,7 @@
 
       items() {
         return this.types.map(type => {
-          const children = this.template.items
+          const children = this.template.tables.items
             .filter(item => item.type === type)
             .map((item, index) => ({ id: index + 1, params: item }))
 
@@ -69,14 +69,14 @@
     },
 
     created() {
-      this.types = uniq(this.template.items.map(item => item.type))
+      this.types = uniq(this.template.tables.items.map(item => item.type))
       this.open = this.types.slice()
     },
 
     methods: {
       showModal(item) {
         const key = Date.now()
-        this.$store.commit('game/addOpenModal', { name: 'eou-item', key, item })
+        this.$store.commit('game/addOpenModal', { name: 'dw-item', key, item })
       },
     }
   }
@@ -113,7 +113,7 @@
     text-overflow: ellipsis;
   }
 
-  .item-level {
+  .item-price {
     text-align: center;
     line-height: 32px;
     white-space: nowrap;
