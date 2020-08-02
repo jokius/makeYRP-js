@@ -16,6 +16,7 @@
   "dependencies": {
     "actioncable-vue": "^2.3.2",
     "dart-sass": "^1.25.0",
+    "js-file-download": "^0.4.12",
     "konva": "^7.0.3",
     "lodash": "^4.17.19",
     "nuxt": "^2.13.3",

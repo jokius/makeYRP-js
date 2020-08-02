@@ -53,6 +53,12 @@
         :key="key"
         :size="size"
       />
+      <dw-enemy-sheet
+        v-else-if="sheetName === 'dungeon_world-enemy'"
+        :id="id"
+        :key="key"
+        :size="size"
+      />
       <v-alert
         v-else
         :key="key"
@@ -77,16 +83,17 @@
 
     components: {
       DraggableDialog,
-      EouEnemySheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/EnemySheet'),
-      MutantSheet: () => import('../../templates/MYZ/sheets/MutantSheet'),
-      BidCharacterSheet: () => import('../../templates/BladeInTheDarck/sheets/CharacterSheet'),
-      BidTeamSheet: () => import('../../templates/BladeInTheDarck/sheets/TeamSheet'),
-      HmwCharacterSheet: () => import('../../templates/pbta/HorrorMovieWorld/sheets/CharacterSheet'),
-      HmwMonsterSheet: () => import('../../templates/pbta/HorrorMovieWorld/sheets/MonsterSheet'),
-      EouCharacterSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/CharacterSheet'),
-      EouShipSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/ShipSheet'),
-      EouCompanionSheet: () => import('../../templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'),
-      DwCharacterSheet: () => import('../../templates/pbta/DungeonWorld/sheets/CharacterSheet'),
+      EouEnemySheet: () => import('@/components/templates/pbta/EdgeOfUniverse/sheets/EnemySheet'),
+      MutantSheet: () => import('@/components/templates/MYZ/sheets/MutantSheet'),
+      BidCharacterSheet: () => import('@/components/templates/BladeInTheDarck/sheets/CharacterSheet'),
+      BidTeamSheet: () => import('@/components/templates/BladeInTheDarck/sheets/TeamSheet'),
+      HmwCharacterSheet: () => import('@/components/templates/pbta/HorrorMovieWorld/sheets/CharacterSheet'),
+      HmwMonsterSheet: () => import('@/components/templates/pbta/HorrorMovieWorld/sheets/MonsterSheet'),
+      EouCharacterSheet: () => import('@/components/templates/pbta/EdgeOfUniverse/sheets/CharacterSheet'),
+      EouShipSheet: () => import('@/components/templates/pbta/EdgeOfUniverse/sheets/ShipSheet'),
+      EouCompanionSheet: () => import('@/components/templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'),
+      DwCharacterSheet: () => import('@/components/templates/pbta/DungeonWorld/sheets/CharacterSheet'),
+      DwEnemySheet: () => import('@/components/templates/pbta/DungeonWorld/sheets/EnemySheet'),
     },
 
     props: {
@@ -148,6 +155,8 @@
             case 'edge_of_universe-companion':
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
             case 'dungeon_world-character':
+              return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
+            case 'dungeon_world-enemy':
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
             default:
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }

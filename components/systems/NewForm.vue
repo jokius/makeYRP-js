@@ -43,6 +43,11 @@
                   accept="application/json"
                   label="Файл с дополнительными данными"
                 />
+                <v-file-input
+                  v-model="mediaFile"
+                  accept="application/zip"
+                  label="Zip архив с медиа файлами"
+                />
               </v-form>
             </v-card-text>
             <v-card-actions>
@@ -71,6 +76,7 @@
         file: null,
         dataFile: null,
         privateDataFile: null,
+        mediaFile: null,
       },
     }),
 
@@ -118,6 +124,16 @@
 
         set(value) {
           this.system.privateDataFile = value
+        },
+      },
+
+      mediaFile: {
+        get() {
+          return this.system.mediaFile
+        },
+
+        set(value) {
+          this.system.mediaFile = value
         },
       },
     },

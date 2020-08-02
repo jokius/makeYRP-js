@@ -4,6 +4,7 @@ export const addSystem = ({ axios, params }) => {
   formData.append('file', params.file)
   formData.append('data_file', params.dataFile)
   formData.append('private_data_file', params.privateDataFile)
+  formData.append('media_file', params.mediaFile)
 
   return axios
     .post('systems', formData)
