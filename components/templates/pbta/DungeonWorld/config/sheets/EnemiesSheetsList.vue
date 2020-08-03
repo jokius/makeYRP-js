@@ -1,7 +1,7 @@
 <template>
   <div class="grid">
     <div class="actions">
-      <v-btn color="indigo" dark @click="showModal(emptyEnemy)">
+      <v-btn color="indigo" dark @click="showModal({ ...emptyEnemy })">
         <span>Новый противник</span>
       </v-btn>
 
