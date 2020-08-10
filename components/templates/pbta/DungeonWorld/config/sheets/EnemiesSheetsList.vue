@@ -9,7 +9,7 @@
         <span>Сохранить</span>
       </v-btn>
 
-      <v-btn color="indigo" dark :loading="loading" :disabled="loading" @click="download">
+      <v-btn color="indigo" :dark="!loading" :disabled="loading" @click="download">
         <span>Скачать аватарки</span>
       </v-btn>
     </div>
@@ -195,7 +195,7 @@
       download() {
         this.loading = true
         const keys = this.enemies.map(item => {
-          const path = item.img.versions?.url
+          const path = item.img?.versions?.url
           if (!path) return
 
           const arr = path.split('/')
@@ -228,6 +228,39 @@
     &.cell {
       grid-template-columns: repeat(6, max-content);
       justify-content: normal;
+    }
+  }
+
+  @-moz-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @-webkit-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @-o-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
     }
   }
 </style>
