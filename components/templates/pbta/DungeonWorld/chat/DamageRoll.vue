@@ -1,13 +1,13 @@
 <template>
   <div class="grid-message gray-board">
     <div class="title-block gray-body">
-      <span class="title-body">Урон</span>
+      <span class="title-body">{{ damageName }}</span>
     </div>
     <v-tooltip top>
       <template v-slot:activator="{ on }">
         <p class="number" v-on="on">{{ damage }}</p>
       </template>
-      <div v-html="fullResult" />
+      <div>бросок: {{ dices }}</div>
     </v-tooltip>
   </div>
 </template>
@@ -21,40 +21,17 @@
     },
 
     computed: {
-      results: {
-        get() {
-          return this.body.results
-        },
-      },
-
       dices() {
-        return this.body.dices
-      },
-
-      modifier() {
-        return this.body.modifier || 0
-      },
-
-      fullResult() {
-        let pull = []
-        for (const key in this.dices) {
-          pull = pull.concat(this.dices[key])
-        }
-
-        let message = `<div>бросок: ${pull.join('+')}</div>`
-        message += `<div>модификатор: ${this.modifier}</div>`
-
-        return message
+        return this.body.dices_string
       },
 
       damage() {
-        let result = 0
-        for (const key in this.dices) {
-          result += this.dices[key].reduce((accumulator, item) => accumulator + item)
-        }
-
-        return result + this.modifier
+        return this.body.dices.result
       },
+
+      damageName() {
+        return this.body.name || 'Урон'
+      }
     },
   }
 </script>
