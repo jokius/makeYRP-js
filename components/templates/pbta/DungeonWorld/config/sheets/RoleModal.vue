@@ -76,8 +76,7 @@
 
 <script>
   import slugify from 'slugify'
-
-  const dicesRegx = /(?:(\d+)\s*X\s*)?(\d*)D(\d*)((?:[+\/*-]\d+)|(?:[+-][LH]))?/i
+  import { dicesRegx } from '@/lib/dicesRegx'
 
   export default {
     name: 'RoleModal',

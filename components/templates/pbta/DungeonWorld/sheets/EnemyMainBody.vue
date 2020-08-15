@@ -3,18 +3,28 @@
     <div class="main-row1">
       <div class="main-row1-col1">
         <avatar :sheet="sheet" />
-        <damage-button :sheet="sheet.toChat" :damage="damage" />
       </div>
       <div class="main-row1-col2">
         <div class="main-row1-col2-base-info">
-          <v-select
-            :value="enemySelect"
-            :items="enemies"
-            label="Стандартный противник"
-            class="input name"
-            color="indigo"
-            @change="setEnemy"
-          />
+          <div class="select-enemy">
+            <v-select
+              :value="enemySelect"
+              :items="enemies"
+              label="Стандартный противник"
+              class="input name"
+              color="indigo"
+              @change="setEnemy"
+            />
+
+            <v-btn
+              class="button name"
+              color="black"
+              @click="randEnemy"
+              dark
+            >
+              <span>Случайный</span>
+            </v-btn>
+          </div>
           <v-text-field
             v-model="name"
             color="indigo"
@@ -28,7 +38,6 @@
               label="Название атаки"
               color="indigo"
             />
-
             <v-text-field
               v-model="damage"
               color="indigo"
@@ -37,6 +46,14 @@
               :error-messages="damageError"
               :error="damageError !== ''"
             />
+            <v-btn
+              class="button name"
+              color="black"
+              @click="sendDamage"
+              dark
+            >
+              <span>Нанести урон</span>
+            </v-btn>
           </div>
           <div class="tags-grid">
             <span class="label tag-label">Теги атаки</span>
@@ -195,8 +212,8 @@
 <script>
 import { mapState } from 'vuex'
 import Avatar from '@/components/templates/pbta/DungeonWorld/components/Avatar'
-
-const dicesRegx = /(?:(\d+)\s*X\s*)?(\d*)D(\d*)((?:[+\/*-]\d+)|(?:[+-][LH]))?/i
+import { Pbta } from '@/lib/Pbta'
+import { dicesRegx } from '@/lib/dicesRegx'
 
 export default {
   name: 'EnemyMainBody',
@@ -404,6 +421,10 @@ export default {
   },
 
   methods: {
+    randEnemy() {
+      this.setEnemy(Pbta.randomRole(this.enemies).value)
+    },
+
     input(target, value) {
       this.$store.commit('game/updateSheetParams',
         {
@@ -414,7 +435,6 @@ export default {
     },
 
     setEnemy(value) {
-      console.log('value', value)
       this.name = value.name
       this.damage = value.damage
       this.damageName = value.damageName
@@ -456,7 +476,6 @@ export default {
       this.saveSheet()
     },
 
-
     saveSheet() {
       this.$cable.perform({
         channel: 'GameChannel',
@@ -464,6 +483,22 @@ export default {
         data: { ...this.sheet, type: 'sheet' },
       })
     },
+
+    sendDamage() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'add',
+        data: {
+          type: 'message',
+          body: {
+            sheet: this.sheet.toChat,
+            name: `Урон ${this.damageName}`,
+            dices_string: this.damage,
+            isDamage: true,
+          },
+        },
+      })
+    }
   },
 }
 </script>
@@ -478,7 +513,7 @@ export default {
   grid-template-columns: 1fr;
   grid-template-rows: repeat(2, max-content);
   grid-row-gap: 5px;
-  height: 570px;
+  height: 600px;
 }
 
 .main-row1 {
@@ -497,9 +532,15 @@ export default {
   margin-right: 5px;
 }
 
+.select-enemy {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  grid-column-gap: 10px;
+}
+
 .damage-info-grid {
   display: grid;
-  grid-template-columns: 150px max-content;
+  grid-template-columns: 150px max-content max-content;
   grid-column-gap: 10px;
 }
 
