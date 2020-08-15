@@ -11,6 +11,7 @@
       >
         Добавить заклинание
       </v-btn>
+      <v-spacer v-else />
       <v-spacer />
       <v-btn
         class="button-add"
@@ -201,7 +202,7 @@
 
   .actions {
     display: grid;
-    grid-template-columns: max-content 10px max-content 10px max-content;
+    grid-template-columns: max-content 10px max-content;
     justify-content: center;
     margin-top: 15px;
     margin-bottom: 5px;
