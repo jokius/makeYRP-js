@@ -204,8 +204,8 @@
   import Avatar from '../components/Avatar'
 
   import RollModifierModal from '../modals/RollModifierModal'
-  import { Pbta } from '../../../../../lib/Pbta'
-  import { Dw } from '../../../../../lib/Dw'
+  import { Pbta } from '@/lib/Pbta'
+  import { Dw } from '@/lib/Dw'
   import RollDamageModal from '../modals/RollDamageModal'
 
   export default {
@@ -490,7 +490,6 @@
       },
 
       changeSpells() {
-        console.log('this.tables.spells[this.role.key]', this.tables.spells[this.role.key])
         let spells = (this.tables.spells[this.role.key] || []).map(group => ({
           title: group.title,
           items: group.isDefault ? group.items : []
@@ -608,8 +607,15 @@
       },
 
       rollDamage(modifier) {
-        const dices = {}
-        dices[this.damage] = 1
+        let dicesString
+        if (modifier > 0) {
+          dicesString = `${this.damage}+${modifier}`
+        } else if (modifier < 0) {
+          dicesString = `${this.damage}${modifier}`
+        } else {
+          dicesString = this.damage
+        }
+
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'add',
@@ -618,8 +624,7 @@
             body: {
               sheet: this.sheet.toChat,
               name: 'Урон',
-              dices,
-              modifier,
+              dices_string: dicesString,
               isDamage: true,
             },
           },
