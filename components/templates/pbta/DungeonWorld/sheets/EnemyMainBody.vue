@@ -176,7 +176,7 @@
         <v-chip-group column>
           <v-chip
             v-for="(tag, tagIndex) in tags"
-            :key="`damage-tag-${tagIndex}`"
+            :key="`tag-${tagIndex}`"
             close
             @click:close="removeTag(tagIndex)"
           >
@@ -206,6 +206,9 @@
         @change="saveSheet"
       />
     </div>
+
+    <add-tag-modal v-if="tagModalOpen" :obj="objTag" @addTag="value => objTag = value" />
+    <add-tag-modal v-if="damageTagModalOpen" :obj="objDamageTag" @addTag="value => objDamageTag = value" />
   </div>
 </template>
 
@@ -214,17 +217,19 @@ import { mapState } from 'vuex'
 import Avatar from '@/components/templates/pbta/DungeonWorld/components/Avatar'
 import { Pbta } from '@/lib/Pbta'
 import { dicesRegx } from '@/lib/dicesRegx'
+import AddTagModal from '@/components/templates/pbta/DungeonWorld/modals/AddTagModal'
 
 export default {
   name: 'EnemyMainBody',
-  components: { Avatar },
+  components: { AddTagModal, Avatar },
   props: {
     id: { type: Number, required: true },
   },
 
   data() {
     return {
-      modalOpen: false,
+      tagModalOpen: false,
+      damageTagModalOpen: false,
       currentState: {},
       damageError: '',
     }
@@ -408,14 +413,25 @@ export default {
       return this.enemies.find(enemy => enemy.value.key === this.params.key)
     },
 
-    obj: {
+    objTag: {
       get() {
-        return { open: this.modalOpen, move: {} }
+        return { open: this.tagModalOpen, tag: '' }
       },
 
-      set({ open, move }) {
-        this.setMove(move)
-        this.modalOpen = open
+      set({ open, tag, isClose }) {
+        if (!isClose) this.addTag(tag)
+        this.tagModalOpen = open
+      },
+    },
+
+    objDamageTag: {
+      get() {
+        return { open: this.damageTagModalOpen, tag: '' }
+      },
+
+      set({ open, tag, isClose }) {
+        if (!isClose) this.addDamageTag(tag)
+        this.damageTagModalOpen = open
       },
     },
   },
@@ -473,6 +489,54 @@ export default {
       list.splice(index, 1)
       this.input('selects', list)
 
+      this.saveSheet()
+    },
+
+    addDamageTag(tag) {
+      if (!tag) return
+
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `damageTags[${this.tags.length}]`,
+          value: tag,
+        })
+
+      this.saveSheet()
+    },
+
+    removeDamageTag(value){
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `damageTags`,
+          value,
+          remove: true,
+        })
+      this.saveSheet()
+    },
+
+    addTag(tag) {
+      if (!tag) return
+
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `tags[${this.tags.length}]`,
+          value: tag,
+        })
+
+      this.saveSheet()
+    },
+
+    removeTag(value){
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `tags`,
+          value,
+          remove: true,
+        })
       this.saveSheet()
     },
 
