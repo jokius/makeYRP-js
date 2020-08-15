@@ -11,6 +11,7 @@
         :lazy-src="sheet.imgLazy"
         :alt="sheet.name"
         contain
+        width="200"
       >
         <template v-slot:placeholder>
           <v-row
