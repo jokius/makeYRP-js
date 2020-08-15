@@ -140,9 +140,6 @@
 
 
       selectSpells() {
-        console.log('this.tables.spells', this.tables.spells)
-        console.log('this.selectRole', this.selectRole)
-        console.log('this.tables.spells[this.selectRole]', this.tables.spells[this.selectRole])
         const group = this.tables.spells[this.selectRole][this.group]
         const spells = this.spells.find(spellGroup => spellGroup.title === group.title)?.items || []
 
