@@ -35,12 +35,31 @@
       </div>
 
       <span class="spell-description" v-html="description" />
+      <div v-if="enable" class="cast-spell">
+        <v-text-field
+          v-model="castSpell"
+          color="indigo"
+          label="Кубик заклинания"
+          hint="d4, d6 и тд; L - если меньшее, H - если большее"
+          :error-messages="diceError"
+          :error="diceError !== ''"
+        />
+        <v-btn
+          class="cast-button"
+          color="black"
+          @click="sendCast"
+          dark
+        >
+          <span>Получить результат</span>
+        </v-btn>
+      </div>
     </details>
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
+  import { dicesRegx } from '@/lib/dicesRegx'
 
   export default {
     name: 'Spell',
@@ -57,6 +76,7 @@
         privateType: {},
         modalOpen: false,
         privateAltType: null,
+        diceError: ''
       }
     },
 
@@ -84,6 +104,22 @@
       description() {
         return this.spell.description
       },
+
+      castSpell: {
+        get() {
+          return this.spell.castSpell || ''
+        },
+
+        set(value) {
+          if (value.search(dicesRegx) < 0) {
+            this.diceError = 'Не корректный формат'
+          } else {
+            this.diceError = ''
+          }
+
+          this.input('castSpell', value)
+        },
+      },
     },
 
     methods: {
@@ -100,11 +136,16 @@
       },
 
       changeSpell(value) {
+        this.input('enable', value)
+      },
+
+
+      input(key, value) {
         this.$store.commit('game/updateSheetParams',
           {
             id: this.sheet.id,
-            path: `${this.path}[${this.index}].enable`,
-            value: value,
+            path: `${this.path}[${this.index}].${key}`,
+            value,
           })
 
         this.saveSheet()
@@ -133,6 +174,24 @@
           },
         })
       },
+
+      sendCast() {
+        if (this.castSpell === '') return
+
+        this.$cable.perform({
+          channel: 'GameChannel',
+          action: 'add',
+          data: {
+            type: 'message',
+            body: {
+              sheet: this.sheet.toChat,
+              name: `${this.name}`,
+              dices_string: this.castSpell,
+              isDamage: true,
+            },
+          },
+        })
+      }
     },
   }
 </script>
@@ -181,11 +240,21 @@
     margin-top: 4px;
   }
 
+  .cast-button {
+    margin-top: 16px;
+  }
+
   .actions {
     display: grid;
     grid-template-columns: max-content;
     grid-row-gap: 10px;
     margin-top: 15px;
     margin-bottom: 5px;
+  }
+
+  .cast-spell {
+    display: grid;
+    grid-template-columns: 200px max-content;
+    grid-column-gap: 5px;
   }
 </style>
