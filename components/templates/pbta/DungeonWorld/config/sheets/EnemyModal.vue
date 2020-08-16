@@ -331,7 +331,7 @@
       removeMove(index) {
         const list = this.moves.slice()
         list.splice(index, 1)
-        this.input('selects', list)
+        this.input('moves', list)
       },
 
       input(key, value) {
