@@ -7,7 +7,7 @@
       <div class="main-row1-col2">
         <div class="main-row1-col2-base-info">
           <div class="select-enemy">
-            <v-select
+            <v-autocomplete
               :value="enemySelect"
               :items="enemies"
               label="Стандартный противник"
