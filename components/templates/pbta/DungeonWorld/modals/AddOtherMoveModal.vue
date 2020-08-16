@@ -61,7 +61,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import { Pbta } from '../../../../../lib/Pbta'
+  import { Pbta } from '~/lib/Pbta'
 
   export default {
     name: 'AddOtherMoveModal',
@@ -79,8 +79,8 @@
     data() {
       return {
         move: {},
-        privateGroup: '',
-        privateSelectRole: '',
+        privateGroup: null,
+        privateSelectRole: null,
       }
     },
 
@@ -129,7 +129,7 @@
 
       group: {
         get() {
-          return this.privateGroup || this.movesGroups.first.value
+          return this.privateGroup || this.movesGroups[0].value
         },
 
         set(value) {
@@ -140,7 +140,8 @@
       selectMoves() {
         if (!this.selectRole) return []
 
-        return Pbta.mapMoves(this.tables.specialMoves[this.selectRole][this.group], this.moves)
+        const moves = { l_1:  this.tables.startMoves[this.selectRole], ...this.tables.specialMoves[this.selectRole] }
+        return Pbta.mapMoves(moves[this.group], this.moves)
       },
     },
 
