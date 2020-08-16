@@ -247,7 +247,7 @@
           return this.sheet.name
         },
         set(name) {
-          this.$store.commit('game/updateSheetParams', { id: this.sheet.id, name })
+          this.$store.commit('game/updateSheetName', { id: this.sheet.id, name })
         },
       },
 
