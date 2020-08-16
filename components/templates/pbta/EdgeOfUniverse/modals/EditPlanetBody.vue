@@ -157,7 +157,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import { d6roll } from '../../../../../lib/rollDices'
+  import { d6roll } from '~/lib/rollDices'
 
   export default {
     name: 'EditPlanetBody',
@@ -286,6 +286,7 @@
 
       input(path, value) {
         if (this.isNew) {
+          // eslint-disable-next-line vue/no-mutating-props
           this.planet.params[path] = value
         } else {
           this.$store.commit('game/updateMenuItemParams', {
