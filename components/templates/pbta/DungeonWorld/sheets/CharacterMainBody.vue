@@ -4,7 +4,7 @@
       <avatar :sheet="sheet" />
       <div class="main-row1-col2">
         <div class="main-row1-col2-base-info">
-          <v-select
+          <v-autocomplete
             :value="role.key"
             :items="tableRoles"
             label="Класс"
