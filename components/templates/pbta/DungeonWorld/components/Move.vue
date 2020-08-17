@@ -341,6 +341,13 @@
       },
 
       showDescription() {
+        let description = this.move.description
+        this.selects.forEach(select => {
+          const item = select.items[select.value]
+          description += `<div>${item.text}</div>`
+          if (item.description !== '') description += `<div>${item.description}</div>`
+        })
+
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'add',
@@ -349,7 +356,7 @@
             body: {
               sheet: this.sheet.toChat,
               name: this.move.name,
-              description: this.move.description,
+              description: description,
               showDescription: true,
             },
           },
