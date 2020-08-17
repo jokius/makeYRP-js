@@ -54,17 +54,25 @@
                 label="множоственный выбор"
               />
               <div v-for="(item, itemIndex) in select.items" :key="`select-item-${index}-${itemIndex}`">
-                <div class="item-grid">
+                <div class="move-select-item-grid">
                   <v-text-field
-                    label="элемент"
+                    class="move-select-item-name"
+                    label="название"
                     color="indigo"
-                    :value="item"
-                    @input="value => changeItem(index, itemIndex, value)"
+                    :value="item.text"
+                    @input="value => changeText(index, itemIndex, value)"
+                  />
+                  <v-text-field
+                    class="move-select-item-description"
+                    label="описание"
+                    color="indigo"
+                    :value="item.description"
+                    @input="value => changeDescription(index, itemIndex, value)"
                   />
                   <v-btn
+                    class="move-select-item-remove"
                     color="red darken-4"
-                    fab
-                    x-small
+                    small
                     dark
                     @click="removeItem(index, itemIndex)"
                   >
@@ -262,41 +270,49 @@
 
     methods: {
       addSelect() {
-        const list = this.selects.slice()
+        const list = JSON.parse(JSON.stringify(this.selects))
         list.push({ label: '', items: [], multiple: false })
         this.input('selects', list)
       },
 
       changeLabel(index, value) {
-        const list = this.selects.slice()
+        const list = JSON.parse(JSON.stringify(this.selects))
         list[index].label = value
         this.input('selects', list)
       },
 
       changeMultiple(index, value) {
-        const list = this.selects.slice()
+        const list = JSON.parse(JSON.stringify(this.selects))
         list[index] = { ...list[index], multiple: value }
         this.input('selects', list)
       },
 
       addItem(index) {
-        const list = this.selects.slice()
-        list[index].items = list[index].items.slice() || []
-        list[index].items.push("")
+        const list = JSON.parse(JSON.stringify(this.selects))
+        list[index].items = list[index].items || []
+        list[index].items.push({ text: '', description: '', value: list[index].items.length })
         this.input('selects', list)
       },
 
-      changeItem(index, itemIndex, value) {
-        const list = this.selects.slice()
-        const items = this.selects[index].items.slice()
-        items[itemIndex] = value
-        list[index].items = items
+      changeText(index, itemIndex, value) {
+        const list = JSON.parse(JSON.stringify(this.selects))
+        const item = list[index].items[itemIndex]
+        list[index].items[itemIndex] = { ...item, text: value }
+
+        this.input('selects', list)
+      },
+
+      changeDescription(index, itemIndex, value) {
+        const list = JSON.parse(JSON.stringify(this.selects))
+        const item = list[index].items[itemIndex]
+        list[index].items[itemIndex] = { ...item, description: value }
+
         this.input('selects', list)
       },
 
       removeItem(index, itemIndex) {
-        const list = this.selects.slice()
-        const items = this.selects[index].items.slice()
+        const list = JSON.parse(JSON.stringify(this.selects))
+        const items = JSON.parse(JSON.stringify(this.selects[index].items))
         items.splice(itemIndex, 1)
         list[index].items = items
         this.input('selects', list)
@@ -336,8 +352,26 @@
     margin-bottom: 5px;
   }
 
-  .item-grid {
+  .move-select-item-grid {
     display: grid;
+    grid-column-gap: 5px;
     grid-template-columns: 1fr max-content;
+    grid-template-areas:
+    'name remove'
+    'description remove';
+  }
+
+  .move-select-item-name {
+    grid-area: name;
+  }
+
+  .move-select-item-description {
+    grid-area: description;
+  }
+
+  .move-select-item-remove {
+    grid-area: remove;
+    position: relative;
+    top: 50%;
   }
 </style>

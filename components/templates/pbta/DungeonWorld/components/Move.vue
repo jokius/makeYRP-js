@@ -108,19 +108,20 @@
         @change="saveSheet"
       />
       <div v-if="move.selects" class="selects">
-        <v-select
-          v-for="(select, selectIndex) in selects"
-          :key="`other-select-${selectIndex}`"
-          :items="select.items"
-          class="other-select"
-          color="black"
-          :multiple="select.multiple"
-          flat
-          :value="select.value"
-          :label="select.label"
-          hide-details
-          @change="value => otherSelect(selectIndex, value)"
-        />
+        <div v-for="(select, selectIndex) in selects" :key="`other-select-${selectIndex}`">
+          <v-select
+            :items="select.items"
+            class="other-select"
+            color="black"
+            :multiple="select.multiple"
+            flat
+            :value="select.value"
+            :label="select.label"
+            hide-details
+            @change="value => otherSelect(selectIndex, value)"
+          />
+          <div>{{ select.items[select.value].description }}</div>
+        </div>
       </div>
     </details>
 
@@ -208,6 +209,7 @@
 
       selects: {
         get() {
+          console.log('this.move.selects', this.move.selects)
           return this.move.selects
         },
       },
