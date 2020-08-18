@@ -120,7 +120,7 @@
             hide-details
             @change="value => otherSelect(selectIndex, value)"
           />
-          <div>{{ select.items[select.value].description }}</div>
+          <div>{{ selectDescription(select) }}</div>
         </div>
       </div>
     </details>
@@ -209,7 +209,6 @@
 
       selects: {
         get() {
-          console.log('this.move.selects', this.move.selects)
           return this.move.selects
         },
       },
@@ -260,6 +259,11 @@
     },
 
     methods: {
+      selectDescription(select) {
+        if (!select.value) return ''
+        return select.items[select.value].description
+      },
+
       otherSelect(index, value) {
         this.input(`selects[${index}].value`, value)
         this.saveSheet()
