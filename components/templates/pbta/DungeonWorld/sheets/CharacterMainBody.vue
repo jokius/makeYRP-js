@@ -58,9 +58,9 @@
               <div class="hp-value">
                 <img src="/images/pbta/DungeonWorld/heart.svg" class="heart" />
                 <div class="hp-text-grid">
-                  <input class="hp-input" type="number" v-model.number="hpCurrent" @change="saveSheet">
+                  <input class="hp-input" type="number" v-model.number="hpCurrent" @change="saveSheet" />
                   <div class="separator" />
-                  <input class="hp-input" type="number" v-model.number="hpMax" @change="saveSheet">
+                  <input class="hp-input" type="number" v-model.number="hpMax" @change="saveSheet" />
                 </div>
               </div>
               <div class="heart-after-line" />
@@ -71,7 +71,7 @@
               <div class="level-title">
                 Уровень
               </div>
-              <input class="level" type="number" v-model.number="level" @change="saveSheet">
+              <input class="level" type="number" v-model.number="level" @change="saveSheet" />
               <div class="level-after-line" />
             </div>
 
@@ -79,7 +79,7 @@
               <div class="level-title">
                 Опыт
               </div>
-              <input class="level" type="number" v-model.number="exp" @change="saveSheet">
+              <input class="level" type="number" v-model.number="exp" @change="saveSheet" />
               <div class="vertical-separator" />
               <div class="level">{{ expNeed }}</div>
               <div class="level-after-line" />
@@ -103,9 +103,9 @@
               type="number"
               class="state-input"
               :value="stat.value"
-              @input="e => inputStat({ path: `stats[${index}].value`, oldValue: stat.value, statType: stat.type, e })"
+              @input="e => inputStat({ path: `stats[${index}].value`, statType: stat.type, e })"
               @change="saveSheet"
-            >
+            />
 
             <div class="injury">
               <div class="box-line">
@@ -547,18 +547,8 @@
           })
       },
 
-      inputStat({ path, e, oldValue, statType }) {
-        let value = null
-
-        if (e.inputType === 'insertText') {
-          if (oldValue) {
-            value = parseInt(`${oldValue}${e.data}`) || null
-          } else {
-            value = parseInt(e.data) || null
-          }
-        } else {
-          value = parseInt(`${oldValue}`.slice(0, -1)) || null
-        }
+      inputStat({ path, e, statType }) {
+        const value = e.target.value
 
         this.$store.commit('game/updateSheetParams', { id: this.sheet.id, path, value, })
 
