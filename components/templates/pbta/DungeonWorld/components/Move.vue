@@ -260,8 +260,7 @@
 
     methods: {
       selectDescription(select) {
-        if (!select.value) return ''
-        return select.items[select.value].description
+        return select.items[select.value]?.description || ''
       },
 
       otherSelect(index, value) {
