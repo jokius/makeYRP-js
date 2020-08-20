@@ -14,7 +14,7 @@
     class-name-handle="draggable-dialog-handle"
     @resizing="onResize"
   >
-    <v-card class="resize-style" :style="style">
+    <v-card class="resize-style" :style="style" ref="dragWidow">
       <v-toolbar height="40" dark color="indigo" class="draggable-dialog-header drag-handle">
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer />
@@ -48,9 +48,8 @@
     props: {
       title: { type: String, required: true },
       onClose: { type: Function, required: true },
-      size: { type: Object, required: true },
-      width: { type: Number, default: 200 },
-      height: { type: Number, default: 200 },
+      width: { type: [Number, String], default: 200 },
+      height: { type: [Number, String], default: 200 },
       resizable: { type: Boolean, default: false },
       disableActions: { type: Boolean, default: false },
       backgroundColor: { type: String },
@@ -97,17 +96,30 @@
       this.handleResize();
     },
 
+    mounted() {
+      const el = this.$refs.dragWidow.$el
+      const width = el.clientWidth
+      const height = el.clientHeight
+
+      this.xPoint = (window.innerWidth - width) / 2
+      this.yPoint = (window.innerHeight - height) / 2
+    },
+
     destroyed() {
       window.removeEventListener('resize', this.handleResize)
     },
 
     methods: {
       handleResize() {
-        this.xPoint = (window.innerWidth - this.width) / 2;
-        this.yPoint = (window.innerHeight - this.height) / 2;
+        if (!this.resizable) return
+
+        this.xPoint = (window.innerWidth - this.width) / 2
+        this.yPoint = (window.innerHeight - this.height) / 2
       },
 
       onResize: function (_x, _y, width, height) {
+        if (!this.resizable) return
+
         this.$emit('onResize', { width, height })
       },
     },

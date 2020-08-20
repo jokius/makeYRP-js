@@ -7,6 +7,8 @@ import { loadGame, loadMessages, loadSheets, loadUsers } from '../api/game'
 import { SheetModel } from '../models/SheetModel'
 import { MessageModel } from '../models/MessageModel'
 import { UserModel } from '../models/UserModel'
+import { loadMenuItems } from '@/api/menu'
+import { ItemMenuModel } from '@/models/ItemMenuModel'
 
 export const state = () => ({
   info: null,
@@ -34,15 +36,26 @@ export const state = () => ({
 })
 
 export const actions = {
-  async load({ commit }, { axios, id, user }) {
+  async load({ commit, state }, { axios, id, user }) {
     try {
       commit('gameLoaded', await loadGame({ axios, id }))
       commit('usersLoaded', await loadUsers({ axios, id }))
       const list = await loadSheets({ axios, id })
       commit('sheetsLoaded', { user, list })
       commit('messagesLoaded', await loadMessages({ axios, id }))
-      commit('updateCurrentPage', 0)
-      commit('setLoaded')
+      const promises = []
+      state.info.menus.forEach(menu => {
+        promises.push(loadMenuItems({ axios, id: menu.id }))
+      })
+
+      Promise.all(promises).then(result => {
+        result.forEach(menuItems => {
+          commit('menuItemsLoaded', { user, list: menuItems })
+        })
+
+        commit('updateCurrentPage', 0)
+        commit('setLoaded')
+      })
     } catch (error) {
       handling(error)
     }
@@ -107,6 +120,17 @@ const addSheet = (state, { user, raw }) => {
   state.sheets = [...state.sheets, sheet]
 }
 
+const pushMenuItem = (state, { user, raw }) => {
+  const menuItem = new ItemMenuModel().setInfo(raw)
+  menuItem.acl.currentUserId = user.id
+  menuItem.acl.masterId = state.info.master.id
+  if (!menuItem.acl.canRead) return
+
+  const menu = state.info.menus.find(menu => menu.id === menuItem.menuId)
+  menu.addItem(menuItem)
+  return menuItem
+}
+
 const deleteSheet = (state, id) => state.sheets = state.sheets.filter(sheet => sheet.id !== id)
 
 export const mutations = {
@@ -117,6 +141,10 @@ export const mutations = {
   sheetsLoaded(state, { list, user }) {
     state.sheets = []
     list.map(raw => addSheet(state, { raw, user }))
+  },
+
+  menuItemsLoaded(state, { list, user }) {
+    list.map(raw => pushMenuItem(state, { raw, user }))
   },
 
   changeCurrentCursor(state, value) {
@@ -274,9 +302,11 @@ export const mutations = {
     state.info = state.info.addPage(page)
   },
 
-  addMenuItem(state, raw) {
-    const menu = state.info.menus.find(item => item.id === raw.menu_id)
-    menu.addItem(raw)
+  addMenuItem(state, { raw, user }) {
+    const menuItem = pushMenuItem(state, { raw, user })
+    if (!menuItem.acl.canRead) return
+
+    const menu = state.info.menus.find(item => item.id === menuItem.menuId)
     const mark = menu.params.mark
     if (!mark) return
 
@@ -302,7 +332,7 @@ export const mutations = {
     const menuIndex = menus.findIndex(item => item.id === raw.menu_id)
     const menu = menus[menuIndex]
     const item = menu.items.find(item => item.id === raw.id)
-    item.setInfo(raw)
+    item.setInfo(raw, false)
     state.info = { ...state.info, menus }
   },
 
@@ -338,6 +368,28 @@ export const mutations = {
       else state.sheets = [...state.sheets, sheet]
     } else {
       if (index >= 0) deleteSheet(state, sheet.id)
+    }
+  },
+
+  accessMenuItem(state, { user, raw }) {
+    const menu = state.info.menus.find(menu => menu.id === raw.menu_id)
+    let index = menu.items.findIndex(item => item.id === raw.id)
+    let menuItem = menu.items[index]
+
+    if (menuItem) {
+      menuItem.setInfo(raw)
+    } else {
+      menuItem = new ItemMenuModel().setInfo(raw)
+    }
+
+    menuItem.acl.currentUserId = user.id
+    menuItem.acl.masterId = state.info.master.id
+
+    if (menuItem.acl.canRead) {
+      if (index >= 0) menu.items[index] = menuItem
+      else menu.addItem(menuItem)
+    } else {
+      if (index >= 0) menu.deleteItem(menuItem.id)
     }
   },
 

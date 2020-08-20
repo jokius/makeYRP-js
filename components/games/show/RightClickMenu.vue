@@ -25,12 +25,6 @@
       v-model="renameModal"
       :obj="currentObj"
     />
-
-    <access-modal
-      v-if="accessModal"
-      v-model="accessModal"
-      :obj="currentObj"
-    />
   </div>
 </template>
 
@@ -38,11 +32,10 @@
   import { mapState } from 'vuex'
 
   import RenameModal from './RenameModal'
-  import AccessModal from './AccessModal'
 
   export default {
     name: 'RightClickMenu',
-    components: { AccessModal, RenameModal },
+    components: { RenameModal },
 
     props: {
       position: { type: Object, required: true },
@@ -54,7 +47,6 @@
     data() {
       return {
         renameModal: false,
-        accessModal: false,
         defaultItems: [
           { title: 'Переименовать', callback: () => this.showRename(), level: 'canWrite' },
           { title: 'Доступы', callback: () => this.showAccess(), level: 'canFull' },
@@ -99,7 +91,13 @@
       },
 
       showAccess() {
-        this.accessModal = true
+        const key = Date.now()
+        this.$store.commit('game/addOpenModal',
+          {
+            name: 'access',
+            key,
+            obj: this.currentObj,
+          })
       },
     },
   }

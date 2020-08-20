@@ -1,5 +1,5 @@
 <template>
-  <div class="clock-item-grid">
+  <div class="note-item-grid">
     <clock
       v-model="params"
       :title="clock.params.title"
@@ -67,7 +67,7 @@
 <style scoped lang="scss">
   @import '~assets/css/colors';
 
-  .clock-item-grid {
+  .note-item-grid {
     display: grid;
     grid-template-columns: 1fr max-content;
     justify-items: center;

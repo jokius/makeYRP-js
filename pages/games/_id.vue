@@ -118,7 +118,7 @@
         if (obj.user) this.$store.commit('game/addUser', obj.user)
         if (obj.sheet) this.$store.commit('game/addSheet', { user: this.user, raw: obj.sheet })
         if (obj.page) this.$store.commit('game/addPage', obj.page)
-        if (obj.menu_item) this.$store.commit('game/addMenuItem', obj.menu_item)
+        if (obj.menu_item) this.$store.commit('game/addMenuItem', { user: this.user, raw: obj.menu_item })
         if (obj.message) this.addMessage(obj.message)
       },
 
@@ -138,6 +138,7 @@
 
       accessObj(obj) {
         if (obj.sheet) this.$store.commit('game/accessSheet', { user: this.user, raw: obj.sheet })
+        if (obj.menu_item) this.$store.commit('game/accessMenuItem', { user: this.user, raw: obj.menu_item })
       },
 
       addMessage(message) {

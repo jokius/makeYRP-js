@@ -2,6 +2,13 @@
   <div>
     <template v-for="modal in openModals">
       <page-modal v-if="modal.name === 'page'" :key="`page_${modal.key}`" :uniq-key="modal.key" />
+      <access-modal
+        v-else-if="modal.name === 'access'"
+        :key="`access_${modal.key}`"
+        :uniq-key="modal.key"
+        :obj="modal.obj"
+      />
+
       <color-picker-modal
         v-else-if="modal.name === 'color-picker'"
         :key="`color-picker_${modal.key}`"
@@ -74,11 +81,13 @@
   import InfoModal from './InfoModal'
   import NoteModal from './NoteModal'
   import PageModal from './PageModal'
+  import AccessModal from '@/components/games/show/AccessModal'
 
   export default {
     name: 'OpenModals',
 
     components: {
+      AccessModal,
       EouItemModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/EouItemModal'),
       PlanetModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/PlanetModal'),
       DwItemModal: () => import('../../templates/pbta/DungeonWorld/modals/DwItemModal'),
