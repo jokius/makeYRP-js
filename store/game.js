@@ -1,14 +1,15 @@
 import { get, set } from 'lodash'
-import { FolderModel } from '../models/FolderModel'
-import { createFolder, deleteFolder, deleteImage, loadFolder, updateFolder, updateImage } from '../api/folder'
-import { handling } from '../lib/errorsHandling'
-import { GameModel } from '../models/GameModel'
-import { loadGame, loadMessages, loadSheets, loadUsers } from '../api/game'
-import { SheetModel } from '../models/SheetModel'
-import { MessageModel } from '../models/MessageModel'
-import { UserModel } from '../models/UserModel'
-import { loadMenuItems } from '@/api/menu'
-import { ItemMenuModel } from '@/models/ItemMenuModel'
+import { FolderModel } from '@/models/FolderModel'
+import { createFolder, deleteFolder, deleteImage, loadFolder, updateFolder, updateImage } from '@/api/folder'
+import { handling } from '@/lib/errorsHandling'
+import { GameModel } from '@/models/GameModel'
+import { loadGame, loadMessages, loadSheets, loadUsers } from '@/api/game'
+import { SheetModel } from '@/models/SheetModel'
+import { MessageModel } from '@/models/MessageModel'
+import { UserModel } from '@/models/UserModel'
+import { loadMenuFolders } from '@/api/menu'
+import { MenuItemModel } from '@/models/MenuItemModel'
+import { MenuFolderItemModel } from '@/models/MenuFolderItemModel'
 
 export const state = () => ({
   info: null,
@@ -45,14 +46,11 @@ export const actions = {
       commit('messagesLoaded', await loadMessages({ axios, id }))
       const promises = []
       state.info.menus.forEach(menu => {
-        promises.push(loadMenuItems({ axios, id: menu.id }))
+        promises.push(loadMenuFolders({ axios, id: menu.id }))
       })
 
       Promise.all(promises).then(result => {
-        result.forEach(menuItems => {
-          commit('menuItemsLoaded', { user, list: menuItems })
-        })
-
+        result.forEach(raw => commit('menuRootFolder', { user, raw }))
         commit('updateCurrentPage', 0)
         commit('setLoaded')
       })
@@ -121,13 +119,16 @@ const addSheet = (state, { user, raw }) => {
 }
 
 const pushMenuItem = (state, { user, raw }) => {
-  const menuItem = new ItemMenuModel().setInfo(raw)
-  menuItem.acl.currentUserId = user.id
-  menuItem.acl.masterId = state.info.master.id
+  const menuItem = new MenuItemModel().setInfo({
+    data: raw.data,
+    changeAcl: true,
+    currentUserId: user.id,
+    masterId: state.info.master.id,
+  })
   if (!menuItem.acl.canRead) return
 
   const menu = state.info.menus.find(menu => menu.id === menuItem.menuId)
-  menu.addItem(menuItem)
+  menu.addItemToFolder(menuItem)
   return menuItem
 }
 
@@ -143,8 +144,16 @@ export const mutations = {
     list.map(raw => addSheet(state, { raw, user }))
   },
 
-  menuItemsLoaded(state, { list, user }) {
-    list.map(raw => pushMenuItem(state, { raw, user }))
+  menuRootFolder(state, { raw, user }) {
+    const rootFolder = new MenuFolderItemModel().setInfo({
+      data: raw.data,
+      changeAcl: true,
+      currentUserId: user.id,
+      masterId: state.info.master.id,
+    })
+
+    const menu = state.info.menus.find(menu => menu.id === rootFolder.menuId)
+    menu.rootFolder = rootFolder
   },
 
   changeCurrentCursor(state, value) {
@@ -222,11 +231,11 @@ export const mutations = {
     state.sheets[index].name = name
   },
 
-  updateMenuItemParams(state, { id, menuId, path, value }) {
+  updateMenuItemParams(state, { id, menuId, folderId, path, value }) {
     const menus = state.info.menus
-    const menuIndex = menus.findIndex(item => item.id === menuId)
-    const menu = menus[menuIndex]
-    const item = menu.items.find(item => item.id === id)
+    const menu = menus.find(item => item.id === menuId)
+    const folder = menu.folderById(menu.rootFolder, folderId)
+    const item = folder.items.find(item => item.id === id)
     set(item.params, path, value)
   },
 
@@ -302,9 +311,32 @@ export const mutations = {
     state.info = state.info.addPage(page)
   },
 
+  addMenuFolder(state, { raw, user }) {
+    if (state.info.master.id !== user.id) return
+
+    const path = raw.data.attributes.path
+    const menu = state.info.menus.find(menu => menu.id === raw.data.attributes.menuId)
+    let parentFolder
+    let folder
+    const newFolder = new MenuFolderItemModel().setInfo({ data: raw.data, changeAcl: false })
+
+    path.forEach((id, index) => {
+      if (path.length === index + 1) return
+
+      parentFolder = (parentFolder || menu.rootFolder).children.find(item => item.id === id.toString())
+      folder = parentFolder.children.find(item => item.id === path[index + 1]) || null
+    })
+
+    if (folder) {
+      folder.setInfo({ data: raw.data, changeAcl: false })
+    } else {
+      (parentFolder || menu.rootFolder).children.push(newFolder)
+    }
+  },
+
   addMenuItem(state, { raw, user }) {
     const menuItem = pushMenuItem(state, { raw, user })
-    if (!menuItem.acl.canRead) return
+    if (!menuItem) return
 
     const menu = state.info.menus.find(item => item.id === menuItem.menuId)
     const mark = menu.params.mark
@@ -327,13 +359,22 @@ export const mutations = {
     state.info = state.info.updatePage(page)
   },
 
+  updateFolderItem(state, raw) {
+    const menus = state.info.menus
+    const menuId = raw.data.attributes.menuId
+    const menu = menus.find(item => item.id === menuId)
+    const folder = menu.folderById(menu.rootFolder, raw.data.id)
+    folder.setInfo({ data: raw.data, changeAcl: false })
+  },
+
   updateMenuItem(state, raw) {
     const menus = state.info.menus
-    const menuIndex = menus.findIndex(item => item.id === raw.menu_id)
-    const menu = menus[menuIndex]
-    const item = menu.items.find(item => item.id === raw.id)
-    item.setInfo(raw, false)
-    state.info = { ...state.info, menus }
+    const menuId = raw.data.attributes.menuId
+    const folderId = raw.data.attributes.folderId
+    const menu = menus.find(item => item.id === menuId)
+    const folder = menu.folderById(menu.rootFolder, folderId)
+    const item = folder.items.find(item => item.id === raw.data.id)
+    item.setInfo({ data: raw.data, changeAcl: false })
   },
 
   deletePage(state, id) {
@@ -342,12 +383,19 @@ export const mutations = {
     if (maxIndex > state.currentPage) state.currentPage = maxIndex
   },
 
+  deleteMenuFolder(state, raw) {
+    const menus = state.info.menus
+    const menuId = raw.menuId
+    const menu = menus.find(item => item.id === menuId)
+    menu.deleteChild(menu.rootFolder, raw.id)
+  },
+
   deleteMenuItem(state, raw) {
     const menus = state.info.menus
-    const menuIndex = menus.findIndex(item => item.id === raw.menu_id)
-    const menu = menus[menuIndex]
-    menu.items = menu.items.filter(item => item.id !== raw.id)
-    state.info = { ...state.info, menus }
+    const menuId = raw.menuId
+    const menu = menus.find(item => item.id === menuId)
+    const folder = menu.folderById(menu.rootFolder, raw.data.id)
+    folder.items = folder.items.filter(item => item.id !== raw.id)
   },
 
   accessSheet(state, { user, raw }) {
@@ -372,25 +420,16 @@ export const mutations = {
   },
 
   accessMenuItem(state, { user, raw }) {
-    const menu = state.info.menus.find(menu => menu.id === raw.menu_id)
-    let index = menu.items.findIndex(item => item.id === raw.id)
-    let menuItem = menu.items[index]
+    console.log('raw', raw)
+    const rootFolder = new MenuFolderItemModel().setInfo({
+      data: raw.data,
+      changeAcl: true,
+      currentUserId: user.id,
+      masterId: state.info.master.id,
+    })
 
-    if (menuItem) {
-      menuItem.setInfo(raw)
-    } else {
-      menuItem = new ItemMenuModel().setInfo(raw)
-    }
-
-    menuItem.acl.currentUserId = user.id
-    menuItem.acl.masterId = state.info.master.id
-
-    if (menuItem.acl.canRead) {
-      if (index >= 0) menu.items[index] = menuItem
-      else menu.addItem(menuItem)
-    } else {
-      if (index >= 0) menu.deleteItem(menuItem.id)
-    }
+    const menu = state.info.menus.find(menu => menu.id === rootFolder.menuId)
+    menu.rootFolder = rootFolder
   },
 
   addMessage(state, message) {

@@ -1,4 +1,4 @@
-export const loadMenuItems = ({ axios, id }) =>
+export const loadMenuFolders = ({ axios, id }) =>
   axios
-    .get(`menu/${id}/items.json`)
+    .get(`menu/${id}/folders.json`)
     .then(response => response.data)

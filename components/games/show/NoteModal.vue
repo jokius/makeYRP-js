@@ -137,6 +137,7 @@
         this.$store.commit('game/updateMenuItemParams', {
           id: this.note.id,
           menuId: this.note.menuId,
+          folderId: this.note.folderId,
           path,
           value,
         })
@@ -148,7 +149,7 @@
             channel: 'GameChannel',
             action: 'add',
             data: {
-              menu_id: this.note.menuId,
+              folder_id: this.note.folderId,
               params: { title: this.privateTitle, text: this.privateText },
               type: 'menu_item',
             },

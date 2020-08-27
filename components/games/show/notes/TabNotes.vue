@@ -1,29 +1,38 @@
 <template>
   <div>
-    <div class="grid">
-      <v-btn
-        class="selectButton"
-        color="indigo"
-        tile
-        dark
-        @click="showModal"
-      >
-        Добавить заметку
-      </v-btn>
-      <notes-list :list="menu.items" />
-    </div>
+    <v-overflow-btn
+      class="selectButton"
+      :items="items"
+      label="Создать"
+      color="indigo"
+      segmented
+      item-color="indigo"
+      hide-details
+      @change="value => add(value)"
+    />
+
+    <notes-folder :folder="menu.rootFolder" />
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
-
-  import NotesList from './NotesList'
-  import { ItemMenuModel } from '../../../../models/ItemMenuModel'
+  import NotesFolder from '@/components/games/show/notes/NotesFolder'
+  import { MenuItemModel } from '@/models/MenuItemModel'
 
   export default {
     name: 'TabNotes',
-    components: { NotesList },
+
+    components: { NotesFolder },
+
+    data() {
+      return {
+        items: [
+          { text: 'папку', value: 'folder' },
+          { text: 'заметку', value: 'note' },
+        ]
+      }
+    },
 
     computed: {
       ...mapState({
@@ -37,37 +46,32 @@
       },
     },
 
-    activated() {
-      this.$store.commit('game/resetMarker', 'notes')
-    },
-
     methods: {
-      showModal() {
+      add(type) {
         const key = Date.now()
-        const note = new ItemMenuModel()
-        note.menuId = this.menu.id
-        this.$store.commit('game/addOpenModal', {
-          name: 'note',
-          key,
-          isNew: true,
-          isEdit: true,
-          note,
-        })
+        switch (type) {
+          case 'folder':
+            this.$store.commit('game/addOpenModal',
+              {
+                name: 'rename-item-folder',
+                parentId: this.folder.id,
+                key,
+                isNew: true,
+                oldName: 'Новая папка',
+              })
+            return
+          case 'note':
+            const note = new MenuItemModel()
+            note.folderId = this.folder.id
+            this.$store.commit('game/addOpenModal', {
+              name: 'note',
+              key,
+              isNew: true,
+              isEdit: true,
+              note,
+            })
+        }
       },
-    },
+    }
   }
 </script>
-
-<style scoped lang="scss">
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-auto-rows: auto;
-    grid-row-gap: 5px;
-  }
-
-  .selectButton {
-    margin: 0;
-    width: auto;
-  }
-</style>

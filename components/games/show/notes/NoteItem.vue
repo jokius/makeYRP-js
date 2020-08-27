@@ -1,35 +1,32 @@
 <template>
   <right-click-menu :position="position" :current-obj="obj" :acl="note.acl" :replacedItems="replacedItems">
-    <v-list-item class="note-item-grid" @contextmenu="handler($event)">
-      <span>{{ note.params.title }}</span>
-      <v-btn
-        fab
-        x-small
-        dark
-        @click="viewNote"
-      >
-        <v-icon>mdi-eye-outline</v-icon>
-      </v-btn>
-      <v-btn
-        v-if="note.acl.canWrite"
-        fab
-        x-small
-        dark
-        @click="editNote"
-      >
-        <v-icon>mdi-pencil</v-icon>
-      </v-btn>
-      <v-btn
-        v-if="note.acl.canFull"
-        color="red darken-4"
-        fab
-        x-small
-        dark
-        @click="deleteNote"
-      >
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
-    </v-list-item>
+    <div class="note-item-grid hover-color" @contextmenu="handler($event)">
+      <v-icon>mdi-note</v-icon>
+      <div class="note-item-title" @click="open">{{ note.params.title }}</div>
+
+      <v-menu bottom left>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on">
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item @click="viewNote">
+            <v-list-item-title>Посмотреть</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="note.acl.canWrite" @click="editNote">
+            <v-list-item-title>Изменить</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="note.acl.canFull" @click="showAccess">
+            <v-list-item-title>Доступы</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="note.acl.canFull" @click="deleteNote">
+            <v-list-item-title>Удалить</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
   </right-click-menu>
 </template>
 
@@ -72,6 +69,14 @@
     },
 
     methods: {
+      open() {
+        if (this.note.acl.canWrite) {
+          this.editNote()
+        } else {
+          this.viewNote()
+        }
+      },
+
       handler(e) {
         this.position = mousePosition(e)
         this.$store.commit('game/updateCurrentRightClickMenu', `note-${this.note.id}`)
@@ -120,13 +125,23 @@
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .note-item-grid {
-    display: grid;
-    grid-template-columns: 1fr max-content max-content max-content;
-    grid-column-gap: 5px;
-    justify-items: center;
-    align-items: center;
+.note-item-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  grid-column-gap: 5px;
+  margin-bottom: 10px;
+}
+
+.note-item-title {
+  line-height: 32px;
+  cursor: pointer;
+}
+
+.hover-color {
+  &:hover {
+    background: $indigoRGBA;
   }
+}
 </style>

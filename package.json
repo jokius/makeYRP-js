@@ -19,7 +19,7 @@
     "js-file-download": "^0.4.12",
     "konva": "^7.0.5",
     "lodash": "^4.17.20",
-    "nuxt": "^2.14.1",
+    "nuxt": "^2.14.3",
     "short-uuid": "^3.1.1",
     "slugify": "^1.4.5",
     "vue": "^2.6.11",
@@ -28,7 +28,7 @@
     "vue-konva": "^2.1.4",
     "vue-wysiwyg": "^1.7.2",
     "vue2-dropzone": "^3.6.0",
-    "vuetify": "2.3.8"
+    "vuetify": "2.3.9"
   },
   "devDependencies": {
     "@nuxtjs/auth": "^4.9.1",

@@ -8,15 +8,17 @@ export class AclModel {
   readIds = []
   writeIds = []
 
-  setInfo(raw) {
-    if (!raw) return this
+  setInfo({ data, currentUserId, masterId }) {
+    if (!data) return this
 
-    this.id = raw.id
-    this.writeAll = raw.write_all
-    this.readAll = raw.read_all
-    this.ownerId = raw.owner_id
-    this.readIds = raw.read_ids
-    this.writeIds = raw.write_ids
+    this.id = data.id
+    this.currentUserId = currentUserId
+    this.masterId = masterId
+    this.writeAll = data.writeAll
+    this.readAll = data.readAll
+    this.ownerId = data.ownerId
+    this.readIds = data.readIds
+    this.writeIds = data.writeIds
 
     return this
   }

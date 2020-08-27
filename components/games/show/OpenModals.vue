@@ -16,6 +16,15 @@
         :target="modal.target"
         :start-color="modal.startColor"
       />
+      <rename-item-folder
+        v-else-if="modal.name === 'rename-item-folder'"
+        :key="`rename-item-folder_${modal.key}`"
+        :uniq-key="modal.key"
+        :id="modal.id"
+        :parent-id="modal.parentId"
+        :is-new="modal.isNew"
+        :old-name="modal.oldName"
+      />
       <sheet-modal
         v-else-if="modal.name === 'sheet'"
         :id="modal.id"
@@ -82,11 +91,13 @@
   import NoteModal from './NoteModal'
   import PageModal from './PageModal'
   import AccessModal from '@/components/games/show/AccessModal'
+  import RenameItemFolder from '@/components/games/show/RenameItemFolder'
 
   export default {
     name: 'OpenModals',
 
     components: {
+      RenameItemFolder,
       AccessModal,
       EouItemModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/EouItemModal'),
       PlanetModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/PlanetModal'),

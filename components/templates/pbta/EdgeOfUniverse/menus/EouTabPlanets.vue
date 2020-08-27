@@ -20,7 +20,7 @@
   import { mapState } from 'vuex'
 
   import PlanetsList from './PlanetsList'
-  import { ItemMenuModel } from '../../../../../models/ItemMenuModel'
+  import { MenuItemModel } from '../../../../../models/MenuItemModel'
 
   export default {
     name: 'EouTabPlanets',
@@ -48,7 +48,7 @@
     methods: {
       showModal() {
         const key = Date.now()
-        const planet = new ItemMenuModel()
+        const planet = new MenuItemModel()
         planet.menuId = this.menu.id
         this.$store.commit('game/addOpenModal', {
           name: 'planet',
