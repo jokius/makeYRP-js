@@ -13,7 +13,7 @@ export class UserModel {
     this.nickname = raw.nickname
     this.avatar = raw.avatar
     this.admin = Boolean(raw.admin)
-    this.sheet = new SheetModel().setInfo(raw.sheet) || {}
+    this.sheet = new SheetModel().setInfo({ data: raw.sheet, changeAcl: false }) || {}
     return this
   }
 

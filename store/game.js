@@ -42,7 +42,7 @@ export const actions = {
       commit('gameLoaded', await loadGame({ axios, id }))
       commit('usersLoaded', await loadUsers({ axios, id }))
       const list = await loadSheets({ axios, id })
-      commit('sheetsLoaded', { user, list })
+      commit('sheetsLoaded', { user, list: list.data })
       commit('messagesLoaded', await loadMessages({ axios, id }))
       const promises = []
       state.info.menus.forEach(menu => {
@@ -55,6 +55,7 @@ export const actions = {
         commit('setLoaded')
       })
     } catch (error) {
+      console.log('error', error)
       handling(error)
     }
   },
@@ -110,9 +111,12 @@ export const actions = {
 }
 
 const addSheet = (state, { user, raw }) => {
-  const sheet = new SheetModel().setInfo(raw)
-  sheet.acl.currentUserId = user.id
-  sheet.acl.masterId = state.info.master.id
+  const sheet = new SheetModel().setInfo({
+    data: raw,
+    changeAcl: true,
+    currentUserId: user.id,
+    masterId: state.info.master.id,
+  })
   if (!sheet.acl.canRead) return
 
   state.sheets = [...state.sheets, sheet]
@@ -399,17 +403,24 @@ export const mutations = {
   },
 
   accessSheet(state, { user, raw }) {
-    let index = state.sheets.findIndex(item => item.id === raw.id)
+    let index = state.sheets.findIndex(item => item.id === raw.data.id)
     let sheet = state.sheets[index]
 
     if (sheet) {
-      sheet.setInfo(raw)
+      sheet.setInfo({
+        data: raw.data,
+        changeAcl: true,
+        currentUserId: user.id,
+        masterId: state.info.master.id,
+      })
     } else {
-      sheet = new SheetModel().setInfo(raw)
+      sheet = new SheetModel().setInfo({
+        data: raw.data,
+        changeAcl: true,
+        currentUserId: user.id,
+        masterId: state.info.master.id,
+      })
     }
-
-    sheet.acl.currentUserId = user.id
-    sheet.acl.masterId = state.info.master.id
 
     if (sheet.acl.canRead) {
       if (index >= 0) state.sheets[index] = sheet
@@ -420,7 +431,6 @@ export const mutations = {
   },
 
   accessMenuItem(state, { user, raw }) {
-    console.log('raw', raw)
     const rootFolder = new MenuFolderItemModel().setInfo({
       data: raw.data,
       changeAcl: true,

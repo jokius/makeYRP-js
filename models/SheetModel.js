@@ -9,14 +9,16 @@ export class SheetModel {
   sheetType = ''
   acl = {}
 
-  setInfo(raw, changeAcl = true) {
-    if (!raw.id) return
+  setInfo(params) {
+    if (!params.data.id) return
 
-    this.id = raw.id
-    this.sheetType = raw.sheet_type
-    this.name = raw.name
-    this.params = raw.params
-    if (changeAcl) this.acl = new AclModel().setInfo(raw.acl)
+    this.id = params.data.id
+    const attributes = params.data.attributes
+    this.sheetType = attributes.sheetType
+    this.name = attributes.name
+    this.params = attributes.params
+    if (params.changeAcl) this.acl = this.acl = new AclModel().setInfo({ ...params, data: attributes.acl })
+
     return this
   }
 
