@@ -14,9 +14,9 @@
         </div>
       </div>
     </right-click-menu>
-    <div v-if="open" class="folder-body">
+    <div v-if="open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
       <notes-folder v-for="child in children" :key="`notes-folder-${child.id}`" :folder="child" />
-      <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" :not-root="!isRoot" />
+      <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" />
     </div>
   </div>
 </template>
@@ -178,6 +178,10 @@ export default {
 
 .folder-body {
   margin-left: 5px;
+}
+
+.not-root {
+  margin-left: 30px;
 }
 
 .hover-color {
