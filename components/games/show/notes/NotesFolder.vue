@@ -16,7 +16,7 @@
     </right-click-menu>
     <div v-if="open" class="folder-body">
       <notes-folder v-for="child in children" :key="`notes-folder-${child.id}`" :folder="child" />
-      <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" />
+      <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" :not-root="!isRoot" />
     </div>
   </div>
 </template>
@@ -50,6 +50,10 @@ export default {
       user: state => state.auth.user,
     }),
 
+    isRoot() {
+      return this.folder.depth === 0
+    },
+
     showFolder() {
       return this.user.id === this.master.id || this.deepItems()
     },
@@ -69,7 +73,7 @@ export default {
     style() {
       const depth = this.folder.depth
       const style = {}
-      if (depth > 0) {
+      if (!this.isRoot) {
         style.marginLeft = `${5 * depth}px`
       }
 

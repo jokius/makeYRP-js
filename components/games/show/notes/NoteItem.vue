@@ -1,6 +1,6 @@
 <template>
   <right-click-menu :position="position" :current-obj="obj" :acl="note.acl" :replacedItems="replacedItems">
-    <div class="note-item-grid hover-color" @contextmenu="handler($event)">
+    <div :class="[{ 'not-root': notRoot }, 'note-item-grid', 'hover-color']" @contextmenu="handler($event)">
       <v-icon>mdi-note</v-icon>
       <div class="note-item-title" @click="open">{{ note.params.title }}</div>
 
@@ -41,6 +41,7 @@
 
     props: {
       note: { type: Object, required: true },
+      notRoot: { type: Boolean, required: true },
     },
 
     data: () => ({
@@ -126,6 +127,10 @@
 
 <style scoped lang="scss">
 @import '~assets/css/colors';
+
+.not-root {
+  margin-left: 40px;
+}
 
 .note-item-grid {
   display: grid;

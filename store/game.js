@@ -394,8 +394,8 @@ export const mutations = {
     const menus = state.info.menus
     const menuId = raw.menuId
     const menu = menus.find(item => item.id === menuId)
-    const folder = menu.folderById(menu.rootFolder, raw.data.id)
-    folder.items = folder.items.filter(item => item.id !== raw.id)
+    const folder = menu.folderById(menu.rootFolder, raw.folderId)
+    folder.deleteItem(raw.id)
   },
 
   accessSheet(state, { user, raw }) {
