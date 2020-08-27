@@ -1,9 +1,10 @@
 <template>
   <div>
     <v-overflow-btn
+      v-if="user.id === master.id"
       class="selectButton"
       :items="items"
-      label="Создать"
+      label="Создать..."
       color="indigo"
       segmented
       item-color="indigo"
@@ -28,8 +29,8 @@
     data() {
       return {
         items: [
-          { text: 'папку', value: 'folder' },
-          { text: 'заметку', value: 'note' },
+          { text: 'создать папку', value: 'folder', callback: () => this.add('folder') },
+          { text: 'создать заметку', value: 'note', callback: () => this.add('note') },
         ]
       }
     },
@@ -37,6 +38,8 @@
     computed: {
       ...mapState({
         menus: state => state.game.info.menus,
+        master: state => state.game.info.master,
+        user: state => state.auth.user,
       }),
 
       menu: {
@@ -49,12 +52,13 @@
     methods: {
       add(type) {
         const key = Date.now()
+        const folderId = this.menu.rootFolder.id
         switch (type) {
           case 'folder':
             this.$store.commit('game/addOpenModal',
               {
                 name: 'rename-item-folder',
-                parentId: this.folder.id,
+                parentId: folderId,
                 key,
                 isNew: true,
                 oldName: 'Новая папка',
@@ -62,7 +66,7 @@
             return
           case 'note':
             const note = new MenuItemModel()
-            note.folderId = this.folder.id
+            note.folderId = folderId
             this.$store.commit('game/addOpenModal', {
               name: 'note',
               key,
@@ -70,6 +74,7 @@
               isEdit: true,
               note,
             })
+            return
         }
       },
     }
