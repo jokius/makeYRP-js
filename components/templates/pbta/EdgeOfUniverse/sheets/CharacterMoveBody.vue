@@ -101,7 +101,7 @@
     name: 'CharacterMoveBody',
     components: { AddWorldMoveModal, AddMoveModal, Move },
     props: {
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
     },
 
     data() {

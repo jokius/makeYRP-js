@@ -112,7 +112,7 @@ export const actions = {
 
 const addSheet = (state, { user, raw }) => {
   const sheet = new SheetModel().setInfo({
-    data: raw,
+    data: raw?.data || raw,
     changeAcl: true,
     currentUserId: user.id,
     masterId: state.info.master.id,
@@ -136,7 +136,7 @@ const pushMenuItem = (state, { user, raw }) => {
   return menuItem
 }
 
-const deleteSheet = (state, id) => state.sheets = state.sheets.filter(sheet => sheet.id !== id)
+const deleteSheet = (state, id) => state.sheets = state.sheets.filter(sheet => sheet.id !== id.toString())
 
 export const mutations = {
   gameLoaded(state, game) {
@@ -350,7 +350,7 @@ export const mutations = {
   },
 
   updateSheets(state, sheet) {
-    const index = state.sheets.findIndex(item => item.id === sheet.id)
+    const index = state.sheets.findIndex(item => item.id === sheet.data.id)
     state.sheets[index] = state.sheets[index].setInfo(sheet, false)
   },
 

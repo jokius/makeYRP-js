@@ -123,7 +123,7 @@
     name: 'TabSpecial',
     components: { Move },
     props: {
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
       specialIndex: { type: Number, required: true },
       special: { type: Object, required: true },
     },

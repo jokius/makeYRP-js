@@ -13,11 +13,11 @@ export class SheetModel {
     if (!params.data.id) return
 
     this.id = params.data.id
-    const attributes = params.data.attributes
+    const attributes = params.data?.attributes || params.data
     this.sheetType = attributes.sheetType
     this.name = attributes.name
     this.params = attributes.params
-    if (params.changeAcl) this.acl = this.acl = new AclModel().setInfo({ ...params, data: attributes.acl })
+    if (params.changeAcl) this.acl = new AclModel().setInfo({ ...params, data: attributes.acl })
 
     return this
   }

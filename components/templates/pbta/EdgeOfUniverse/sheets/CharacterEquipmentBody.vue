@@ -50,7 +50,7 @@
     name: 'CharacterEquipmentBody',
     components: { AddStartingEquipmentModal, Equipment },
     props: {
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
     },
 
     data() {

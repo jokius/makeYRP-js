@@ -25,7 +25,7 @@
   export default {
     name: 'CharacterRelationshipBody',
     props: {
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
     },
 
     computed: {

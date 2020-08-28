@@ -67,7 +67,7 @@
     name: 'Specials',
     components: { Move },
     props: {
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
     },
 
     data() {

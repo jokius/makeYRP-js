@@ -98,7 +98,7 @@
 
     props: {
       uniqKey: { type: Number, required: true },
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
       sheetType: { type: String, required: true },
     },
 

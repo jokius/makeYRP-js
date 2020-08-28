@@ -154,7 +154,7 @@
     name: 'ShipCompartments',
     components: { CompartmentEditable, Compartment },
     props: {
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
     },
 
     computed: {

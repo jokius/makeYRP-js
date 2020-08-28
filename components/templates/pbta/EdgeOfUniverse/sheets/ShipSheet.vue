@@ -43,7 +43,7 @@
       CharacterReadOnly,
     },
     props: {
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
       size: { type: Object, required: true },
     },
 

@@ -66,7 +66,7 @@
 
     props: {
       obj: { type: Object, required: true },
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
     },
 
     data() {
