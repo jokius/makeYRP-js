@@ -1,6 +1,6 @@
-import { handling } from '../lib/errorsHandling'
-import { createGame, loadGames, switchStatus } from '../api/games'
-import { GameModel } from '../models/GameModel'
+import { handling } from '@/lib/errorsHandling'
+import { createGame, loadGames, switchStatus } from '@/api/games'
+import { GameModel } from '@/models/GameModel'
 
 export const state = () => ({
   open: [],

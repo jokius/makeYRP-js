@@ -7,11 +7,13 @@ export class GraphicModel {
   params = {}
   acl = {}
 
-  setInfo(raw, changeAcl = true) {
-    this.id = raw.id
-    this.kind = raw.kind
-    this.params = { ...raw.params, name: `graphic-${this.id}-${short.generate()}` }
-    if (changeAcl) this.acl = new AclModel().setInfo(raw.acl)
+  setInfo(params) {
+    this.id = params.data.id
+    const attributes = params.data.attributes
+    this.kind = attributes.kind
+    this.params = { ...attributes.params, name: `graphic-${this.id}-${short.generate()}` }
+    if (params.changeAcl) this.acl = new AclModel().setInfo({ ...params, data: attributes.acl })
+
     return this
   }
 }

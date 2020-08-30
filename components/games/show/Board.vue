@@ -46,12 +46,12 @@
 <script>
   import { mapState } from 'vuex'
   import KImage from './konva/KImage'
-  import { loadGraphics, loadImages, loadTokens } from '../../../api/board'
-  import { TokenModel } from '../../../models/TokenModel'
-  import { mousePosition } from '../../../lib/mousePosition'
+  import { loadGraphics, loadImages, loadTokens } from '@/api/board'
+  import { TokenModel } from '@/models/TokenModel'
+  import { mousePosition } from '@/lib/mousePosition'
   import RightClickMenu from './RightClickMenu'
-  import { ImageModel } from '../../../models/ImageModel'
-  import { GraphicModel } from '../../../models/GraphicModel'
+  import { ImageModel } from '@/models/ImageModel'
+  import { GraphicModel } from '@/models/GraphicModel'
   import KGraphic from './konva/KGraphic'
 
   export default {
@@ -416,20 +416,20 @@
       },
 
       loadTokens() {
-        loadTokens({ axios: this.$axios, page_id: this.pageId }).then(tokens => {
-          tokens.forEach(raw => this.addToken(raw))
+        loadTokens({ axios: this.$axios, page_id: this.pageId }).then(({ data }) => {
+          data.forEach(raw => this.addToken({ data: raw }))
         })
       },
 
       loadImages() {
-        loadImages({ axios: this.$axios, page_id: this.pageId }).then(images => {
-          images.forEach(raw => this.addImage(raw))
+        loadImages({ axios: this.$axios, page_id: this.pageId }).then(({ data }) => {
+          data.forEach(raw => this.addImage({ data: raw }))
         })
       },
 
       loadGraphics() {
-        loadGraphics({ axios: this.$axios, page_id: this.pageId }).then(graphics => {
-          graphics.forEach(raw => this.addGraphic(raw))
+        loadGraphics({ axios: this.$axios, page_id: this.pageId }).then(({ data }) => {
+          data.forEach(raw => this.addGraphic({ data: raw }))
         })
       },
 
@@ -448,24 +448,38 @@
       },
 
       addToken(raw) {
-        const token = new TokenModel().setInfo(raw)
-        token.acl.currentUserId = this.user.id
-        token.acl.masterId = this.master.id
+        const token = new TokenModel().setInfo({
+          data: raw.data,
+          changeAcl: true,
+          currentUserId: this.user.id,
+          masterId: this.master.id,
+        })
         if (!token.acl.canRead) return
 
         this.tokens = [...this.tokens, token]
       },
 
       addImage(raw) {
-        const image = new ImageModel().setInfo(raw)
+        const image = new ImageModel().setInfo({
+          data: raw.data,
+          changeAcl: true,
+          currentUserId: this.user.id,
+          masterId: this.master.id,
+        })
+        if (!image.acl.canRead) return
+
         this.images = [...this.images, image]
       },
 
       addGraphic(raw) {
-        const graphic = new GraphicModel().setInfo(raw)
-        // graphic.acl.currentUserId = this.user.id
-        // graphic.acl.masterId = this.master.id
-        // if (!graphic.acl.canRead) return
+        console.log('raw', raw)
+        const graphic = new GraphicModel().setInfo({
+          data: raw.data,
+          changeAcl: true,
+          currentUserId: this.user.id,
+          masterId: this.master.id,
+        })
+        if (!graphic.acl.canRead) return
 
         this.graphics = [...this.graphics, graphic]
       },
@@ -485,11 +499,12 @@
       },
 
       changeToken(raw, by) {
-        const index = this.tokens.findIndex(item => item.id === raw.id)
+        const index = this.tokens.findIndex(item => item.id === raw.data.id)
         const token = this.tokens[index]
-        token.setInfo(raw, index, true)
-        token.acl.currentUserId = this.user.id
-        token.acl.masterId = this.master.id
+        token.setInfo({
+          data: raw.data,
+          changeAcl: false,
+        })
         this.$set(this.tokens, index, token)
         if (this.user.id !== by && this.selectedItemName === token.name) {
           this.selectedItemName = ''
@@ -500,16 +515,20 @@
       changeImage(raw) {
         const index = this.images.findIndex(item => item.id === raw.id)
         const image = this.images[index]
-        image.setInfo(raw, index)
+        image.setInfo({
+          data: raw.data,
+          changeAcl: false,
+        })
         this.$set(this.images, index, image)
       },
 
       changeGraphic(raw) {
         const index = this.graphics.findIndex(item => item.id === raw.id)
         const graphic = this.graphics[index]
-        graphic.setInfo(raw, index, true)
-        // graphic.acl.currentUserId = this.user.id
-        // graphic.acl.masterId = this.master.id
+        graphic.setInfo({
+          data: raw.data,
+          changeAcl: false,
+        })
         this.$set(this.graphics, index, graphic)
       },
 
@@ -528,21 +547,21 @@
       },
 
       removeToken(token) {
-        const index = this.tokens.findIndex(item => item.id === token.id)
+        const index = this.tokens.findIndex(item => item.id === token.id.toString())
         this.tokens.splice(index, 1)
         this.selectedItemName = ''
         this.updateTransformer()
       },
 
       removeImage(image) {
-        const index = this.images.findIndex(item => item.id === image.id)
+        const index = this.images.findIndex(item => item.id === image.id.toString())
         this.images.splice(index, 1)
         this.selectedItemName = ''
         this.updateTransformer()
       },
 
       removeGraphic(graphic) {
-        const index = this.graphics.findIndex(item => item.id === graphic.id)
+        const index = this.graphics.findIndex(item => item.id === graphic.id.toString())
         this.graphics.splice(index, 1)
         this.selectedItemName = ''
         this.updateTransformer()
