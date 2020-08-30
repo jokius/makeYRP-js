@@ -472,7 +472,6 @@
       },
 
       addGraphic(raw) {
-        console.log('raw', raw)
         const graphic = new GraphicModel().setInfo({
           data: raw.data,
           changeAcl: true,
