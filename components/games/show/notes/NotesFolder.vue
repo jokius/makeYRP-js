@@ -14,7 +14,7 @@
         </div>
       </div>
     </right-click-menu>
-    <div v-if="open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
+    <div v-if="isRoot || open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
       <notes-folder v-for="child in children" :key="`notes-folder-${child.id}`" :folder="child" />
       <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" />
     </div>
@@ -36,7 +36,7 @@ export default {
 
   data() {
     return {
-      open: true,
+      open: false,
       position: {
         x: 0,
         y: 0,
