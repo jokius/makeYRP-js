@@ -1,41 +1,44 @@
 <template>
   <div>
-    <div class="grid">
-      <v-btn
-        class="selectButton"
-        color="indigo"
-        tile
-        dark
-        @click="modalOpen = true"
-      >
-        Добавить счетчик
-      </v-btn>
-      <counters-list :list="menu.items" />
-    </div>
+    <v-overflow-btn
+      v-if="user.id === master.id"
+      class="selectButton"
+      :items="items"
+      label="Создать..."
+      color="indigo"
+      segmented
+      item-color="indigo"
+      hide-details
+      @change="value => add(value)"
+    />
 
-    <add-counter-modal v-model="obj" />
+    <counters-folder :folder="menu.rootFolder" />
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
-
-  import CountersList from './CountersList'
-
-  import AddCounterModal from '../modals/AddCounterModal'
+  import CountersFolder from '@/components/templates/pbta/EdgeOfUniverse/menus/CountesFolder'
 
   export default {
     name: 'EouTabCounters',
-    components: { AddCounterModal, CountersList },
+
+    components: { CountersFolder },
+
     data() {
       return {
-        modalOpen: false,
+        items: [
+          { text: 'создать папку', value: 'folder', callback: () => this.add('folder') },
+          { text: 'создать счетчик', value: 'clock', callback: () => this.add('clock') },
+        ]
       }
     },
 
     computed: {
       ...mapState({
         menus: state => state.game.info.menus,
+        master: state => state.game.info.master,
+        user: state => state.auth.user,
       }),
 
       menu: {
@@ -57,12 +60,32 @@
     },
 
     methods: {
-      addItem({ title }) {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: { menu_id: this.menu.id,  params: { title, max: 5, current: 0 }, type: 'menu_item' },
-        })
+      add(type) {
+        const key = Date.now()
+        const folderId = this.menu.rootFolder.id
+        switch (type) {
+          case 'folder':
+            this.$store.commit('game/addOpenModal',
+              {
+                name: 'rename-item-folder',
+                parentId: folderId,
+                key,
+                isNew: true,
+                oldName: 'Новая папка',
+              })
+            return
+          case 'clock':
+            this.$cable.perform({
+              channel: 'GameChannel',
+              action: 'add',
+              data: {
+                folder_id: this.menu.rootFolder.id,
+                params: { title: 'Новый счетчик', max: 5, current: 0 },
+                type: 'menu_item'
+              },
+            })
+            return
+        }
       },
     },
   }

@@ -1,35 +1,31 @@
 <template>
   <right-click-menu :position="position" :current-obj="obj" :acl="planet.acl" :replacedItems="replacedItems">
-    <v-list-item class="planet-item-grid" @contextmenu="handler($event)">
-      <span>{{ name }}</span>
-      <v-btn
-        fab
-        x-small
-        dark
-        @click="viewPlanet"
-      >
-        <v-icon>mdi-eye-outline</v-icon>
-      </v-btn>
-      <v-btn
-        v-if="planet.acl.canWrite"
-        fab
-        x-small
-        dark
-        @click="editPlanet"
-      >
-        <v-icon>mdi-pencil</v-icon>
-      </v-btn>
-      <v-btn
-        v-if="planet.acl.canFull"
-        color="red darken-4"
-        fab
-        x-small
-        dark
-        @click="deletePlanet"
-      >
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
-    </v-list-item>
+    <div class="planet-item-grid hover-color" @contextmenu="handler($event)">
+      <v-icon>mdi-map-marker</v-icon>
+      <div class="planet-item-title" @click="open">{{ name }}</div>
+      <v-menu bottom left>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on">
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item @click="viewPlanet">
+            <v-list-item-title>Посмотреть</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="planet.acl.canWrite" @click="editPlanet">
+            <v-list-item-title>Изменить</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="planet.acl.canFull" @click="showAccess">
+            <v-list-item-title>Доступы</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="planet.acl.canFull" @click="deletePlanet">
+            <v-list-item-title>Удалить</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
   </right-click-menu>
 </template>
 
@@ -76,6 +72,14 @@
     },
 
     methods: {
+      open() {
+        if (this.planet.acl.canWrite) {
+          this.editPlanet()
+        } else {
+          this.viewPlanet()
+        }
+      },
+
       handler(e) {
         this.position = mousePosition(e)
         this.$store.commit('game/updateCurrentRightClickMenu', `planet-${this.planet.id}`)
@@ -124,11 +128,23 @@
 </script>
 
 <style scoped lang="scss">
-  .planet-item-grid {
-    display: grid;
-    grid-template-columns: 1fr max-content max-content max-content;
-    grid-column-gap: 5px;
-    justify-items: center;
-    align-items: center;
+@import '~assets/css/colors';
+
+.planet-item-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  grid-column-gap: 5px;
+  margin-bottom: 10px;
+}
+
+.planet-item-title {
+  line-height: 32px;
+  cursor: pointer;
+}
+
+.hover-color {
+  &:hover {
+    background: $indigoRGBA;
   }
+}
 </style>

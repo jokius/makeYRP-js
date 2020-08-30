@@ -73,6 +73,7 @@
           this.$store.commit('game/updateMenuItemParams', {
             id: this.clock.id,
             menuId: this.clock.menuId,
+            folderId: this.clock.folderId,
             path: 'title',
             value,
           })
@@ -94,6 +95,7 @@
           this.$store.commit('game/updateMenuItemParams', {
             id: this.clock.id,
             menuId: this.clock.menuId,
+            folderId: this.clock.folderId,
             path: 'current',
             value: this.current === value && value === 1 ? 0 : value,
           })

@@ -15,21 +15,23 @@
       </div>
     </right-click-menu>
     <div v-if="isRoot || open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
-      <notes-folder v-for="child in children" :key="`notes-folder-${child.id}`" :folder="child" />
-      <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" />
+      <planets-folder v-for="child in children" :key="`planets-folder-${child.id}`" :folder="child" />
+      <planet-item v-for="item in items" :key="`planets-item-${item.id}`" :planet="item" />
     </div>
   </div>
 </template>
 <script>
 import { mapState } from 'vuex'
-import NoteItem from '@/components/games/show/notes/NoteItem'
-import { MenuItemModel } from '@/models/MenuItemModel'
 import RightClickMenu from '@/components/games/show/RightClickMenu'
 import { mousePosition } from '@/lib/mousePosition'
+import PlanetItem from '@/components/templates/pbta/EdgeOfUniverse/menus/PlanetItem'
+import { MenuItemModel } from '@/models/MenuItemModel'
 
 export default {
-  name: 'NotesFolder',
-  components: { RightClickMenu, NoteItem },
+  name: 'PlanetsFolder',
+
+  components: { PlanetItem, RightClickMenu },
+
   props: {
     folder: { type: Object, required: true },
   },
@@ -90,7 +92,7 @@ export default {
     replacedItems() {
       return [
         { title: 'Добавить папку', callback: () => this.createFolder() },
-        { title: 'Добавить заметку', callback: () => this.showNoteModal() },
+        { title: 'Добавить планету', callback: () => this.newPlanetModel() },
         { title: 'Переименовать', callback: () => this.renameFolder() },
         { title: 'Удалить', callback: () => this.deleteFolder() },
       ]
@@ -150,16 +152,17 @@ export default {
       })
     },
 
-    showNoteModal() {
+    newPlanetModel() {
       const key = Date.now()
-      const note = new MenuItemModel()
-      note.folderId = this.folder.id
+      const planet = new MenuItemModel()
+      planet.menuId = this.menu.id
+      planet.folderId = this.folder.id
       this.$store.commit('game/addOpenModal', {
-        name: 'note',
+        name: 'planet',
         key,
         isNew: true,
         isEdit: true,
-        note,
+        planet,
       })
     },
   },

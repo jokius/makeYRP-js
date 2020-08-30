@@ -1,33 +1,39 @@
 <template>
   <div>
-    <div class="grid">
-      <v-btn
+    <div>
+      <v-overflow-btn
         v-if="user.id === master.id"
         class="selectButton"
+        :items="items"
+        label="Создать..."
         color="indigo"
-        tile
-        dark
-        @click="showModal"
-      >
-        Новая планета
-      </v-btn>
-      <planets-list :list="menu.items" />
+        segmented
+        item-color="indigo"
+        hide-details
+        @change="value => add(value)"
+      />
+
+      <planets-folder :folder="menu.rootFolder" />
     </div>
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
-
-  import PlanetsList from './PlanetsList'
-  import { MenuItemModel } from '../../../../../models/MenuItemModel'
+  import { MenuItemModel } from '@/models/MenuItemModel'
+  import PlanetsFolder from '@/components/templates/pbta/EdgeOfUniverse/menus/PlanetsFolder'
 
   export default {
     name: 'EouTabPlanets',
-    components: { PlanetsList },
+
+    components: { PlanetsFolder },
+
     data() {
       return {
-        modalOpen: false,
+        items: [
+          { text: 'создать папку', value: 'folder', callback: () => this.add('folder') },
+          { text: 'создать планету', value: 'planet', callback: () => this.add('planet') },
+        ]
       }
     },
 
@@ -46,17 +52,33 @@
     },
 
     methods: {
-      showModal() {
+      add(type) {
         const key = Date.now()
-        const planet = new MenuItemModel()
-        planet.menuId = this.menu.id
-        this.$store.commit('game/addOpenModal', {
-          name: 'planet',
-          key,
-          isNew: true,
-          isEdit: true,
-          planet,
-        })
+        const folderId = this.menu.rootFolder.id
+        switch (type) {
+          case 'folder':
+            this.$store.commit('game/addOpenModal',
+              {
+                name: 'rename-item-folder',
+                parentId: folderId,
+                key,
+                isNew: true,
+                oldName: 'Новая папка',
+              })
+            return
+          case 'planet':
+            const planet = new MenuItemModel()
+            planet.menuId = this.menu.id
+            planet.folderId = folderId
+            this.$store.commit('game/addOpenModal', {
+              name: 'planet',
+              key,
+              isNew: true,
+              isEdit: true,
+              planet,
+            })
+            return
+        }
       },
     },
   }

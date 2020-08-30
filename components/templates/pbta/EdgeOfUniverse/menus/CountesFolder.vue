@@ -15,21 +15,22 @@
       </div>
     </right-click-menu>
     <div v-if="isRoot || open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
-      <notes-folder v-for="child in children" :key="`notes-folder-${child.id}`" :folder="child" />
-      <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" />
+      <counters-folder v-for="child in children" :key="`counters-folder-${child.id}`" :folder="child" />
+      <counter-item v-for="item in items" :key="`counters-item-${item.id}`" :clock="item" />
     </div>
   </div>
 </template>
 <script>
 import { mapState } from 'vuex'
-import NoteItem from '@/components/games/show/notes/NoteItem'
-import { MenuItemModel } from '@/models/MenuItemModel'
 import RightClickMenu from '@/components/games/show/RightClickMenu'
 import { mousePosition } from '@/lib/mousePosition'
+import CounterItem from '@/components/templates/pbta/EdgeOfUniverse/menus/CounterItem'
 
 export default {
-  name: 'NotesFolder',
-  components: { RightClickMenu, NoteItem },
+  name: 'CountersFolder',
+
+  components: { CounterItem, RightClickMenu },
+
   props: {
     folder: { type: Object, required: true },
   },
@@ -90,7 +91,7 @@ export default {
     replacedItems() {
       return [
         { title: 'Добавить папку', callback: () => this.createFolder() },
-        { title: 'Добавить заметку', callback: () => this.showNoteModal() },
+        { title: 'Добавить счетчик', callback: () => this.createClock() },
         { title: 'Переименовать', callback: () => this.renameFolder() },
         { title: 'Удалить', callback: () => this.deleteFolder() },
       ]
@@ -150,16 +151,15 @@ export default {
       })
     },
 
-    showNoteModal() {
-      const key = Date.now()
-      const note = new MenuItemModel()
-      note.folderId = this.folder.id
-      this.$store.commit('game/addOpenModal', {
-        name: 'note',
-        key,
-        isNew: true,
-        isEdit: true,
-        note,
+    createClock() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'add',
+        data: {
+          folder_id: this.folder.id,
+          params: { title: 'Новый счетчик', max: 5, current: 0 },
+          type: 'menu_item'
+        },
       })
     },
   },

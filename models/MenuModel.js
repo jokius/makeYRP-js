@@ -16,6 +16,8 @@ export class MenuModel {
   }
 
   folderById(parent, id) {
+    if (parent.id === id.toString()) return parent // is root folder
+
     let folder = parent.children.find(item => item.id === id.toString())
     if (folder) return folder
 
