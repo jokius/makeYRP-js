@@ -1,27 +1,19 @@
-import { ShortFolderModel } from '@/models/ShortFolderModel'
 import { FolderImageModel } from '@/models/FolderImageModel'
 
-export class FolderModel {
+export class FolderTreeModel {
   id = null
   name = ''
   parentId = null
   children = []
   images = []
 
-  setInfo({ data, included }) {
+  setInfo({ data }) {
     this.id = data.id
     const attributes = data.attributes
     this.name = attributes.name
     this.parentId = attributes.parentId
-    this.children = data.relationships.children.data.map(child => {
-      const obj = included.find(item => item.type === 'shortFolder' && item.id === child.id)
-      return new ShortFolderModel().setInfo(obj)
-    })
-
-    this.images = data.relationships.images.data.map(image => {
-      const obj = included.find(item => item.type === 'folderImage' && item.id === image.id)
-      return new FolderImageModel().setInfo(obj)
-    })
+    this.children = attributes.children.map(child => new FolderTreeModel().setInfo(child))
+    this.images = attributes.images.map(image => new FolderImageModel().setInfo(image.data))
 
     return this
   }

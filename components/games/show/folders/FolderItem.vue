@@ -21,13 +21,13 @@
   import { mapState } from 'vuex'
 
   import RightClickMenu from '../RightClickMenu'
-  import { mousePosition } from '../../../../lib/mousePosition'
+  import { mousePosition } from '@/lib/mousePosition'
 
   export default {
     name: 'FolderItem',
     components: { RightClickMenu },
     props: {
-      id: { type: Number, required: true },
+      id: { type: String, required: true },
       name: { type: String, required: true },
     },
 

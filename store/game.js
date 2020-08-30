@@ -55,7 +55,6 @@ export const actions = {
         commit('setLoaded')
       })
     } catch (error) {
-      console.log('error', error)
       handling(error)
     }
   },

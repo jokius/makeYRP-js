@@ -43,7 +43,7 @@
 
 <script>
   import RightClickMenu from '../RightClickMenu'
-  import { mousePosition } from '../../../../lib/mousePosition'
+  import { mousePosition } from '@/lib/mousePosition'
 
   export default {
     name: 'ImageItem',

@@ -53,8 +53,9 @@
 
 <script>
   import FoldersModal from './folders/FoldersModal'
-  import { loadTree } from '../../../api/folder'
-  import { FolderImageModel } from '../../../models/FolderImageModel'
+  import { loadTree } from '@/api/folder'
+  import { FolderImageModel } from '@/models/FolderImageModel'
+  import { FolderTreeModel } from '@/models/FolderTreeModel'
 
   export default {
     name: 'TabImages',
@@ -112,16 +113,18 @@
 
     methods: {
       loadTree() {
-        loadTree(this.$axios).then(tree => {
-          this.open = [tree.name]
-          this.items = [this.parseFolder(tree)]
+        loadTree(this.$axios).then(raw => {
+          const root = new FolderTreeModel().setInfo(raw)
+          this.open = [root.name]
+          this.items = [this.parseFolder(root)]
         })
       },
 
       parseFolder(folder) {
         const item = { id: folder.id, name: folder.name, children: [] }
         folder.children.forEach(child => item.children.push(this.parseFolder(child)))
-        folder.images.forEach(raw => item.children.push(new FolderImageModel().setInfo(raw)))
+        folder.images.forEach(image => item.children.push(image))
+
         return item
       },
     }

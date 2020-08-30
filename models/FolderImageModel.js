@@ -4,12 +4,13 @@ export class FolderImageModel {
   id = null
   name = ''
   versions = {}
-  acl = {}
 
-  setInfo(raw) {
-    this.id = raw.id
-    this.name = raw.name
-    this.versions = raw.versions
+  setInfo(data) {
+    this.id = data.id
+    const attributes = data.attributes
+    this.name = attributes.name
+    this.versions = attributes.versions
+
     return this
   }
 
