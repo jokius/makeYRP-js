@@ -30,7 +30,7 @@
           return {
             ...this.config,
             image: this.image,
-            draggable: this.draggable && this.currentCursor === 'default',
+            draggable: this.draggable,
           }
         },
       },

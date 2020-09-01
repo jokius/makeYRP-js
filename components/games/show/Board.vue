@@ -19,7 +19,7 @@
             :kind="graphic.kind"
             :config="graphic.params"
             :handleEventEnd="handleEventEnd"
-            draggable
+            :draggable="canDraggable(graphic.acl.canWrite)"
           />
 
           <k-image
@@ -27,14 +27,14 @@
             :key="token.name"
             :config="token.params"
             :handleEventEnd="handleEventEnd"
-            :draggable="token.acl.canWrite"
+            :draggable="canDraggable(token.acl.canWrite)"
           />
           <k-image
             v-for="image in images"
             :key="image.params.name"
             :config="image.params"
             :handleEventEnd="handleEventEnd"
-            :draggable="isMaster"
+            :draggable="canDraggable(isMaster)"
           />
           <v-transformer ref="transformer" />
         </v-layer>
@@ -53,6 +53,8 @@
   import { ImageModel } from '@/models/ImageModel'
   import { GraphicModel } from '@/models/GraphicModel'
   import KGraphic from './konva/KGraphic'
+
+  const drawingPoints = ['brush', 'rect', 'circle']
 
   export default {
     name: 'Board',
@@ -93,6 +95,7 @@
         bodyColor: state => state.game.bodyColor,
         master: state => state.game.info.master,
         user: state => state.auth.user,
+        altPressed: state => state.game.altPressed,
       }),
 
       cursor() {
@@ -236,7 +239,7 @@
 
         stage.on('mousedown touchstart', () => {
           pos = this.mousePosition()
-          isPaint = ['brush', 'rect', 'circle'].includes(this.cursor)
+          isPaint = drawingPoints.includes(this.cursor)
 
           if (this.cursor === 'brush') {
             graphic = new Konva.Line({
@@ -403,6 +406,8 @@
 
       showMenu(e) {
         e.evt.preventDefault()
+        if (drawingPoints.includes(this.cursor)) return
+
         this.position = mousePosition(e.evt)
         const name = e.target.name()
         const [type] = name.split('-')
@@ -623,6 +628,12 @@
 
         const [type, id] = this.selectedItemName.split('-')
         this.remove({ id, type })
+      },
+
+      canDraggable(can) {
+        if (!can) return false
+
+        return this.cursor === 'default' && !this.altPressed
       }
     },
   }

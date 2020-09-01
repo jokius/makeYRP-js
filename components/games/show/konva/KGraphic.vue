@@ -30,7 +30,7 @@
 
       configKonva: {
         get() {
-          return { ...this.config, draggable: this.draggable && this.currentCursor === 'default' }
+          return { ...this.config, draggable: this.draggable }
         },
       },
     },
