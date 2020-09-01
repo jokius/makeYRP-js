@@ -314,6 +314,16 @@
 
           layer.batchDraw()
         })
+
+        const con = stage.container()
+        con.addEventListener('dragover', e => {
+          e.preventDefault()
+        });
+
+        con.addEventListener('drop', e => {
+          e.preventDefault()
+          stage.setPointersPositions(e)
+        });
       },
 
       scaleStage() {
