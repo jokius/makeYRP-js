@@ -22,10 +22,12 @@ export class PageModel {
     },
   }
 
-  setInfo(raw) {
-    this.id = raw.id
-    this.name = raw.name
-    this.params = { ...this.defaultParams, ...raw.params }
+  setInfo({ data }) {
+    this.id = data.id
+    const attributes = data.attributes
+    this.name = attributes.name
+    this.params = { ...this.defaultParams, ...attributes.params }
+
     return this
   }
 

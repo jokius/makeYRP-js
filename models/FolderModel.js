@@ -12,7 +12,7 @@ export class FolderModel {
     this.id = data.id
     const attributes = data.attributes
     this.name = attributes.name
-    this.parentId = attributes.parentId
+    this.parentId = attributes.parentId.toString()
     this.children = data.relationships.children.data.map(child => {
       const obj = included.find(item => item.type === 'shortFolder' && item.id === child.id)
       return new ShortFolderModel().setInfo(obj)

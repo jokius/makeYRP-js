@@ -11,7 +11,7 @@ export class TokenModel {
   setInfo(params) {
     this.id = params.data.id
     const attributes = params.data.attributes
-    this.sheetId = attributes.sheetId
+    this.sheetId = attributes.sheetId.toString()
     this.name = this.name || `token-${this.id}-${short.generate()}`
     this.params = { ...attributes.params, name: this.name }
     if (params.changeAcl) this.acl = new AclModel().setInfo({ ...params, data: attributes.acl })

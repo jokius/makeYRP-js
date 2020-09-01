@@ -1,7 +1,7 @@
-import { handling } from '../lib/errorsHandling'
-import { GameModel } from '../models/GameModel'
+import { handling } from '@/lib/errorsHandling'
+import { GameModel } from '@/models/GameModel'
 import { cloneDeep, get, set } from 'lodash'
-import { loadGame, updateGame } from '../api/gameConfig'
+import { loadGame, updateGame } from '@/api/gameConfig'
 
 export const state = () => ({
   info: null,

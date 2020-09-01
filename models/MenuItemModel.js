@@ -10,8 +10,8 @@ export class MenuItemModel {
   setInfo(params) {
     this.id = params.data.id
     const attributes = params.data.attributes
-    this.menuId = attributes.menuId
-    this.folderId = attributes.folderId
+    this.menuId = attributes.menuId.toString()
+    this.folderId = attributes.folderId.toString()
 
     this.params = attributes.params
     if (params.changeAcl) this.acl = new AclModel().setInfo({ ...params, data: attributes.acl })

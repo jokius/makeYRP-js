@@ -9,10 +9,10 @@ module.exports = {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Стол для настольных ролевых игр' }
+      { hid: 'description', name: 'description', content: 'Стол для настольных ролевых игр' },
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v1' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v1' },
     ]
   },
 
@@ -25,7 +25,7 @@ module.exports = {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /(node_modules)/
+          exclude: /(node_modules)/,
         })
       }
     },
@@ -33,7 +33,7 @@ module.exports = {
     splitChunks: {
       layouts: true,
       pages: true,
-      commons: true
+      commons: true,
     },
 
     optimization: {
@@ -43,11 +43,11 @@ module.exports = {
 
   buildModules: [
     '@nuxtjs/dotenv',
-    '@nuxtjs/vuetify'
+    '@nuxtjs/vuetify',
   ],
 
   css: [
-    '~/assets/css/dices.scss'
+    '~/assets/css/dices.scss',
   ],
 
   modules: [
@@ -61,14 +61,17 @@ module.exports = {
         endpoints: {
           login:  { url: '/users/sign_in' },
           logout: { url: '/users/sign_out', method: 'delete' },
-          user:   { url: '/users/current', propertyName: '' }
-        }
-      }
-    }
+          user:   { url: '/users/current', propertyName: '' },
+        },
+      },
+    },
+    plugins: [
+      '~/plugins/auth.js',
+    ],
   },
 
   axios: {
-    baseUrl: process.env.API_URL
+    baseUrl: process.env.API_URL,
   },
 
   env: {
@@ -77,7 +80,7 @@ module.exports = {
   },
 
   router: {
-    middleware: ['auth']
+    middleware: ['auth'],
   },
 
   plugins: [
@@ -86,9 +89,10 @@ module.exports = {
     { src: '~/plugins/wysiwyg', ssr: false },
     { src: '~/plugins/konva', ssr: false },
   ],
+
   vue: {
     config: ({ isDev }) => ({
-      devtools: isDev
+      devtools: isDev,
     })
   }
 }

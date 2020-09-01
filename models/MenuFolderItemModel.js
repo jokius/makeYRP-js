@@ -11,7 +11,7 @@ export class MenuFolderItemModel {
   setInfo(params) {
     this.id = params.data.id
     const attributes = params.data.attributes
-    this.menuId = attributes.menuId
+    this.menuId = attributes.menuId.toString()
     this.name = attributes.name
     this.depth = attributes.depth
     this.items = attributes.items.map(raw => {

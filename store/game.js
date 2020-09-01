@@ -276,7 +276,7 @@ export const mutations = {
   },
 
   deleteUser(state, id) {
-    state.users = state.users.filter(user => user.id !== id)
+    state.users = state.users.filter(user => user.id !== id.toString())
   },
 
   updateSheet(state, raw) {
@@ -285,14 +285,14 @@ export const mutations = {
   },
 
   usersLoaded(state, users) {
-    state.users = users.map(user => (
-      new UserModel().setInfo(user)
+    state.users = users.data.map(user => (
+      new UserModel().setInfo({ data: user })
     ))
   },
 
   messagesLoaded(state, messages) {
-    state.messages = messages.map(message => (
-      new MessageModel().setInfo(message)
+    state.messages = messages.data.map(data => (
+      new MessageModel().setInfo({ data, included: messages.included })
     ))
   },
 
@@ -318,7 +318,7 @@ export const mutations = {
     if (state.info.master.id !== user.id) return
 
     const path = raw.data.attributes.path
-    const menu = state.info.menus.find(menu => menu.id === raw.data.attributes.menuId)
+    const menu = state.info.menus.find(menu => menu.id === raw.data.attributes.menuId.toString())
     let parentFolder
     let folder
     const newFolder = new MenuFolderItemModel().setInfo({ data: raw.data, changeAcl: false })
@@ -389,15 +389,15 @@ export const mutations = {
   deleteMenuFolder(state, raw) {
     const menus = state.info.menus
     const menuId = raw.menuId
-    const menu = menus.find(item => item.id === menuId)
-    menu.deleteChild(menu.rootFolder, raw.id)
+    const menu = menus.find(item => item.id === menuId.toString())
+    menu.deleteChild(menu.rootFolder, raw.id.toString())
   },
 
   deleteMenuItem(state, raw) {
     const menus = state.info.menus
     const menuId = raw.menuId
-    const menu = menus.find(item => item.id === menuId)
-    const folder = menu.folderById(menu.rootFolder, raw.folderId)
+    const menu = menus.find(item => item.id === menuId.toString())
+    const folder = menu.folderById(menu.rootFolder, raw.folderId.toString())
     folder.deleteItem(raw.id)
   },
 

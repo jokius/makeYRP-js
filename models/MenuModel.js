@@ -4,10 +4,12 @@ export class MenuModel {
   params = {}
   rootFolder = {}
 
-  setInfo(raw) {
-    this.id = raw.id
-    this.type = raw.type
-    this.params = raw.params
+  setInfo({ data }) {
+    this.id = data.id
+    const attributes = data.attributes
+    this.type = attributes.type
+    this.params = attributes.params
+
     return this
   }
 
@@ -16,9 +18,9 @@ export class MenuModel {
   }
 
   folderById(parent, id) {
-    if (parent.id === id.toString()) return parent // is root folder
+    if (parent.id === id) return parent // is root folder
 
-    let folder = parent.children.find(item => item.id === id.toString())
+    let folder = parent.children.find(item => item.id === id)
     if (folder) return folder
 
     parent.children.forEach(child => {
@@ -30,9 +32,9 @@ export class MenuModel {
   }
 
   deleteChild(parent, id) {
-    let folder = parent.children.find(item => item.id === id.toString())
+    let folder = parent.children.find(item => item.id === id)
     if (folder) {
-      parent.children = parent.children.filter(item => item.id !== id.toString())
+      parent.children = parent.children.filter(item => item.id !== id)
       return true
     }
 

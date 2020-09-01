@@ -51,8 +51,8 @@ export const actions = {
 
 export const mutations = {
   gamesLoaded(state, games) {
-    state.open = games.open.map(game => new GameModel().setInfo(game))
-    state.close = games.close.map(game => new GameModel().setInfo(game))
+    state.open = games.open.data.map(data => new GameModel().setInfo({ data, included: games.open.included }))
+    state.close = games.close.data.map(data => new GameModel().setInfo({ data, included: games.close.included }))
     state.loaded = true
   },
 

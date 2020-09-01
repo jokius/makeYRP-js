@@ -8,12 +8,14 @@ export class UserModel {
   avatar = {}
   sheet = {}
 
-  setInfo(raw) {
-    this.id = raw.id
-    this.nickname = raw.nickname
-    this.avatar = raw.avatar
-    this.admin = Boolean(raw.admin)
-    this.sheet = new SheetModel().setInfo({ data: raw.sheet, changeAcl: false }) || {}
+  setInfo({ data }) {
+    this.id = data.id
+    const attributes = data.attributes
+    this.nickname = attributes.nickname
+    this.avatar = attributes.avatar
+    this.admin = Boolean(attributes.admin)
+    this.sheet = new SheetModel().setInfo({ data: attributes.sheet, changeAcl: false }) || {}
+
     return this
   }
 

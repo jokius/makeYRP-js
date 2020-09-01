@@ -13,17 +13,30 @@ export class GameModel {
   template = {}
   customTemplate = {}
 
-  setInfo(raw) {
+  setInfo({ data, included }) {
+    this.id = data.id
+    const attributes = data.attributes
+    this.name = attributes.name
+    this.system = attributes.system
+    this.template = attributes.template || {}
+    this.customTemplate = attributes.custom_template || {}
+    const relationships = data.relationships
+    const masterData = included.find(item => item.type === 'shortUser' && item.id === relationships.master.data.id)
+    this.master = masterData ? new UserModel().setInfo({ data: masterData }) : {}
+    this.users = relationships?.users?.data.map(user => {
+      const userData = included.find(item => item.type === 'shortUser' && item.id === user.id)
+      return new UserModel().setInfo({ data: userData })
+    })
 
-    this.id = raw.id
-    this.name = raw.name
-    this.master = raw.master ? new UserModel().setInfo(raw.master) : {}
-    this.users = (raw.users || []).map(user => new UserModel().setInfo(user))
-    this.menus = (raw.menus || []).map(menu => new MenuModel().setInfo(menu))
-    this.pages = (raw.pages || []).map(page => new PageModel().setInfo(page))
-    this.system = raw.system
-    this.template = raw.template || {}
-    this.customTemplate = raw.custom_template || {}
+    this.menus = (relationships.menus?.data || []).map(menu => {
+      const menuData = included.find(item => item.type === 'menu' && item.id === menu.id)
+      return new MenuModel().setInfo({ data: menuData })
+    })
+
+    this.pages = (relationships.pages?.data || []).map(page => {
+      const pageData = included.find(item => item.type === 'page' && item.id === page.id)
+      return new PageModel().setInfo({ data: pageData })
+    })
 
     return this
   }

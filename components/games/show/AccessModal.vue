@@ -92,6 +92,7 @@
   import Loader from '../../Loader'
   import { AclUsers } from '@/api/acl'
   import DraggableDialog from '@/components/games/show/DraggableDialog'
+  import { UserModel } from '@/models/UserModel'
 
   export default {
     name: 'AccessModal',
@@ -133,7 +134,11 @@
 
     created() {
       AclUsers({ axios: this.$axios, params: this.obj }).then(acl => {
-        this.acl = acl
+        this.acl = acl.data.attributes
+        this.acl.levels.forEach(level => {
+          level.user = new UserModel().setInfo(level.user)
+        })
+
         this.loaded = true
       })
     },

@@ -11,7 +11,7 @@ export class FolderTreeModel {
     this.id = data.id
     const attributes = data.attributes
     this.name = attributes.name
-    this.parentId = attributes.parentId
+    this.parentId = attributes.parentId?.toString()
     this.children = attributes.children.map(child => new FolderTreeModel().setInfo(child))
     this.images = attributes.images.map(image => new FolderImageModel().setInfo(image.data))
 

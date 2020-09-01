@@ -1,5 +1,6 @@
-import { handling } from '../lib/errorsHandling'
-import { addSystem, loadSystems } from '../api/systems'
+import { handling } from '@/lib/errorsHandling'
+import { addSystem, loadSystems } from '@/api/systems'
+import { SystemModel } from '@/models/SystemModel'
 
 export const actions = {
   async load({ commit }, axios) {
@@ -21,7 +22,7 @@ export const actions = {
 
 export const mutations = {
   updateSystems(state, systems) {
-    state.list = systems
+    state.list = systems.data.map(data => new SystemModel().setInfo(data))
     state.loaded = true
   },
 }

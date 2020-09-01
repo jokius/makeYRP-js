@@ -6,11 +6,14 @@ export class MessageModel {
   created_at = ''
   user = {}
 
-  setInfo(raw) {
-    this.id = raw.id
-    this.body = raw.body
-    this.createdAt = raw.created_at
-    this.user = new UserModel().setInfo(raw.user)
+  setInfo({ data, included }) {
+    this.id = data.id
+    const attributes = data.attributes
+    this.body = attributes.body
+    this.createdAt = attributes.created_at
+    const userId = data.relationships.user.data.id
+    const userData = included.find(item => item.type === 'shortUser' && item.id === userId)
+    this.user = new UserModel().setInfo({ data: userData })
 
     return this
   }

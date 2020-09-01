@@ -48,7 +48,6 @@
   import { mapState } from 'vuex'
 
   export default {
-
     props: { list: { type: Array, required: true } },
 
     data: () => ({
