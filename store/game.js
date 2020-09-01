@@ -381,7 +381,7 @@ export const mutations = {
   },
 
   deletePage(state, id) {
-    state.info = state.info.deletePage(id)
+    state.info = state.info.deletePage(id.toString())
     const maxIndex = state.info.pages.length - 1
     if (maxIndex > state.currentPage) state.currentPage = maxIndex
   },
