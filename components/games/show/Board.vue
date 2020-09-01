@@ -540,9 +540,9 @@
       },
 
       removeObj(obj) {
-        if (obj.token) this.removeToken(obj.token)
-        if (obj.image) this.removeImage(obj.image)
-        if (obj.graphic) this.removeGraphic(obj.graphic)
+        if (obj.token) this.removeToken(obj)
+        if (obj.image) this.removeImage(obj)
+        if (obj.graphic) this.removeGraphic(obj)
       },
 
       removeToken(token) {
