@@ -7,7 +7,7 @@
       height="30"
     >
       <v-tab class="tab" active-class="tab-active">
-        <span class="xolonium-font">О персанаже</span>
+        <span class="xolonium-font">О персонаже</span>
       </v-tab>
       <v-tab class="tab" active-class="tab-active">
         <span class="xolonium-font">Навыки и снаряжение</span>
