@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="notes-body">
     <v-overflow-btn
       v-if="user.id === master.id"
       class="selectButton"
@@ -80,3 +80,12 @@
     },
   }
 </script>
+
+<style scoped lang="scss">
+.notes-body {
+  position: relative;
+  bottom: 12px;
+  overflow: auto;
+  height: 94vh;
+}
+</style>
