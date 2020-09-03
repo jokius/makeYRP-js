@@ -39,6 +39,7 @@
     data() {
       return {
         overlay: false,
+        connectedNow: false,
       }
     },
 
@@ -46,9 +47,15 @@
       GameChannel: {
         connected() {
           this.overlay = false
+          this.connectedNow = true
         },
         disconnected() {
-          this.overlay = true
+          this.connectedNow = false
+          new Promise(() => {
+            setTimeout(() => {
+              this.overlay = !this.connectedNow
+            }, 3000) // wait 3 seconds
+          })
         },
 
         received(obj) {
