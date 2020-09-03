@@ -16,7 +16,7 @@ export class AclModel {
     this.masterId = masterId
     this.writeAll = data.writeAll
     this.readAll = data.readAll
-    this.ownerId = data.ownerId
+    this.ownerId = data.ownerId.toString()
     this.readIds = data.readIds
     this.writeIds = data.writeIds
 
