@@ -51,8 +51,7 @@
 </template>
 
 <script>
-
-  import DraggableDialog from './DraggableDialog'
+  import DraggableDialog from '../DraggableDialog'
 
   export default {
     name: 'NoteModal',

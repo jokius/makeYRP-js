@@ -88,7 +88,7 @@
   import ColorPickerModal from './ColorPickerModal'
   import SheetModal from './SheetModal'
   import InfoModal from './InfoModal'
-  import NoteModal from './NoteModal'
+  import NoteModal from './notes/NoteModal'
   import PageModal from './PageModal'
   import AccessModal from '@/components/games/show/AccessModal'
   import RenameItemFolder from '@/components/games/show/RenameItemFolder'
