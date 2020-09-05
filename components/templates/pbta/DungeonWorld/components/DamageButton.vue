@@ -47,8 +47,15 @@
 
     methods: {
       rollDamage(modifier) {
-        const dices = {}
-        dices[this.damage] = 1
+        let dicesString
+        if (modifier > 0) {
+          dicesString = `${this.damage}+${modifier}`
+        } else if (modifier < 0) {
+          dicesString = `${this.damage}${modifier}`
+        } else {
+          dicesString = this.damage
+        }
+
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'add',
@@ -57,8 +64,7 @@
             body: {
               sheet: this.sheet,
               name: 'Урон',
-              dices,
-              modifier,
+              dices_string: dicesString,
               isDamage: true,
             },
           },

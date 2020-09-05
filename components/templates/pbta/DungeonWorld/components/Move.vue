@@ -209,7 +209,7 @@
 
       selects: {
         get() {
-          return this.move.selects
+          return this.move.selects || []
         },
       },
 

@@ -55,7 +55,7 @@
 
     props: {
       image: { type: Object, required: true },
-      currentSelected: { type: Number, default: 0 },
+      currentSelected: { type: String, default: '0' },
     },
 
     data: () => ({

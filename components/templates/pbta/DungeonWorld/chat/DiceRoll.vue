@@ -23,7 +23,7 @@
 
 <script>
   import DamageButton from '../components/DamageButton'
-  import { Dw } from '../../../../../lib/Dw'
+  import { Dw } from '@/lib/Dw'
 
   export default {
     name: 'DiceRoll',
