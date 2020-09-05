@@ -19,7 +19,7 @@ export class GameModel {
     this.name = attributes.name
     this.system = attributes.system
     this.template = attributes.template || {}
-    this.customTemplate = attributes.custom_template || {}
+    this.customTemplate = attributes.customTemplate || {}
     const relationships = data.relationships
     const masterData = included.find(item => item.type === 'shortUser' && item.id === relationships.master.data.id)
     this.master = masterData ? new UserModel().setInfo({ data: masterData }) : {}
