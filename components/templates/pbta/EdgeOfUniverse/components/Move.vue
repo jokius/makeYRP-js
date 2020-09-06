@@ -182,7 +182,6 @@
       },
 
       altTypes() {
-        console.log('1234')
         const stats = this.tables.stats
         const list = Object.keys(stats).map(key => ({ text: stats[key], value: key }))
         return list.concat(this.specialsStats.map(item => ({ text: item.name, value: item.key })))
