@@ -236,8 +236,8 @@ export const mutations = {
 
   updateMenuItemParams(state, { id, menuId, folderId, path, value }) {
     const menus = state.info.menus
-    const menu = menus.find(item => item.id === menuId)
-    const folder = menu.folderById(menu.rootFolder, folderId)
+    const menu = menus.find(item => item.id === menuId.toString())
+    const folder = menu.folderById(menu.rootFolder, folderId.toString())
     const item = folder.items.find(item => item.id === id)
     set(item.params, path, value)
   },
@@ -374,8 +374,8 @@ export const mutations = {
     const menus = state.info.menus
     const menuId = raw.data.attributes.menuId
     const folderId = raw.data.attributes.folderId
-    const menu = menus.find(item => item.id === menuId)
-    const folder = menu.folderById(menu.rootFolder, folderId)
+    const menu = menus.find(item => item.id === menuId.toString())
+    const folder = menu.folderById(menu.rootFolder, folderId.toString())
     const item = folder.items.find(item => item.id === raw.data.id)
     item.setInfo({ data: raw.data, changeAcl: false })
   },
