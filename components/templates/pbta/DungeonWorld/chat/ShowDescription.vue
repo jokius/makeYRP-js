@@ -55,15 +55,6 @@
     background-color: $gray42;
   }
 
-  .number {
-    font-weight: bold;
-    font-size: 25px;
-    margin: 0;
-    text-align: center;
-    height: 60px;
-    line-height: 60px;
-  }
-
   .result-text {
     margin: 0 5px;
   }

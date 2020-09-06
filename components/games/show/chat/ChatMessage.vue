@@ -28,8 +28,9 @@
 
     <div class="grid-body">
       <span v-if="body.text" class="chat-text">{{ body.text }}</span>
+      <note-in-chat v-if="body.isNote" :body="body" />
       <myz-roll
-        v-if="!body.noSystem && body.dices && system === 'mutant_year_zero'"
+        v-else-if="!body.noSystem && body.dices && system === 'mutant_year_zero'"
         :sheet="character || {}"
         :roll="body.dices"
         :prev-success="body.prevSuccess || 0"
@@ -69,10 +70,11 @@
   import EouRoll from '../../../templates/pbta/EdgeOfUniverse/chat/EouRoll'
   import * as dateTime from '../../../../lib/dateTime'
   import DwRoll from '../../../templates/pbta/DungeonWorld/chat/DwRoll'
+  import NoteInChat from '@/components/games/show/notes/NoteInChat'
 
   export default {
     name: 'ChatMessage',
-    components: { DwRoll, EouRoll, HmwRoll, BidRoll, DefaultRoll, MyzRoll },
+    components: { NoteInChat, DwRoll, EouRoll, HmwRoll, BidRoll, DefaultRoll, MyzRoll },
 
     props: {
       message: { type: Object, required: true },

@@ -2,7 +2,7 @@
   <right-click-menu :position="position" :current-obj="obj" :acl="note.acl" :replacedItems="replacedItems">
     <div class="note-item-grid hover-color" @contextmenu="handler($event)">
       <v-icon>mdi-note</v-icon>
-      <div class="note-item-title" @click="open">{{ note.params.title }}</div>
+      <div class="note-item-title" @click="open">{{ name }}</div>
 
       <v-menu bottom left>
         <template v-slot:activator="{ on, attrs }">
@@ -12,6 +12,9 @@
         </template>
 
         <v-list>
+          <v-list-item @click="sendNote">
+            <v-list-item-title>В чат</v-list-item-title>
+          </v-list-item>
           <v-list-item @click="viewNote">
             <v-list-item-title>Посмотреть</v-list-item-title>
           </v-list-item>
@@ -58,8 +61,13 @@
         }
       },
 
+      name() {
+        return this.note.params.title
+      },
+
       replacedItems() {
         return [
+          { title: 'В чат', callback: () => this.sendNote(), level: 'canFull' },
           { title: 'Изменить', callback: () => this.editNote(), level: 'canWrite' },
           { title: 'Просмотреть', callback: () => this.viewNote(), level: 'canRead' },
           { title: 'Доступы', callback: () => this.showAccess(), level: 'canFull' },
@@ -81,6 +89,30 @@
         this.position = mousePosition(e)
         this.$store.commit('game/updateCurrentRightClickMenu', `note-${this.note.id}`)
         e.preventDefault()
+      },
+
+      sendNote() {
+        console.log('this.note.acl', this.note.acl)
+        const data = { read_all: true, type: 'menu_item', id: this.note.id }
+        this.$cable.perform({
+          channel: 'GameChannel',
+          action: 'change_access',
+          data,
+        })
+
+        this.$cable.perform({
+          channel: 'GameChannel',
+          action: 'add',
+          data: {
+            type: 'message',
+            body: {
+              name: this.name,
+              id: this.note.id,
+              folderId: this.note.folderId,
+              isNote: true,
+            },
+          },
+        })
       },
 
       viewNote() {

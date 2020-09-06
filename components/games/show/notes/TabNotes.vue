@@ -42,10 +42,8 @@
         user: state => state.auth.user,
       }),
 
-      menu: {
-        get() {
-          return this.menus.find(item => item.type === 'notes')
-        },
+      menu() {
+        return this.menus.find(item => item.type === 'notes')
       },
     },
 

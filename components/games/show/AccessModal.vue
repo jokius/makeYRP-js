@@ -48,15 +48,15 @@
               <td>
                 <v-checkbox
                   color="indigo"
-                  :input-value="acl.read_all"
-                  @change="changePermission('read_all', !acl.read_all)"
+                  :input-value="acl.readAll"
+                  @change="changePermission('readAll', !acl.readAll)"
                 />
               </td>
               <td>
                 <v-checkbox
                   color="indigo"
-                  :input-value="acl.write_all"
-                  @change="changePermission('write_all', !acl.write_all)"
+                  :input-value="acl.writeAll"
+                  @change="changePermission('writeAll', !acl.writeAll)"
                 />
               </td>
             </tr>
@@ -155,8 +155,8 @@
       },
 
       save() {
-        const data = { ...this.acl, type: this.obj.type }
-        data.levels = data.levels.map(level => ({ ...level, user: null, user_id: level.user.id }))
+        const data = { type: this.obj.type, id: this.obj.id, write_all: this.acl.writeAll, read_all: this.acl.readAll }
+        data.levels = this.acl.levels.map(level => ({ ...level, user: null, user_id: level.user.id }))
         this.$cable.perform({
           channel: 'GameChannel',
           action: 'change_access',
