@@ -28,7 +28,7 @@
                 Урон
               </div>
               <div class="damage-cube button" @click="damageModalOpen = true">
-                <div class="damage-text">
+                <div class="damage-text button" @click="damageModalOpen = true">
                   {{ damage }}
                 </div>
                 <div class="cube">
