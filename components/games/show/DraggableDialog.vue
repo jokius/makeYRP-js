@@ -1,23 +1,32 @@
 <template>
   <vue-draggable-resizable
     drag-handle=".drag-handle"
-    :w="width"
-    :h="height"
+    :w="isShow ? width : 'auto'"
+    :h="isShow ? height : 40"
     :x="xPoint"
     :y="yPoint"
     :z="zModal"
     :min-width="150"
     :min-height="40"
-    :resizable="resizable"
-    :active="resizable"
+    :resizable="resizable && isShow"
+    :active="resizable && isShow"
     class-name-active="resize-boards"
     class-name-handle="draggable-dialog-handle"
     @resizing="onResize"
+    :class="{ opacity: !isShow }"
   >
-    <v-card class="resize-style" :style="style" ref="dragWidow">
-      <v-toolbar height="40" dark color="indigo" class="draggable-dialog-header drag-handle">
+    <v-card v-if="isShow" class="resize-style" :style="style" ref="dragWidow">
+      <v-toolbar
+        height="40"
+        dark color="indigo"
+        class="draggable-dialog-header drag-handle"
+        @dblclick="isShow = false"
+      >
         <v-toolbar-title>{{ title }}</v-toolbar-title>
         <v-spacer />
+        <v-btn icon dark @click="isShow = false">
+          <v-icon>mdi-minus</v-icon>
+        </v-btn>
         <v-btn icon dark @click="onClose">
           <v-icon>mdi-close</v-icon>
         </v-btn>
@@ -27,6 +36,22 @@
       <v-card-actions v-if="hasActionsSlot">
         <slot name="actions" />
       </v-card-actions>
+    </v-card>
+    <v-card v-else class="resize-style" ref="dragWidow">
+      <v-toolbar
+        height="40"
+        dark color="indigo"
+        class="draggable-dialog-header drag-handle"
+        @dblclick="isShow = true"
+      >
+        <v-toolbar-title>{{ title }}</v-toolbar-title>
+        <v-btn icon dark @click="isShow = true">
+          <v-icon>mdi-minus</v-icon>
+        </v-btn>
+        <v-btn icon dark @click="onClose">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-toolbar>
     </v-card>
   </vue-draggable-resizable>
 </template>
@@ -61,6 +86,7 @@
         yPoint: 0,
         dataWidth: null,
         dataHeight: null,
+        isShow: true,
       }
     },
 
@@ -127,78 +153,82 @@
 </script>
 
 <style lang="scss">
-  .draggable-dialog-header {
-    cursor: move;
-  }
+.opacity {
+  opacity: 0.75;
+}
 
-  .draggable-dialog-handle {
-    position: absolute;
-    background-color: black;
-    height: 2px;
-    width: 2px;
-  }
+.draggable-dialog-header {
+  cursor: move;
+}
 
-  .draggable-dialog-handle-tl {
-    display: block;
-    cursor: nw-resize;
-    top: -2px;
-    left: -1px;
-    width: 4px;
-    height: 3px;
-  }
+.draggable-dialog-handle {
+  position: absolute;
+  background-color: black;
+  height: 2px;
+  width: 2px;
+}
 
-  .draggable-dialog-handle-tm {
-    display: block;
-    cursor: n-resize;
-    top: -2px;
-    width: 100%;
-  }
+.draggable-dialog-handle-tl {
+  display: block;
+  cursor: nw-resize;
+  top: -2px;
+  left: -1px;
+  width: 4px;
+  height: 3px;
+}
 
-  .draggable-dialog-handle-tr {
-    display: block;
-    cursor: ne-resize;
-    top: -2px;
-    right: -1px;
-    width: 4px;
-    height: 3px;
-  }
+.draggable-dialog-handle-tm {
+  display: block;
+  cursor: n-resize;
+  top: -2px;
+  width: 100%;
+}
 
-  .draggable-dialog-handle-mr {
-    display: block;
-    cursor: e-resize;
-    height: 100%;
-    right: -2px;
-  }
+.draggable-dialog-handle-tr {
+  display: block;
+  cursor: ne-resize;
+  top: -2px;
+  right: -1px;
+  width: 4px;
+  height: 3px;
+}
 
-  .draggable-dialog-handle-bl {
-    display: block;
-    cursor: sw-resize;
-    bottom: -2px;
-    left: -1px;
-    width: 4px;
-    height: 3px;
-  }
+.draggable-dialog-handle-mr {
+  display: block;
+  cursor: e-resize;
+  height: 100%;
+  right: -2px;
+}
 
-  .draggable-dialog-handle-bm {
-    display: block;
-    cursor: s-resize;
-    bottom: -4px;
-    width: 100%;
-  }
+.draggable-dialog-handle-bl {
+  display: block;
+  cursor: sw-resize;
+  bottom: -2px;
+  left: -1px;
+  width: 4px;
+  height: 3px;
+}
 
-  .draggable-dialog-handle-ml {
-    display: block;
-    cursor: w-resize;
-    height: 100%;
-    left: -2px;
-  }
+.draggable-dialog-handle-bm {
+  display: block;
+  cursor: s-resize;
+  bottom: -4px;
+  width: 100%;
+}
 
-  .draggable-dialog-handle-br {
-    display: block;
-    cursor: se-resize;
-    bottom: -2px;
-    right: -1px;
-    width: 4px;
-    height: 3px;
-  }
+.draggable-dialog-handle-ml {
+  display: block;
+  cursor: w-resize;
+  height: 100%;
+  left: -2px;
+}
+
+.draggable-dialog-handle-br {
+  display: block;
+  cursor: se-resize;
+  bottom: -2px;
+  right: -1px;
+  width: 4px;
+  height: 3px;
+}
 </style>
