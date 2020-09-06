@@ -116,9 +116,10 @@ const addSheet = (state, { user, raw }) => {
     currentUserId: user.id,
     masterId: state.info.master.id,
   })
-  if (!sheet.acl.canRead) return
+  if (!sheet.acl.canRead) return false
 
   state.sheets = [...state.sheets, sheet]
+  return true
 }
 
 const pushMenuItem = (state, { user, raw }) => {
@@ -273,6 +274,9 @@ export const mutations = {
 
   deleteSheet(state, id) {
     deleteSheet(state, id)
+    if (state.currentItem.mark !== 'sheet' && state.marks.sheet > 0) {
+      state.marks = { ...state.marks, sheet: state.marks.sheet - 1 }
+    }
   },
 
   deleteUser(state, id) {
@@ -301,8 +305,9 @@ export const mutations = {
   },
 
   addSheet(state, params) {
-    addSheet(state, params)
-    if (state.currentItem.mark !== 'sheet') state.marks = { ...state.marks, sheet: state.marks.sheet + 1 }
+    if (addSheet(state, params)) {
+      if (state.currentItem.mark !== 'sheet') state.marks = { ...state.marks, sheet: state.marks.sheet + 1 }
+    }
   },
 
   addUser(state, user) {
@@ -422,10 +427,19 @@ export const mutations = {
     }
 
     if (sheet.acl.canRead) {
-      if (index >= 0) state.sheets[index] = sheet
-      else state.sheets = [...state.sheets, sheet]
+      if (index >= 0) {
+        state.sheets[index] = sheet
+      } else {
+        state.sheets = [...state.sheets, sheet]
+        if (state.currentItem.mark !== 'sheet') state.marks = { ...state.marks, sheet: state.marks.sheet + 1 }
+      }
     } else {
-      if (index >= 0) deleteSheet(state, sheet.id)
+      if (index >= 0) {
+        deleteSheet(state, sheet.id)
+        if (state.currentItem.mark !== 'sheet' && state.marks.sheet > 0) {
+          state.marks = { ...state.marks, sheet: state.marks.sheet - 1 }
+        }
+      }
     }
   },
 

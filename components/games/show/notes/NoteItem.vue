@@ -92,7 +92,6 @@
       },
 
       sendNote() {
-        console.log('this.note.acl', this.note.acl)
         const data = { read_all: true, type: 'menu_item', id: this.note.id }
         this.$cable.perform({
           channel: 'GameChannel',

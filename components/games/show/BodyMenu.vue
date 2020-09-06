@@ -76,7 +76,7 @@
   import { mapState } from 'vuex'
 
   import TabChat from './TabChat'
-  import TabSheets from './TabSheets'
+  import TabSheets from './sheets/TabSheets'
   import TabSettings from './TabSettings'
   import TabNotes from './notes/TabNotes'
   import TabImages from './TabImages'
