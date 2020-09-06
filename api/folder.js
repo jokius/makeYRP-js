@@ -30,3 +30,14 @@ export const loadTree = (axios) =>
   axios
     .get('folders/tree.json')
     .then(response => response.data)
+
+export const dropImage = ({ axios, params }) => {
+  const formData = new FormData()
+  formData.append('file', params.file)
+  formData.append('x', params.position.x)
+  formData.append('y', params.position.x)
+  formData.append('page_id', params.pageId)
+
+  return axios
+    .post('folders/0/images/drop', formData)
+}

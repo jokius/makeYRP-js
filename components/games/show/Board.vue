@@ -53,6 +53,7 @@
   import { ImageModel } from '@/models/ImageModel'
   import { GraphicModel } from '@/models/GraphicModel'
   import KGraphic from './konva/KGraphic'
+  import { dropImage } from '@/api/folder'
 
   const drawingPoints = ['brush', 'rect', 'circle']
 
@@ -69,6 +70,7 @@
         position: { x: 0, y: 0 },
         menuItems: [],
         item: {},
+        loadingImages: false,
       }
     },
 
@@ -188,10 +190,16 @@
         return transform.point(pos)
       },
 
-      handleDrop({ sheet, image }) {
+      handleDrop(transferData, nativeEvent) {
         const position = this.mousePosition()
-        if (sheet) return this.sendToken(sheet, position)
-        if (image) return this.sendImage(image, position)
+
+        if (transferData) {
+          const { sheet, image } = transferData
+          if (sheet) return this.sendToken(sheet, position)
+          if (image) return this.sendImage(image, position)
+        } else {
+          this.dropImages([...nativeEvent.dataTransfer.files], position)
+        }
       },
 
       sendToken(sheet, position) {
@@ -527,7 +535,7 @@
       },
 
       changeImage(raw) {
-        const index = this.images.findIndex(item => item.id === raw.id)
+        const index = this.images.findIndex(item => item.id === raw.data.id)
         const image = this.images[index]
         image.setInfo({
           data: raw.data,
@@ -634,7 +642,25 @@
         if (!can) return false
 
         return this.cursor === 'default' && !this.altPressed
-      }
+      },
+
+      dropImages(files, position) {
+        this.loadingImages = true
+        const promises = []
+
+        files.forEach(file => {
+          if (file.type.match(/image\//)) {
+            promises.push(dropImage({
+              axios: this.$axios,
+              params: { position, file, pageId: this.pageId }
+            }))
+          }
+        })
+
+        Promise.all(promises).then(() => {
+          this.loadingImages = false
+        })
+      },
     },
   }
 </script>
