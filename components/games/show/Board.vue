@@ -379,7 +379,11 @@
       changeStageDraggable(e) {
         const event = e.evt
         const stage = this.$refs.stage.getStage()
-        stage.draggable(this.currentCursor === 'pointer' || (event.button === 0 && event.altKey))
+        stage.draggable(this.canDraggableStage(event))
+      },
+
+      canDraggableStage(event) {
+        return event.button === 2 || this.currentCursor === 'pointer' || (event.button === 0 && event.altKey)
       },
 
       showTransformer(e) {
