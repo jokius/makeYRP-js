@@ -51,13 +51,6 @@ export class GameModel {
     return this
   }
 
-  updatePage(updatedPage) {
-    const page = this.pages.find(item => item.id === updatedPage.id)
-    page.setInfo(updatedPage)
-
-    return this
-  }
-
   deletePage(id) {
     this.pages = this.pages.filter(page => page.id !== id)
 

@@ -359,12 +359,13 @@ export const mutations = {
   },
 
   updateUser(state, user) {
-    const index = state.users.findIndex(item => item.id === user.id)
+    const index = state.users.findIndex(item => item.id === user.data.id)
     state.users[index] = state.users[index].setInfo(user)
   },
 
-  updatePage(state, page) {
-    state.info = state.info.updatePage(page)
+  updatePage(state, raw) {
+    const page = state.info.pages.find(item => item.id === raw.data.id)
+    page.setInfo(raw)
   },
 
   updateFolderItem(state, raw) {

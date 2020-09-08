@@ -9,10 +9,8 @@
         @mousedown="stageClick"
         @keydown="deletePress"
       >
-        <v-layer ref="map">
-          <k-image v-if="backgroundUrl" :config="backgroundConfig" />
-        </v-layer>
         <v-layer ref="graphic">
+          <k-image v-if="backgroundUrl" :key="mapKey" :config="backgroundConfig" />
           <k-graphic
             v-for="graphic in graphics"
             :key="graphic.params.name"
@@ -54,7 +52,6 @@
   import { GraphicModel } from '@/models/GraphicModel'
   import KGraphic from './konva/KGraphic'
   import { dropImage } from '@/api/folder'
-  import Konva from 'konva'
 
   const drawingPoints = ['brush', 'rect', 'circle']
 
@@ -72,6 +69,7 @@
         menuItems: [],
         item: {},
         loadingImages: false,
+        mapKey: Date.now()
       }
     },
 
@@ -166,7 +164,6 @@
     },
 
     mounted() {
-      console.log('Konva.dragButtons', Konva.dragButtons)
       this.$cable.subscribe({ channel: 'PageChannel', page_id: this.pageId })
       this.scaleStage()
       this.setPosition()
@@ -180,6 +177,7 @@
     watch: {
       params() {
         this.setPosition()
+        this.mapKey = Date.now()
       },
     },
 
@@ -521,6 +519,8 @@
       },
 
       changeObj(obj) {
+        if (obj.from === this.user.id) return
+
         if (obj.token) this.changeToken(obj.token, obj.by)
         if (obj.image) this.changeImage(obj.image)
         if (obj.graphic) this.changeGraphic(obj.graphic)
@@ -534,7 +534,7 @@
           changeAcl: false,
         })
         this.$set(this.tokens, index, token)
-        if (this.user.id !== by && this.selectedItemName === token.name) {
+        if (this.selectedItemName === token.name) {
           this.selectedItemName = ''
           this.updateTransformer()
         }
@@ -548,16 +548,27 @@
           changeAcl: false,
         })
         this.$set(this.images, index, image)
+
+        if (this.selectedItemName === image.name) {
+          this.selectedItemName = ''
+          this.updateTransformer()
+        }
       },
 
       changeGraphic(raw) {
-        const index = this.graphics.findIndex(item => item.id === raw.id)
+        const index = this.graphics.findIndex(item => item.id === raw.data.id)
         const graphic = this.graphics[index]
         graphic.setInfo({
           data: raw.data,
           changeAcl: false,
         })
         this.$set(this.graphics, index, graphic)
+        console.log('this.selectedItemName', this.selectedItemName)
+        console.log('this.selectedItemName', this.selectedItemName)
+        if (this.selectedItemName === graphic.name) {
+          this.selectedItemName = ''
+          this.updateTransformer()
+        }
       },
 
       remove(params) {
