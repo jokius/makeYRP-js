@@ -54,6 +54,7 @@
   import { GraphicModel } from '@/models/GraphicModel'
   import KGraphic from './konva/KGraphic'
   import { dropImage } from '@/api/folder'
+  import Konva from 'konva'
 
   const drawingPoints = ['brush', 'rect', 'circle']
 
@@ -134,7 +135,7 @@
         return {
           width: this.width,
           height: this.height,
-          draggable: false,
+          draggable: true,
         }
       },
 
@@ -165,6 +166,7 @@
     },
 
     mounted() {
+      console.log('Konva.dragButtons', Konva.dragButtons)
       this.$cable.subscribe({ channel: 'PageChannel', page_id: this.pageId })
       this.scaleStage()
       this.setPosition()
