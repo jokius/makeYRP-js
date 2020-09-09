@@ -1,7 +1,7 @@
 <template>
-  <div class="notes-body">
+  <div :class="[{ 'user-view': !isMaster }, 'notes-body']">
     <v-overflow-btn
-      v-if="user.id === master.id"
+      v-if="isMaster"
       class="selectButton"
       :items="items"
       label="Создать..."
@@ -45,6 +45,10 @@
       menu() {
         return this.menus.find(item => item.type === 'notes')
       },
+
+      isMaster() {
+        return this.user.id === this.master.id
+      }
     },
 
     created() {
@@ -89,5 +93,9 @@
   bottom: 12px;
   overflow: auto;
   height: 94vh;
+}
+
+.user-view {
+  margin-top: 10px;
 }
 </style>
