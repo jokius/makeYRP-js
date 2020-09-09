@@ -24,7 +24,7 @@
       </div>
       <div
         v-else
-        :style="{ width, height, minWidth }"
+        :style="{ width, height, minWidth, overflow: 'auto' }"
         v-html="text"
       />
     </template>
@@ -126,7 +126,11 @@
       height: {
         get() {
           const height = this.size.height
-          return typeof height === 'number' ? `${height - this.bodyOffsetH}px` : `calc(${height} - 112px)`
+          if (this.isEdit) {
+            return typeof height === 'number' ? `${height - this.bodyOffsetH}px` : `calc(${height} - 112px)`
+          } else {
+            return typeof height === 'number' ? `${height - 40}px` : `calc(${height} - 40px)`
+          }
         },
       },
     },

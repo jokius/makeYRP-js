@@ -47,6 +47,10 @@
       },
     },
 
+    created() {
+      console.log('menu.rootFolder', this.menu.rootFolder)
+    },
+
     methods: {
       add(type) {
         const key = Date.now()
