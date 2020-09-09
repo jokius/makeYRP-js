@@ -571,8 +571,6 @@
           changeAcl: false,
         })
         this.$set(this.graphics, index, graphic)
-        console.log('this.selectedItemName', this.selectedItemName)
-        console.log('this.selectedItemName', this.selectedItemName)
         if (this.selectedItemName === graphic.name) {
           this.selectedItemName = ''
           this.updateTransformer()

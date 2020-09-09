@@ -1,5 +1,5 @@
 <template>
-  <div v-if="deepItems(folder)" :style="style">
+  <div v-if="showFolder(folder)" :style="style">
     <right-click-menu :position="position" :current-obj="obj" :replacedItems="replacedItems">
       <div v-if="!isRoot" class="folder-title hover-color" @click="open = !open" @contextmenu="handler($event)">
         <v-icon>
@@ -54,10 +54,6 @@ export default {
       return this.folder.depth === 0
     },
 
-    showFolder() {
-      return this.user.id === this.master.id || this.deepItems()
-    },
-
     children() {
       return this.folder.children
     },
@@ -98,6 +94,10 @@ export default {
   },
 
   methods: {
+    showFolder(folder) {
+      return this.user.id === this.master.id || this.deepItems(folder)
+    },
+
     deepItems(folder) {
       if (folder.isRoot || folder.items.length > 0) return true
 
