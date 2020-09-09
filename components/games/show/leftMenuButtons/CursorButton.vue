@@ -9,7 +9,7 @@
         <v-icon class="icon">mdi-cursor-default</v-icon>
       </div>
       <div v-else :class="[{ selected: cursor === 'pointer' }, 'button']" @click="cursor = 'pointer'">
-        <v-icon class="icon">mdi-cursor-pointer</v-icon>
+        <v-icon class="icon">mdi-hand-right</v-icon>
       </div>
     </template>
 

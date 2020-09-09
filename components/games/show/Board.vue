@@ -6,7 +6,8 @@
         class="stage"
         :config="configKonva"
         @contextmenu="showMenu($event)"
-        @mousedown="stageClick"
+        @mousedown="stageMouseDown"
+        @mouseup="stageMouseUp"
         @keydown="deletePress"
       >
         <v-layer ref="graphic">
@@ -366,7 +367,7 @@
         })
       },
 
-      stageClick(e) {
+      stageMouseDown(e) {
         if (e.target === e.target.getStage() || e.target.name() === 'background') {
           this.selectedItemName = ''
           this.updateTransformer()
@@ -376,10 +377,17 @@
         }
       },
 
+      stageMouseUp() {
+        const stage = this.$refs.stage.getStage()
+        stage.container().style.cursor = 'default'
+      },
+
       changeStageDraggable(e) {
         const event = e.evt
         const stage = this.$refs.stage.getStage()
-        stage.draggable(this.canDraggableStage(event))
+        const canDraggable = this.canDraggableStage(event)
+        stage.draggable(canDraggable)
+        stage.container().style.cursor = canDraggable ? 'grabbing' : 'default'
       },
 
       canDraggableStage(event) {
