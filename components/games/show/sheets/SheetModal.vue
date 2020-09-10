@@ -76,24 +76,24 @@
 <script>
   import { mapState } from 'vuex'
 
-  import DraggableDialog from './DraggableDialog'
+  import DraggableDialog from '../DraggableDialog'
 
   export default {
     name: 'SheetModal',
 
     components: {
       DraggableDialog,
-      EouEnemySheet: () => import('@/components/templates/pbta/EdgeOfUniverse/sheets/EnemySheet'),
-      MutantSheet: () => import('@/components/templates/MYZ/sheets/MutantSheet'),
-      BidCharacterSheet: () => import('@/components/templates/BladeInTheDarck/sheets/CharacterSheet'),
-      BidTeamSheet: () => import('@/components/templates/BladeInTheDarck/sheets/TeamSheet'),
-      HmwCharacterSheet: () => import('@/components/templates/pbta/HorrorMovieWorld/sheets/CharacterSheet'),
-      HmwMonsterSheet: () => import('@/components/templates/pbta/HorrorMovieWorld/sheets/MonsterSheet'),
-      EouCharacterSheet: () => import('@/components/templates/pbta/EdgeOfUniverse/sheets/CharacterSheet'),
-      EouShipSheet: () => import('@/components/templates/pbta/EdgeOfUniverse/sheets/ShipSheet'),
-      EouCompanionSheet: () => import('@/components/templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'),
-      DwCharacterSheet: () => import('@/components/templates/pbta/DungeonWorld/sheets/CharacterSheet'),
-      DwEnemySheet: () => import('@/components/templates/pbta/DungeonWorld/sheets/EnemySheet'),
+      EouEnemySheet: () => import('~/components/templates/pbta/EdgeOfUniverse/sheets/EnemySheet'),
+      MutantSheet: () => import('~/components/templates/MYZ/sheets/MutantSheet'),
+      BidCharacterSheet: () => import('~/components/templates/BladeInTheDarck/sheets/CharacterSheet'),
+      BidTeamSheet: () => import('~/components/templates/BladeInTheDarck/sheets/TeamSheet'),
+      HmwCharacterSheet: () => import('~/components/templates/pbta/HorrorMovieWorld/sheets/CharacterSheet'),
+      HmwMonsterSheet: () => import('~/components/templates/pbta/HorrorMovieWorld/sheets/MonsterSheet'),
+      EouCharacterSheet: () => import('~/components/templates/pbta/EdgeOfUniverse/sheets/CharacterSheet'),
+      EouShipSheet: () => import('~/components/templates/pbta/EdgeOfUniverse/sheets/ShipSheet'),
+      EouCompanionSheet: () => import('~/components/templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'),
+      DwCharacterSheet: () => import('~/components/templates/pbta/DungeonWorld/sheets/CharacterSheet'),
+      DwEnemySheet: () => import('~/components/templates/pbta/DungeonWorld/sheets/EnemySheet'),
     },
 
     props: {

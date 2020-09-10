@@ -86,7 +86,7 @@
   import { mapState } from 'vuex'
 
   import ColorPickerModal from './ColorPickerModal'
-  import SheetModal from './SheetModal'
+  import SheetModal from './sheets/SheetModal'
   import InfoModal from './InfoModal'
   import NoteModal from './notes/NoteModal'
   import PageModal from './PageModal'
