@@ -1,5 +1,15 @@
 <template>
   <div class="moves-body">
+    <v-overflow-btn
+      class="selectButton"
+      :items="items"
+      label="Добавить..."
+      color="black"
+      segmented
+      item-color="black"
+      hide-details
+      @change="value => add(value)"
+    />
     <details class="moves" open>
       <summary class="moves-title">Базовые ходы</summary>
       <div class="moves-grid">
@@ -9,7 +19,7 @@
           :sheet="sheet"
           :move="move"
           :index="index"
-          path="moves"
+          path="baseMoves"
         />
       </div>
     </details>
@@ -25,37 +35,6 @@
           path="moves"
         />
       </div>
-      <div class="actions">
-        <v-btn
-          class="button-add"
-          raised
-          color="black"
-          dark
-          @click="deathMovesOpen = true"
-        >
-          Добавить ход смерти
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          class="button-add"
-          raised
-          color="black"
-          dark
-          @click="specialMovesOpen = true"
-        >
-          Добавить сложный ход
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          class="button-add"
-          raised
-          color="black"
-          dark
-          @click="otherMovesOpen = true"
-        >
-          Добавить ход другого класса
-        </v-btn>
-      </div>
     </details>
     <details class="moves">
       <summary class="moves-title">Опциональные ходы</summary>
@@ -66,7 +45,7 @@
           :sheet="sheet"
           :move="move"
           :index="index"
-          path="moves"
+          path="optionalMoves"
         />
       </div>
     </details>
@@ -94,12 +73,11 @@
 
 <script>
   import { mapState } from 'vuex'
-
   import Move from '../components/Move'
-
   import AddMoveModal from '../modals/AddMoveModal'
   import AddOtherMoveModal from '../modals/AddOtherMoveModal'
   import AddDeathMoveModal from '../modals/AddDeathMoveModal'
+  import { Pbta } from '~/lib/Pbta'
 
   export default {
     name: 'CharacterMoveBody',
@@ -115,6 +93,12 @@
         deathMovesOpen: false,
         specialMovesOpen: false,
         otherMovesOpen: false,
+        items: [
+          { text: 'Добавить ход смерти', value: 'death', callback: () => this.add('death') },
+          { text: 'Добавить сложный ход', value: 'special', callback: () => this.add('special') },
+          { text: 'Добавить ход другого класса', value: 'other', callback: () => this.add('other') },
+          { text: 'Добавить свой ход', value: 'self', callback: () => this.add('self') },
+        ]
       }
     },
 
@@ -189,6 +173,25 @@
     },
 
     methods: {
+      add(type) {
+        switch (type) {
+          case 'death':
+            this.deathMovesOpen = true
+            break
+          case 'special':
+            this.specialMovesOpen = true
+            break
+          case 'other':
+            this.otherMovesOpen = true
+            break
+          case 'self':
+            this.setMove(Pbta.newMove())
+            break
+          default:
+            break
+        }
+      },
+
       setMove(move) {
         if (!move.name) return
 
@@ -246,13 +249,5 @@
 
   .gray {
     background-color: $grayC5;
-  }
-
-  .actions {
-    display: grid;
-    grid-template-columns: max-content 10px max-content 10px max-content;
-    justify-content: center;
-    margin-top: 15px;
-    margin-bottom: 5px;
   }
 </style>

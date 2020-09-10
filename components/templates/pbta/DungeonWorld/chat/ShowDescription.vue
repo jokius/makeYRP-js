@@ -27,9 +27,6 @@
 <style scoped lang="scss">
   @import '~assets/css/colors';
 
-  $border: 3px solid $black;
-  $size: 60px;
-
   .grid-message {
     display: grid;
     grid-template-columns: 1fr;

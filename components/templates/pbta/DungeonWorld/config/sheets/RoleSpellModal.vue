@@ -129,10 +129,8 @@
   }
 </script>
 
-<style lang="scss">
-  @import '~assets/css/wysiwyg';
-
-  .button {
-    margin-bottom: 5px;
-  }
+<style scoped lang="scss">
+.button {
+  margin-bottom: 5px;
+}
 </style>

@@ -174,7 +174,3 @@
     },
   }
 </script>
-
-<style lang="scss">
-  @import '~assets/css/wysiwyg';
-</style>

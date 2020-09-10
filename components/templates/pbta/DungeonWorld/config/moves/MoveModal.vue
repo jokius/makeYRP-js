@@ -345,33 +345,31 @@
   }
 </script>
 
-<style lang="scss">
-  @import '~assets/css/wysiwyg';
+<style scoped lang="scss">
+.button {
+  margin-bottom: 5px;
+}
 
-  .button {
-    margin-bottom: 5px;
-  }
+.move-select-item-grid {
+  display: grid;
+  grid-column-gap: 5px;
+  grid-template-columns: 1fr max-content;
+  grid-template-areas:
+  'name remove'
+  'description remove';
+}
 
-  .move-select-item-grid {
-    display: grid;
-    grid-column-gap: 5px;
-    grid-template-columns: 1fr max-content;
-    grid-template-areas:
-    'name remove'
-    'description remove';
-  }
+.move-select-item-name {
+  grid-area: name;
+}
 
-  .move-select-item-name {
-    grid-area: name;
-  }
+.move-select-item-description {
+  grid-area: description;
+}
 
-  .move-select-item-description {
-    grid-area: description;
-  }
-
-  .move-select-item-remove {
-    grid-area: remove;
-    position: relative;
-    top: 50%;
-  }
+.move-select-item-remove {
+  grid-area: remove;
+  position: relative;
+  top: 50%;
+}
 </style>
