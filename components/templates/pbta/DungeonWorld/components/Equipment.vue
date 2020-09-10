@@ -32,9 +32,9 @@
             hide-details
             @change="saveSheet"
           />
-          <span v-if="use" class="label">Использований</span>
+          <span v-if="use || edit" class="label">Использований</span>
           <v-text-field
-            v-if="use"
+            v-if="use || edit"
             v-model.number="use"
             color="indigo"
             class="input"
@@ -43,9 +43,9 @@
             hide-details
             @change="saveSheet"
           />
-          <span v-if="weight" class="label">Вес</span>
+          <span v-if="weight || edit" class="label">Вес</span>
           <v-text-field
-            v-if="weight"
+            v-if="weight || edit"
             v-model.number="weight"
             color="indigo"
             class="input"
