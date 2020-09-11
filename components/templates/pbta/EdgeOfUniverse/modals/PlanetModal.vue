@@ -8,6 +8,7 @@
     :disable-actions="!isEdit"
     resizable
     background-color="#c5c5c5"
+    name="planet"
   >
     <template v-slot:body>
       <edit-planet-body v-if="isEdit" :planet="isNew ? privatePlanet : planet" :is-new="isNew" :size="size" />

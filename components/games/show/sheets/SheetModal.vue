@@ -6,6 +6,7 @@
     :width="size.width + 2"
     :height="size.height + 40"
     resizable
+    name="sheet"
   >
     <template v-slot:body>
       <mutant-sheet v-if="sheetName === 'mutant_year_zero-mutant'" :id="id" :key="key" :size="size"/>

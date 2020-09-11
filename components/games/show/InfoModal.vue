@@ -5,6 +5,7 @@
     :width="600"
     :height="500"
     resizable
+    name="info"
   >
     <template v-slot:body>
       <v-container class="fill-height" fluid>

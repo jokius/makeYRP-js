@@ -7,6 +7,7 @@
     :height="size.height"
     resizable
     background-color="#c5c5c5"
+    name="dw-item"
   >
     <template v-slot:body>
       <div class="edit-planet-grid" :style="style">

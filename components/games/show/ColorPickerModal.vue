@@ -5,6 +5,7 @@
     :width="325"
     :height="400"
     :size="{}"
+    name="color-picker"
   >
     <template v-slot:body>
       <v-container class="fill-height page-modal-body" fluid>

@@ -4,6 +4,7 @@
     title="Доступы"
     :width="325"
     height="auto"
+    name="access"
   >
     <template v-slot:body>
       <div v-if="!loaded" class="loaded">

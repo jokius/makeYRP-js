@@ -5,6 +5,7 @@
     :width="300"
     :height="200"
     :size="{}"
+    name="rename-item-folder"
   >
     <template v-slot:body>
       <v-container class="fill-height page-modal-body" fluid>

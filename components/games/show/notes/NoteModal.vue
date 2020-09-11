@@ -7,6 +7,7 @@
     :height="size.height"
     :disable-actions="!isEdit"
     resizable
+    name="note"
   >
     <template v-slot:body>
       <div v-if="isEdit">

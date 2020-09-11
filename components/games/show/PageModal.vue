@@ -5,6 +5,7 @@
     :width="300"
     :height="200"
     :size="{}"
+    name="page"
   >
     <template v-slot:body>
       <v-container class="fill-height page-modal-body" fluid>
