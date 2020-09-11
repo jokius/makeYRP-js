@@ -5,7 +5,7 @@
     :h="isShow ? height : 40"
     :x="xPoint"
     :y="yPoint"
-    :z="zModal"
+    :z="zIndex"
     :min-width="150"
     :min-height="40"
     :resizable="resizable && isShow"
@@ -15,44 +15,46 @@
     @resizing="onResize"
     :class="{ opacity: !isShow }"
   >
-    <v-card v-if="isShow" class="resize-style" :style="style" ref="dragWidow">
-      <v-toolbar
-        height="40"
-        dark color="indigo"
-        class="draggable-dialog-header drag-handle"
-        @dblclick="isShow = false"
-      >
-        <v-toolbar-title>{{ title }}</v-toolbar-title>
-        <v-spacer />
-        <v-btn icon dark @click="isShow = false">
-          <v-icon>mdi-minus</v-icon>
-        </v-btn>
-        <v-btn icon dark @click="onClose">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </v-toolbar>
-      <slot name="body" />
-      <v-divider v-if="hasActionsSlot" />
-      <v-card-actions v-if="hasActionsSlot">
-        <slot name="actions" />
-      </v-card-actions>
-    </v-card>
-    <v-card v-else class="resize-style" ref="dragWidow">
-      <v-toolbar
-        height="40"
-        dark color="indigo"
-        class="draggable-dialog-header drag-handle"
-        @dblclick="isShow = true"
-      >
-        <v-toolbar-title>{{ title }}</v-toolbar-title>
-        <v-btn icon dark @click="isShow = true">
-          <v-icon>mdi-minus</v-icon>
-        </v-btn>
-        <v-btn icon dark @click="onClose">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </v-toolbar>
-    </v-card>
+    <div @click.capture="changeZIndex">
+      <v-card v-if="isShow" class="resize-style" :style="style" ref="dragWidow">
+        <v-toolbar
+          height="40"
+          dark color="indigo"
+          class="draggable-dialog-header drag-handle"
+          @dblclick="isShow = false"
+        >
+          <v-toolbar-title>{{ title }}</v-toolbar-title>
+          <v-spacer />
+          <v-btn icon dark @click="isShow = false">
+            <v-icon>mdi-minus</v-icon>
+          </v-btn>
+          <v-btn icon dark @click="onClose">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <slot name="body" />
+        <v-divider v-if="hasActionsSlot" />
+        <v-card-actions v-if="hasActionsSlot">
+          <slot name="actions" />
+        </v-card-actions>
+      </v-card>
+      <v-card v-else class="resize-style" ref="dragWidow">
+        <v-toolbar
+          height="40"
+          dark color="indigo"
+          class="draggable-dialog-header drag-handle"
+          @dblclick="isShow = true"
+        >
+          <v-toolbar-title>{{ title }}</v-toolbar-title>
+          <v-btn icon dark @click="isShow = true">
+            <v-icon>mdi-minus</v-icon>
+          </v-btn>
+          <v-btn icon dark @click="onClose">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-card>
+    </div>
   </vue-draggable-resizable>
 </template>
 
@@ -60,6 +62,8 @@
   import { mapState } from 'vuex'
   import VueDraggableResizable from 'vue-draggable-resizable'
   import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
+
+  const START_INDEX = 100
 
   export default {
     name: 'DraggableDialog',
@@ -82,22 +86,21 @@
 
     data() {
       return {
+        id: Date.now(),
         xPoint: 0,
         yPoint: 0,
         dataWidth: null,
         dataHeight: null,
         isShow: true,
+        zIndex: START_INDEX,
       }
     },
 
     computed: {
       ...mapState({
         openModals: state => state.game.openModals,
+        modalsZIndex: state => state.game.modalsZIndex,
       }),
-
-      zModal() {
-        return 100 + this.openModals.length
-      },
 
       hasActionsSlot: {
         get() {
@@ -119,7 +122,9 @@
 
     created() {
       window.addEventListener('resize', this.handleResize)
-      this.handleResize();
+      this.handleResize()
+      this.zIndex = this.maxZIndex() + 1
+      this.$store.commit('game/addZIndex', { id: this.id, zIndex: this.zIndex })
     },
 
     mounted() {
@@ -133,9 +138,23 @@
 
     destroyed() {
       window.removeEventListener('resize', this.handleResize)
+      this.$store.commit('game/removeZIndex', this.id)
     },
 
     methods: {
+      maxZIndex() {
+        const max = this.modalsZIndex[0] || {}
+        return max.zIndex || START_INDEX
+      },
+
+      changeZIndex() {
+        const max = this.maxZIndex()
+        if (this.zIndex < max) {
+          this.zIndex = max + 1
+          this.$store.commit('game/changeZIndex', { id: this.id, zIndex: this.zIndex })
+        }
+      },
+
       handleResize() {
         if (!this.resizable) return
 

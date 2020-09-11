@@ -34,6 +34,7 @@ export const state = () => ({
   specialTabs: [],
   altPressed: false,
   users: [],
+  modalsZIndex: [],
 })
 
 export const actions = {
@@ -464,4 +465,18 @@ export const mutations = {
   altIsPressed(state, value) {
     state.altPressed = value
   },
+
+  addZIndex(state, value) {
+    state.modalsZIndex.unshift(value)
+  },
+
+  changeZIndex(state, { id, zIndex }) {
+    const modal = state.modalsZIndex.find(item => item.id === id)
+    modal.zIndex = zIndex
+    state.modalsZIndex = state.modalsZIndex.sort((a, b) =>  b.zIndex - a.zIndex)
+  },
+
+  removeZIndex(state, id) {
+    state.modalsZIndex = state.modalsZIndex.filter(item => item.id !== id)
+  }
 }
