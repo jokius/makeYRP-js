@@ -131,9 +131,9 @@
       const el = this.$refs.dragWidow.$el
       const width = el.clientWidth
       const height = el.clientHeight
-
-      this.xPoint = (window.innerWidth - width) / 2
-      this.yPoint = (window.innerHeight - height) / 2
+      const modals = this.openModals.length
+      this.xPoint = (window.innerWidth - width) / 2 + (modals - 1) * 40
+      this.yPoint = (window.innerHeight - height) / 2 + (modals - 1)  * 40
     },
 
     destroyed() {
