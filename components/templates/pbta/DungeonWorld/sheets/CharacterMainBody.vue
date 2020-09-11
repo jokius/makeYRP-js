@@ -553,7 +553,7 @@
         this.$store.commit('game/updateSheetParams', { id: this.sheet.id, path, value, })
 
         if (statType === 'constitution') {
-          const hp = this.role.hp.max + (value || 0)
+          const hp = parseInt(this.role.hp.max) + (parseInt(value) || 0)
 
           if (this.hpCurrent === this.hpMax) {
             this.$store.commit('game/updateSheetParams', {
