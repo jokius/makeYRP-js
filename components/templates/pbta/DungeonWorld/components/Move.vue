@@ -14,7 +14,7 @@
       <span v-else class="move-name">{{ name }}</span>
       <v-spacer />
       <v-btn
-        v-if="custom"
+        v-if="typeof edit !== 'undefined'"
         color="white"
         icon
         small
@@ -217,13 +217,9 @@
         return this.params.stats.map(item => ({ text: item.short, value: item.type }))
       },
 
-      custom() {
-        return this.move.custom
-      },
-
       edit: {
         get() {
-          return this.move.edit || false
+          return this.move.edit
         },
 
         set(value) {

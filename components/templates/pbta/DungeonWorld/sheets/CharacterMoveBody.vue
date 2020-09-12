@@ -1,7 +1,6 @@
 <template>
   <div class="moves-body">
     <v-overflow-btn
-      class="selectButton"
       :items="items"
       label="Добавить..."
       color="black"

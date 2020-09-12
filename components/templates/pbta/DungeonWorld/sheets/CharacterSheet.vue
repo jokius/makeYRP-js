@@ -28,7 +28,7 @@
       </v-tab-item>
 
       <v-tab-item>
-        <character-spells-body :id="id" />
+        <character-spells-body :id="id" :height="height" />
       </v-tab-item>
 
       <v-tab-item>

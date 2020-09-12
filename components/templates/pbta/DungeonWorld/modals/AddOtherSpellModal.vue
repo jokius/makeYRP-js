@@ -61,7 +61,6 @@
 
 <script>
   import { mapState } from 'vuex'
-  import { Pbta } from '../../../../../lib/Pbta'
 
   export default {
     name: 'AddOtherSpellModal',

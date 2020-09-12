@@ -21,6 +21,15 @@
               label="Длительное"
               color="indigo"
             />
+
+            <v-text-field
+              v-model="castSpell"
+              color="indigo"
+              label="Кубик заклинания"
+              hint="d4, d6 и тд; L - если меньшее, H - если большее"
+              :error-messages="diceError"
+              :error="diceError !== ''"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -53,6 +62,7 @@
 <script>
   import { mapState } from 'vuex'
   import { omitBy } from 'lodash'
+  import { dicesRegx } from '~/lib/dicesRegx'
 
   export default {
     name: 'RoleSpellModal',
@@ -64,6 +74,12 @@
 
     props: {
       obj: { type: Object, required: true },
+    },
+
+    data() {
+      return {
+        diceError: ''
+      }
     },
 
     computed: {
@@ -107,6 +123,22 @@
 
         set(value) {
           this.input('long', value)
+        },
+      },
+
+      castSpell: {
+        get() {
+          return this.spell.castSpell || ''
+        },
+
+        set(value) {
+          if (value.search(dicesRegx) < 0) {
+            this.diceError = 'Не корректный формат'
+          } else {
+            this.diceError = ''
+          }
+
+          this.input('castSpell', value)
         },
       },
     },

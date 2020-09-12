@@ -2,15 +2,31 @@
   <div class="spell-block">
     <div class="title-spell">
       <div :class="[{ enable }, 'box']" @click="changeSpell(!enable)" />
-      <span class="spell-name">{{ name }}</span>
+      <input
+        v-if="edit"
+        class="input"
+        v-model="name"
+        @change="saveSheet"
+      />
+      <span v-else class="spell-name">{{ name }}</span>
       <span v-if="long" class="spell-long">Длительное</span>
       <v-spacer v-else />
+      <v-btn
+        v-if="typeof edit !== 'undefined'"
+        color="white"
+        icon
+        small
+        class="icon-button"
+        @click="edit = !edit"
+      >
+        <v-icon>{{ edit ? 'mdi-lock-open-variant-outline' : 'mdi-lock-outline' }}</v-icon>
+      </v-btn>
       <v-btn
         color="red darken-4"
         icon
         small
         dark
-        class="delete-button"
+        class="icon-button"
         @click="removeSpell"
       >
         <v-icon>mdi-delete</v-icon>
@@ -21,21 +37,22 @@
       <summary class="pointer">
         Подробнее
       </summary>
-      <div class="actions">
-        <v-btn
-          class="button-add"
-          raised
-          color="black"
-          small
-          dark
-          @click="showDescription"
-        >
-          Показать описание
-        </v-btn>
-      </div>
+      <div v-if="edit" class="edit">
+        <v-text-field
+          v-model="name"
+          label="название"
+          color="indigo"
+        />
 
-      <span class="spell-description" v-html="description" />
-      <div v-if="enable" class="cast-spell">
+        <div>Описание</div>
+        <wysiwyg v-model="description" :options="wysiwygConfig" />
+
+        <v-checkbox
+          v-model="long"
+          label="Длительное"
+          color="black"
+        />
+
         <v-text-field
           v-model="castSpell"
           color="indigo"
@@ -44,14 +61,40 @@
           :error-messages="diceError"
           :error="diceError !== ''"
         />
-        <v-btn
-          class="cast-button"
-          color="black"
-          @click="sendCast"
-          dark
-        >
-          <span>Получить результат</span>
-        </v-btn>
+      </div>
+      <div v-else>
+        <div class="actions">
+          <v-btn
+            class="button-add"
+            raised
+            color="black"
+            small
+            dark
+            @click="showDescription"
+          >
+            Показать описание
+          </v-btn>
+        </div>
+
+        <span class="spell-description" v-html="description" />
+        <div v-if="enable" class="cast-spell">
+          <v-text-field
+            v-model="castSpell"
+            color="indigo"
+            label="Кубик заклинания"
+            hint="d4, d6 и тд; L - если меньшее, H - если большее"
+            :error-messages="diceError"
+            :error="diceError !== ''"
+          />
+          <v-btn
+            class="cast-button"
+            color="black"
+            @click="sendCast"
+            dark
+          >
+            <span>Получить результат</span>
+          </v-btn>
+        </div>
       </div>
     </details>
   </div>
@@ -76,7 +119,8 @@
         privateType: {},
         modalOpen: false,
         privateAltType: null,
-        diceError: ''
+        diceError: '',
+        wysiwygConfig: { hideModules: { image: true, link: true } },
       }
     },
 
@@ -89,20 +133,48 @@
         return this.sheet.params
       },
 
-      long() {
-        return this.spell.long
+      edit: {
+        get() {
+          return this.spell.edit
+        },
+
+        set(value) {
+          this.input('edit', value)
+        },
+      },
+
+      long: {
+        get() {
+          return this.spell.long
+        },
+
+        set(value) {
+          this.input('long', value)
+        }
       },
 
       enable() {
         return this.spell.enable
       },
 
-      name() {
-        return this.spell.name
+      name: {
+        get() {
+          return this.spell.name
+        },
+
+        set(value) {
+          this.input('name', value)
+        }
       },
 
-      description() {
-        return this.spell.description
+      description: {
+        get() {
+          return this.spell.description
+        },
+
+        set(value) {
+          this.input('description', value)
+        }
       },
 
       castSpell: {
@@ -199,13 +271,13 @@
 <style scoped lang="scss">
   @import '~assets/css/colors';
 
-  .move-block {
+  .spell-block {
     margin-bottom: 5px;
   }
 
   .title-spell {
     display: grid;
-    grid-template-columns: repeat(2, max-content) 1fr max-content;
+    grid-template-columns: repeat(2, max-content) 1fr repeat(2, max-content);
     background-color: $black;
     color: $white;
     line-height: 35px;
@@ -236,7 +308,7 @@
     font-style: italic;
   }
 
-  .delete-button {
+  .icon-button {
     margin-top: 4px;
   }
 
@@ -256,5 +328,13 @@
     display: grid;
     grid-template-columns: 200px max-content;
     grid-column-gap: 5px;
+  }
+
+  .edit {
+    background: $white;
+  }
+
+  .input {
+    color: $white;
   }
 </style>

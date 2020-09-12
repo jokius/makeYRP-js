@@ -1,32 +1,48 @@
 <template>
-  <div class="spells-body">
+  <div class="spells-body" :style="{ minHeight: `calc(${height} - 30px` }">
     <div class="actions">
-      <v-btn
-        v-if="classSpells"
-        class="button-add"
-        raised
+      <v-overflow-btn
+        :items="items"
+        label="Добавить..."
         color="black"
-        dark
-        @click="spellsOpen = true"
-      >
-        Добавить заклинание
-      </v-btn>
-      <v-spacer v-else />
-      <v-spacer />
+        segmented
+        item-color="black"
+        hide-details
+        @change="value => add(value)"
+      />
+
       <v-btn
-        class="button-add"
-        raised
         color="black"
-        dark
-        @click="otherSpellsOpen = true"
+        icon
+        class="edit-button"
+        x-large
+        @click="edit = !edit"
       >
-        Добавить заклинание другого класса
+        <v-icon>{{ edit ? 'mdi-lock-open-variant-outline' : 'mdi-lock-outline' }}</v-icon>
       </v-btn>
     </div>
 
     <template v-for="(spellGroup, indexGroup) in spells">
+      <div v-if="edit" :key="`spellGroup-${indexGroup}`" class="edit-group">
+        <input
+          class="input"
+          :value="spellGroup.title"
+          @input="e => changeSpellGroup(indexGroup, e)"
+          @change="saveSheet"
+        />
+        <v-btn
+          color="red darken-4"
+          icon
+          small
+          dark
+          class="delete-button"
+          @click="removeSpellGroup(indexGroup)"
+        >
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </div>
       <details
-        v-if="spellGroup.items.length > 0"
+        v-else-if="!edit && spellGroup.items.length > 0"
         :key="`spellGroup-${indexGroup}`"
         class="spells"
         open
@@ -57,23 +73,31 @@
       :obj="otherSpellObj"
       @completed="value => otherSpellObj = value"
     />
+    <add-self-spell-modal
+      v-if="selfSpellsOpen"
+      :id="id"
+      :obj="selfSpellObj"
+      @completed="value => selfSpellObj = value"
+    />
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
 
-  import Spell from '../components/Spell'
-  import AddSpellModal from '../modals/AddSpellModal'
-  import AddOtherSpellModal from '../modals/AddOtherSpellModal'
+  import Spell from '~/components/templates/pbta/DungeonWorld/components/Spell'
+  import AddSpellModal from '~/components/templates/pbta/DungeonWorld/modals/AddSpellModal'
+  import AddOtherSpellModal from '~/components/templates/pbta/DungeonWorld/modals/AddOtherSpellModal'
+  import AddSelfSpellModal from '~/components/templates/pbta/DungeonWorld/modals/AddSelfSpellModal'
 
   export default {
     name: 'CharacterSpellsBody',
 
-    components: { AddOtherSpellModal, AddSpellModal, Spell },
+    components: { AddSelfSpellModal, AddOtherSpellModal, AddSpellModal, Spell },
 
     props: {
       id: { type: String, required: true },
+      height: { type: String, required: true },
     },
 
     data() {
@@ -81,6 +105,8 @@
         panels: [],
         spellsOpen: false,
         otherSpellsOpen: false,
+        selfSpellsOpen: false,
+        edit: false,
       }
     },
 
@@ -89,6 +115,18 @@
         sheets: state => state.game.sheets,
         tables: state => state.game.info.template.tables,
       }),
+
+      items() {
+        const list = []
+        if (this.classSpells) {
+          list.push({ text: 'Добавить заклинание', value: 'spell', callback: () => this.add('spell') })
+        }
+
+        return list.concat([
+          { text: 'Добавить заклинание другого класса', value: 'other', callback: () => this.add('other') },
+          { text: 'Добавить своё заклинание', value: 'selfSpell', callback: () => this.add('selfSpell') },
+        ])
+      },
 
       sheet() {
         return this.sheets.find(sheet => sheet.id === this.id)
@@ -127,31 +165,89 @@
           this.otherSpellsOpen = open
         },
       },
+
+      selfSpellObj: {
+        get() {
+          return { open: this.selfSpellsOpen }
+        },
+
+        set({ open, spell, groupTitle }) {
+          this.setSpell(spell, groupTitle)
+          this.selfSpellsOpen = open
+        },
+      },
     },
 
     methods: {
+      changeSpellGroup(index, e) {
+        const value = e.target.value
+        this.$store.commit('game/updateSheetParams',
+          {
+            id: this.sheet.id,
+            path: `spells[${index}].title`,
+            value: value,
+          })
+      },
+
+      removeSpellGroup(index) {
+        const list = this.spells.slice()
+        list.splice(index, 1)
+        this.$store.commit('game/updateSheetParams',
+          {
+            id: this.sheet.id,
+            path: `spells`,
+            value: list,
+          })
+
+        this.saveSheet()
+      },
+
+      add(type) {
+        switch (type) {
+          case 'spell':
+            this.spellsOpen = true
+            break
+          case 'other':
+            this.otherSpellsOpen = true
+            break
+          case 'selfSpell':
+            this.selfSpellsOpen = true
+            break
+          default:
+            break
+        }
+      },
+
       setSpell(spell, groupTitle) {
         if (!spell.name) return
 
-        const spellIndex = this.spells.findIndex(item => item.title === groupTitle)
-        if (spellIndex < 0) {
-          const group = { title: groupTitle, items: [spell] }
-          this.$store.commit('game/updateSheetParams',
-            {
-              id: this.sheet.id,
-              path: 'spells',
-              value: [...this.spells, group],
-            })
+        const groupIndex = this.spells.findIndex(item => item.title === groupTitle)
+        if (groupIndex < 0) {
+          this.setGroup({ title: groupTitle, items: [spell] })
         } else {
-          this.$store.commit('game/updateSheetParams',
-            {
-              id: this.sheet.id,
-              path: `spells[${spellIndex}].items[${this.spells[spellIndex].items.length}]`,
-              value: spell,
-            })
+          this.addSpell(groupIndex, spell)
         }
 
         this.saveSheet()
+      },
+
+      setGroup(group) {
+        this.$store.commit('game/updateSheetParams',
+          {
+            id: this.sheet.id,
+            path: 'spells',
+            value: [...this.spells, group],
+          })
+      },
+
+      addSpell(groupIndex, spell) {
+        const spellIndex = this.spells[groupIndex].items.length
+        this.$store.commit('game/updateSheetParams',
+          {
+            id: this.sheet.id,
+            path: `spells[${groupIndex}].items[${spellIndex}]`,
+            value: spell,
+          })
       },
 
       saveSheet() {
@@ -168,13 +264,32 @@
 <style scoped lang="scss">
   @import '~assets/css/colors';
 
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    grid-column-gap: 10px;
+  }
+
+  .edit-button {
+    margin-top: 5px;
+  }
+
   .spells-body {
     background-color: $grayC5;
     overflow: auto;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: max-content;
+    grid-auto-rows: max-content;
     padding: 0 5px;
+  }
+
+  .edit-group {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+  }
+
+  .input {
+    border-bottom: 1px solid $black;
   }
 
   .spells {
@@ -198,13 +313,5 @@
 
   .gray {
     background-color: $grayC5;
-  }
-
-  .actions {
-    display: grid;
-    grid-template-columns: max-content 10px max-content;
-    justify-content: center;
-    margin-top: 15px;
-    margin-bottom: 5px;
   }
 </style>
