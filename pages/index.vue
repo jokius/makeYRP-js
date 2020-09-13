@@ -5,11 +5,11 @@
         <div class="user-grid">
           <v-avatar :key="user.id" size="36" color="indigo">
             <img
-              v-if="user.avatar.thumb"
-              :src="user.avatar.thumb"
+              v-if="user.imgThumb"
+              :src="user.imgThumb"
               :alt="user.nickname"
             />
-            <v-icon v-if="!user.avatar.thumb" dark>mdi-account-circle</v-icon>
+            <v-icon v-if="!user.imgThumb" dark>mdi-account-circle</v-icon>
           </v-avatar>
           <v-btn
             tile
@@ -44,13 +44,10 @@
   import Actions from '../components/games/Actions'
   import Tabs from '../components/games/Tabs'
   import Loader from '../components/Loader'
+  import { UserModel } from '~/models/UserModel'
 
   export default {
     components: { Loader, Tabs, Actions },
-
-    created() {
-      this.$store.dispatch('games/load', this.$axios)
-    },
 
     computed: {
       ...mapState({
@@ -58,6 +55,11 @@
         loaded: state => state.games.loaded,
         user: state => state.auth.user,
       }),
+    },
+
+    created() {
+      if (this.user.data) this.$auth.setUser(new UserModel().setInfo(this.user)) // fix login
+      this.$store.dispatch('games/load', this.$axios)
     },
 
     methods: {

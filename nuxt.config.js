@@ -61,7 +61,7 @@ module.exports = {
         endpoints: {
           login:  { url: '/users/sign_in' },
           logout: { url: '/users/sign_out', method: 'delete' },
-          user:   { url: '/users/current', propertyName: '' },
+          user:   { url: '/users/current', propertyName: false },
         },
       },
     },

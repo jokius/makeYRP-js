@@ -1,4 +1,3 @@
-import { get } from 'lodash'
 import { SheetModel } from './SheetModel'
 
 export class UserModel {
@@ -20,14 +19,14 @@ export class UserModel {
   }
 
   get imgChat() {
-    return get(this, 'avatar.chat', null)
+    return this.avatar?.chat
   }
 
   get imgThumb() {
-    return get(this, 'avatar.thumb', null)
+    return this.avatar?.thumb
   }
 
   get imgLazy() {
-    return get(this, 'avatar.lazy', null)
+    return this.avatar?.lazy
   }
 }
