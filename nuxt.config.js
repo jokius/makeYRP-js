@@ -1,6 +1,6 @@
 module.exports = {
   target: 'static',
-  mode: 'spa',
+  ssr: false,
   /*
   ** Headers of the page
   */
