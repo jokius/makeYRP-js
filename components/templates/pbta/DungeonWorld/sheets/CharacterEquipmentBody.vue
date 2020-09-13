@@ -1,6 +1,16 @@
 <template>
   <div class="equipment-body">
     <div class="weight-info">Вес {{ currentWeight }} / {{ maxWeight }}</div>
+    <v-overflow-btn
+      :items="items"
+      label="Добавить..."
+      color="black"
+      segmented
+      item-color="black"
+      hide-details
+      class="select-button"
+      @change="value => add(value)"
+    />
     <div class="equipments-grid">
       <equipment
         v-for="(item, index) in equipment"
@@ -10,29 +20,6 @@
         :index="index"
         path="equipment"
       />
-    </div>
-    <div class="actions">
-      <v-spacer />
-      <v-btn
-        class="button-add"
-        raised
-        color="black"
-        dark
-        @click="startingEquipmentOpen = true"
-      >
-        Выбрать стартовое снарежение
-      </v-btn>
-      <v-spacer />
-      <v-btn
-        class="button-add"
-        raised
-        color="black"
-        dark
-        @click="newItem"
-      >
-        Добавить снаряжение
-      </v-btn>
-      <v-spacer />
     </div>
 
     <add-starting-equipment-modal v-if="startingEquipmentOpen" v-model="startingObj" :role="params.role.key" />
@@ -45,7 +32,7 @@
   import Equipment from '../components/Equipment'
 
   import AddStartingEquipmentModal from '../modals/AddStartingEquipmentModal'
-  import { Dw } from '../../../../../lib/Dw'
+  import { Dw } from '~/lib/Dw'
 
   export default {
     name: 'CharacterEquipmentBody',
@@ -58,6 +45,10 @@
       return {
         panels: [],
         startingEquipmentOpen: false,
+        items: [
+          { text: 'Добавить стартовое снарежение', value: 'starting', callback: () => this.add('starting') },
+          { text: 'Добавить своё снаряжение', value: 'self', callback: () => this.add('self') },
+        ]
       }
     },
 
@@ -104,6 +95,19 @@
     },
 
     methods: {
+      add(type) {
+        switch (type) {
+          case 'starting':
+            this.startingEquipmentOpen = true
+            break
+          case 'self':
+            this.newItem()
+            break
+          default:
+            break
+        }
+      },
+
       setEquipment(items) {
         if (items.length === 0) return
 
@@ -114,7 +118,7 @@
                              {
                                id: this.sheet.id,
                                path: `equipment[${this.equipment.length}]`,
-                               value: item,
+                               value: { ...Dw.newItem(), ...item },
                              })
         })
 
@@ -150,7 +154,10 @@
     background-color: $black;
     color: $white;
     text-align: center;
-    margin-bottom: 1px;
+  }
+
+  .select-button {
+    margin: 0;
   }
 
   .equipment-body {

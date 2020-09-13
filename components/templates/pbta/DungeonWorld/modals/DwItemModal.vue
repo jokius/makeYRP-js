@@ -65,6 +65,7 @@
   import { mapState } from 'vuex'
 
   import DraggableDialog from '../../../../games/show/DraggableDialog'
+  import { Dw } from '~/lib/Dw'
 
   export default {
     name: 'EouItemModal',
@@ -178,7 +179,7 @@
           {
             id: this.id,
             path: `equipment[${this.equipment.length}]`,
-            value: this.item,
+            value: { ...Dw.newItem(), ...this.item },
           })
 
         this.saveSheet()

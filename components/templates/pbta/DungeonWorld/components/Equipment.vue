@@ -12,7 +12,25 @@
         @change="saveSheet"
       />
       <span v-else class="equipment-name">{{ name }}</span>
-      <span class="equipment-remove" @click="removeEquipment">Удалить</span>
+      <v-btn
+        color="white"
+        icon
+        small
+        class="icon-button"
+        @click="edit = !edit"
+      >
+        <v-icon>{{ edit ? 'mdi-lock-open-variant-outline' : 'mdi-lock-outline' }}</v-icon>
+      </v-btn>
+      <v-btn
+        color="red darken-4"
+        icon
+        small
+        dark
+        class="icon-button"
+        @click="removeEquipment"
+      >
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
     </div>
 
     <details>
@@ -162,8 +180,13 @@
         return this.item.enable
       },
 
-      edit() {
-        return this.item.edit
+      edit: {
+        get(){
+          return this.item.edit
+        },
+        set(value) {
+          this.input('edit', value)
+        }
       },
 
       name: {
@@ -330,97 +353,101 @@
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .equipment-grid {
-    margin-bottom: 5px;
-    background-color: $grayC5;
-  }
+.equipment-grid {
+  margin-bottom: 5px;
+  background-color: $grayC5;
+}
 
-  .pointer {
-    cursor: pointer;
-  }
+.pointer {
+  cursor: pointer;
+}
 
-  .title-equipment {
-    display: grid;
-    grid-template-columns: 30px 1fr max-content;
-    background-color: $black;
-    color: $white;
-    line-height: 35px;
-    margin-left: -5px;
-  }
+.title-equipment {
+  display: grid;
+  grid-template-columns: 30px 1fr repeat(2, max-content);
+  background-color: $black;
+  color: $white;
+  line-height: 35px;
+  margin-left: -5px;
+}
 
-  .box {
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-    margin-left: 5px;
-    margin-top: 7px;
-    border: 2px solid $white;
-  }
+.box {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  margin-top: 7px;
+  border: 2px solid $white;
+}
 
-  .enable {
-    background-color: $white;
-    border: 2px solid $black;
-  }
+.enable {
+  background-color: $white;
+  border: 2px solid $black;
+}
 
-  .equipment-name {
-    margin-left: 5px;
-    font-size: 18px;
-    font-weight: 600;
-  }
+.equipment-name {
+  margin-left: 5px;
+  font-size: 18px;
+  font-weight: 600;
+}
 
-  .equipment-remove {
-    cursor: pointer;
-    margin-right: 10px;
-  }
+.equipment-remove {
+  cursor: pointer;
+  margin-right: 10px;
+}
 
-  .markers-grid {
-    display: grid;
-    grid-template-columns: max-content;
-    grid-column-gap: 10px;
-  }
+.markers-grid {
+  display: grid;
+  grid-template-columns: max-content;
+  grid-column-gap: 10px;
+}
 
-  .input-grid {
-    display: grid;
-    grid-template-columns: repeat(3, max-content 50px);
-    grid-column-gap: 10px;
-    height: 35px;
-    line-height: 35px;
-    margin-bottom: 10px;
-  }
+.input-grid {
+  display: grid;
+  grid-template-columns: repeat(3, max-content 50px);
+  grid-column-gap: 10px;
+  height: 35px;
+  line-height: 35px;
+  margin-bottom: 10px;
+}
 
-  .protection-grid {
-    display: grid;
-    grid-template-columns: max-content 50px max-content;
-    grid-column-gap: 10px;
-    height: 35px;
-    line-height: 35px;
-    margin-bottom: 10px;
-  }
+.protection-grid {
+  display: grid;
+  grid-template-columns: max-content 50px max-content;
+  grid-column-gap: 10px;
+  height: 35px;
+  line-height: 35px;
+  margin-bottom: 10px;
+}
 
-  .protection-add {
-    margin-top: 5px;
-  }
+.protection-add {
+  margin-top: 5px;
+}
 
-  .tags-grid {
-    display: grid;
-    grid-template-columns: max-content 1fr max-content;
-    grid-column-gap: 10px;
-    line-height: 35px;
-  }
+.tags-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  grid-column-gap: 10px;
+  line-height: 35px;
+}
 
-  .input {
-    padding: 0;
-    margin: 0;
-  }
+.input {
+  padding: 0;
+  margin: 0;
+}
 
-  .tag-label {
-    margin-top: 5px;
-  }
+.tag-label {
+  margin-top: 5px;
+}
 
-  .tag-button {
-    margin-top: 10px;
-    margin-right: 5px;
-  }
+.tag-button {
+  margin-top: 10px;
+  margin-right: 5px;
+}
+
+.icon-button {
+  margin-top: 4px;
+}
 </style>
