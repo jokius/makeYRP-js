@@ -889,8 +889,8 @@
   .stats-grid {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: 145px;
-    grid-column-gap: 10px;
+    grid-auto-columns: 154px;
+    grid-column-gap: 2px;
     justify-content: center;
     margin-left: -5px;
   }
