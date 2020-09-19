@@ -17,7 +17,7 @@
     "actioncable-vue": "^2.3.2",
     "dart-sass": "^1.25.0",
     "js-file-download": "^0.4.12",
-    "konva": "7.1.0",
+    "konva": "7.0.3",
     "lodash": "^4.17.20",
     "nuxt": "^2.14.5",
     "short-uuid": "^4.1.0",
@@ -45,6 +45,6 @@
     "gulp-rsync": "^0.0.9",
     "sass-loader": "^10.0.2",
     "vue-template-compiler": "^2.6.12",
-    "webpack": "^4.44.1"
+    "webpack": "^4.44.2"
   }
 }
