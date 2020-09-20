@@ -74,11 +74,11 @@
       }),
 
       template() {
-        return this.game.template
+        return this.game.template.tables
       },
 
       customTemplate() {
-        return this.game.customTemplate
+        return this.game.customTemplate.tables
       },
 
       types() {
@@ -105,7 +105,7 @@
 
     created() {
       if (!this.customTemplate.items) {
-        this.$store.commit('gameConfig/update', { path: `customTemplate.items`, value: [] })
+        this.$store.commit('gameConfig/update', { path: `customTemplate.tables.items`, value: [] })
       }
     },
 
@@ -133,11 +133,12 @@
           items.push(item)
         }
 
-        this.$store.commit('gameConfig/update', { path: `customTemplate.items`, value: items })
+        this.$store.commit('gameConfig/update', { path: `customTemplate.tables.items`, value: items })
       },
 
       removeItem(index) {
-        this.$store.commit('gameConfig/update', { path: `customTemplate.items`, value: index, remove: true })
+        this.$store.commit('gameConfig/update',
+          { path: `customTemplate.tables.items`, value: index, remove: true })
       },
 
       save() {
