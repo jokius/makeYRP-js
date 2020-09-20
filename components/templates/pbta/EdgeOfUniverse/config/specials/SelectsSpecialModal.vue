@@ -2,7 +2,7 @@
   <v-dialog :value="obj.open" persistent>
     <v-card>
       <v-card-title class="headline grey lighten-2" primary-title>
-        Добавить или Изменить список
+        Добавить или Изменить группу списков
       </v-card-title>
       <v-container class="fill-height" fluid>
         <v-row align="center" justify="center">
@@ -13,21 +13,10 @@
               color="indigo"
             />
 
-            <v-text-field
-              v-model="label"
-              label="описание"
-              color="indigo"
-            />
-
-            <v-checkbox
-              v-model="multiple"
-              color="indigo"
-              label="множественный выбор"
-            />
-            <select-special-item
-              v-for="(item, index) in list"
-              :key="`select-list-${index}`"
-              :item="item"
+            <selects-special-item
+              v-for="(select, index) in selects"
+              :key="`selects-list-${index}`"
+              :select="select"
               :input="(key, value) => inputItem(key, value, index)"
               :remove="() => removeItem(index)"
             />
@@ -39,7 +28,7 @@
             @click="addSelect"
             dark
           >
-            <span>Добавить выбор</span>
+            <span>Добавить список</span>
           </v-btn>
         </v-row>
       </v-container>
@@ -71,11 +60,13 @@
 
 <script>
 import { omitBy } from 'lodash'
-import SelectSpecialItem from '~/components/templates/pbta/EdgeOfUniverse/config/specials/SelectSpecialItem'
+import SelectsSpecialItem from '@/components/templates/pbta/EdgeOfUniverse/config/specials/SelectsSpecialItem'
 
 export default {
-  name: 'SelectSpecialModal',
-  components: { SelectSpecialItem },
+  name: 'SelectsSpecialModal',
+
+  components: { SelectsSpecialItem },
+
   model: {
     prop: 'obj',
     event: 'changeSpecial',
@@ -87,7 +78,7 @@ export default {
 
   computed: {
     isValid() {
-      return (this.name && this.name !== '' && this.list.length > 0)
+      return (this.name && this.name !== '' && this.selects.length > 0)
     },
 
     special() {
@@ -104,48 +95,28 @@ export default {
       },
     },
 
-    label: {
-      get() {
-        return this.special.label
-      },
-
-      set(value) {
-        this.input('label', value)
-      },
-    },
-
-    multiple: {
-      get() {
-        return this.special.multiple
-      },
-
-      set(value) {
-        this.input('multiple', value)
-      },
-    },
-
-    list() {
-      return this.special.list || []
+    selects() {
+      return this.special.selects || []
     },
   },
 
   methods: {
     addSelect() {
-      const list = JSON.parse(JSON.stringify(this.list))
-      list.push({ text: '', value: '' })
-      this.input('list', list)
+      const selects = JSON.parse(JSON.stringify(this.selects))
+      selects.push({ label: '', list: [] })
+      this.input('selects', selects)
     },
 
     removeItem(index) {
-      const list = JSON.parse(JSON.stringify(this.list))
-      list.splice(index, 1)
-      this.input('list', list)
+      const selects = JSON.parse(JSON.stringify(this.selects))
+      selects.splice(index, 1)
+      this.input('selects', selects)
     },
 
     inputItem(key, value, index) {
-      const list = JSON.parse(JSON.stringify(this.list))
-      list[index] = { ...list[index], [key]: value }
-      this.input('list', list)
+      const selects = JSON.parse(JSON.stringify(this.selects))
+      selects[index] = { ...selects[index], [key]: value }
+      this.input('selects', selects)
     },
 
     input(key, value) {

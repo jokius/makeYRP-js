@@ -28,9 +28,8 @@ export default {
   name: 'SelectSpecialItem',
 
   props: {
-    list: { type: Array, required: true },
     item: { type: Object, required: true },
-    index: { type: Number, required: true },
+    input: { type: Function, required: true },
     remove: { type: Function, required: true },
   },
 
@@ -53,14 +52,6 @@ export default {
       set(value) {
         this.input('value', value)
       },
-    },
-  },
-
-  methods: {
-    input(key, value) {
-      const list = JSON.parse(JSON.stringify(this.list))
-      list[this.index][key] = value
-      this.$set(this, 'list', list)
     },
   },
 }
