@@ -66,16 +66,16 @@
 <script>
   import { mapState } from 'vuex'
   import { uniqBy } from 'lodash'
-  import RoleModal from './RoleModal'
-  import RoleMovesModal from './RoleMoveModal'
-  import RoleItemsModal from './RoleItemsModal'
-  import RoleRelationshipModal from './RoleRelationshipModal'
-  import RoleSpellsModal from './RoleSpellsModal'
+  import RoleModal from '~/components/templates/pbta/DungeonWorld/config/sheets/RoleModal'
+  import RoleMovesModal from '~/components/templates/pbta/DungeonWorld/config/sheets/RoleMovesModal'
+  import RoleItemsModal from '~/components/templates/pbta/DungeonWorld/config/sheets/RoleItemsModal'
+  import RoleSpellsModal from '~/components/templates/pbta/DungeonWorld/config/sheets/RoleSpellsModal'
+  import RoleRelationshipModal from '~/components/templates/pbta/DungeonWorld/config/sheets/RoleRelationshipModal'
 
   export default {
     name: 'SheetsList',
 
-    components: { RoleSpellsModal, RoleRelationshipModal, RoleItemsModal, RoleMovesModal, RoleModal },
+    components: { RoleRelationshipModal, RoleSpellsModal, RoleItemsModal, RoleMovesModal, RoleModal },
 
     data() {
       return {

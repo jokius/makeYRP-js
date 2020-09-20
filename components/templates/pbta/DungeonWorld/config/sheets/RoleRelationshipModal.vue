@@ -67,8 +67,8 @@
 
 <script>
   import { mapState } from 'vuex'
-  import { uniqBy, get } from 'lodash'
-  import RoleRelationModal from './RoleRelationModal'
+  import { uniqBy } from 'lodash'
+  import RoleRelationModal from '~/components/templates/pbta/DungeonWorld/config/sheets/RoleRelationModal'
 
   export default {
     name: 'RoleRelationshipModal',
@@ -148,7 +148,7 @@
       },
 
       addRelation(relation) {
-        const relationship = get(this.customTables, `relationship.${this.roleKey}`).slice()
+        const relationship = (this.customTables?.relationship?.[this.roleKey] || []).slice()
         relationship.push(relation)
 
         this.$store.commit('gameConfig/update',
@@ -156,7 +156,7 @@
       },
 
       customRelationIndex(relation) {
-        return get(this.customTables, `relationship.${this.roleKey}`)
+        return (this.customTables?.relationship?.[this.roleKey] || [])
                 .findIndex(item => item.name === relation.name)
       },
 
