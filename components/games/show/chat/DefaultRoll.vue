@@ -3,7 +3,7 @@
     <p class="dices">бросок {{ rollText }}</p>
     <div v-for="(rolls, dice) in roll" :key="`${dice}-${Date.now}`">
       <div v-for="(value, index) in rolls" :key="`${dice}-${index}-${Date.now}`" class="dice">
-        <span :class="dice.replace('d', 'dice')">{{ valueToSymb(dice, value) }}</span>
+        <span :class=diceClass(dice)>{{ valueToSymb(dice, value) }}</span>
         <span v-if="index + 1 < rolls.length" class="plus"> + </span>
       </div>
     </div>
@@ -77,15 +77,16 @@
         }
 
         return result
-          .replace('1', 'a')
-          .replace('2', 'b')
-          .replace('3', 'c')
-          .replace('4', 'd')
-          .replace('5', 'e')
-          .replace('6', 'f')
-          .replace('7', 'g')
-          .replace('8', 'h')
-          .replace('9', 'i')
+          .replace('0', 'a')
+          .replace('1', 'b')
+          .replace('2', 'c')
+          .replace('3', 'd')
+          .replace('4', 'e')
+          .replace('5', 'f')
+          .replace('6', 'g')
+          .replace('7', 'h')
+          .replace('8', 'i')
+          .replace('9', 'j')
       },
 
       replaceNumberToChar(value) {
@@ -100,6 +101,15 @@
           .replace('7', 'h')
           .replace('8', 'i')
           .replace('9', 'j')
+      },
+
+      diceClass(dice){
+        const diceReplace =  dice.replace('d', 'dice')
+        if (diceReplace === 'dice100') {
+          return 'dice10'
+        } else {
+          return diceReplace
+        }
       },
     },
   }
