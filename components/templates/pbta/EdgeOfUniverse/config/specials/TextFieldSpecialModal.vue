@@ -12,6 +12,13 @@
               label="название"
               color="indigo"
             />
+
+            <v-text-field
+              v-model="value"
+              label="название"
+              color="indigo"
+              :type="type"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -52,6 +59,7 @@ export default {
 
   props: {
     obj: { type: Object, required: true },
+    type: { type: String, required: true },
   },
 
   computed: {
@@ -72,6 +80,23 @@ export default {
         this.input('name', value)
       },
     },
+
+    value: {
+      get() {
+        return this.special.value
+      },
+
+      set(value) {
+        let result
+        if (this.type === 'text') {
+          result = value ||''
+        } else {
+         result = parseInt(value, 10) || 0
+        }
+
+        this.input('value', result)
+      },
+    },
   },
 
   methods: {
@@ -83,7 +108,7 @@ export default {
       if (this.isValid) {
         this.$emit('changeSpecial', {
           open: false,
-          special: { ...this.special, value: '' },
+          special: { ...this.special },
         })
       }
     },
