@@ -11,7 +11,7 @@
       <v-container class="fill-height page-modal-body" fluid>
         <v-row align="center" justify="center">
           <v-col cols="12">
-            <v-form>
+            <v-form @submit.prevent = "save">
               <v-text-field
                 v-model="name"
                 required
