@@ -212,10 +212,7 @@ export default {
         if (typeof this.move.type === 'string') {
           return [this.move.type]
         } else {
-          return this.move.type.map(key => ({
-            value: key,
-            text: this.statesList[key],
-          }))
+          return this.move.type
         }
       },
 
