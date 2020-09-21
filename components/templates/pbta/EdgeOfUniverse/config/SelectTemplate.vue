@@ -10,15 +10,22 @@
         <span :class="[{ 'white--text': tab !== 0 }, 'xolonium-font']">Листы персонажей</span>
       </v-tab>
       <v-tab class="tab" active-class="tab-active">
-        <span :class="[{ 'white--text': tab !== 1 }, 'xolonium-font']">Ходы</span>
+        <span :class="[{ 'white--text': tab !== 1 }, 'xolonium-font']">Листы противников</span>
       </v-tab>
       <v-tab class="tab" active-class="tab-active">
-        <span :class="[{ 'white--text': tab !== 2 }, 'xolonium-font']">Предметы</span>
+        <span :class="[{ 'white--text': tab !== 2 }, 'xolonium-font']">Ходы</span>
+      </v-tab>
+      <v-tab class="tab" active-class="tab-active">
+        <span :class="[{ 'white--text': tab !== 3 }, 'xolonium-font']">Предметы</span>
       </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab" continuous>
       <v-tab-item>
         <sheets-list />
+      </v-tab-item>
+
+      <v-tab-item>
+        <enemies-sheets-list />
       </v-tab-item>
 
       <v-tab-item>
@@ -34,14 +41,15 @@
 
 <script>
 
-import SheetsList from '~/components/templates/pbta/EdgeOfUniverse/config/sheets/SheetsList'
-import ItemsList from '~/components/templates/pbta/EdgeOfUniverse/config/items/ItemsList'
+import SheetsList from '@/components/templates/pbta/EdgeOfUniverse/config/sheets/SheetsList'
+import ItemsList from '@/components/templates/pbta/EdgeOfUniverse/config/items/ItemsList'
 import MovesList from '@/components/templates/pbta/EdgeOfUniverse/config/moves/MovesList'
+import EnemiesSheetsList from '@/components/templates/pbta/EdgeOfUniverse/config/sheets/EnemiesSheetsList'
 
 export default {
   name: 'SelectTemplate',
 
-  components: { MovesList, ItemsList, SheetsList },
+  components: { EnemiesSheetsList, MovesList, ItemsList, SheetsList },
 
   data() {
     return {
