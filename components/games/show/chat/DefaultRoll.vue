@@ -97,6 +97,19 @@ export default {
 
       let result = value.toString()
 
+      if (dice === 'd8') {
+        return result
+          .replace('1', 'a')
+          .replace('2', 'b')
+          .replace('3', 'c')
+          .replace('4', 'd')
+          .replace('5', 'e')
+          .replace('6', 'f')
+          .replace('7', 'g')
+          .replace('8', 'h')
+          .replace('9', 'i')
+      }
+
       if (dice === 'd100') {
         return result.split('').map(value => this.replaceNumberToChar(value)).join('')
       }
