@@ -30,7 +30,7 @@
   import { mapState } from 'vuex'
 
   import ChatMessage from './chat/ChatMessage'
-  import { dicesRegx } from "@/lib/dicesRegx";
+  import { dicesRegx } from '@/lib/dicesRegx'
 
   export default {
     name: 'TabChat',
@@ -87,13 +87,12 @@
           sheet: user.sheet.toChat,
           noSystem: true,
         }
-        const result = this.text.split(/\/r\s|\/roll\s/)
-        console.log('Результат', result)
+        const result = this.text.split(/^\/r\s|^\/roll\s/)
 
         if (result.length === 2 && result[1].search(dicesRegx) >= 0){
           body.dices_string = result[1]
         } else {
-          body.text = this.test
+          body.text = this.text
         }
 
         this.$cable.perform({

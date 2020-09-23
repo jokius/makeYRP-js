@@ -23,7 +23,6 @@ export default {
 
   data() {
     const { dice, mod, incr, result } = this.roll
-    console.log('this.roll', this.roll)
     return {
       dice,
       mod,
@@ -97,17 +96,18 @@ export default {
 
       let result = value.toString()
 
-      if (dice === 'd8') {
+      if (dice === 'd10') {
         return result
-          .replace('1', 'a')
-          .replace('2', 'b')
-          .replace('3', 'c')
-          .replace('4', 'd')
-          .replace('5', 'e')
-          .replace('6', 'f')
-          .replace('7', 'g')
-          .replace('8', 'h')
-          .replace('9', 'i')
+          .replace('0', 'a')
+          .replace('1', 'b')
+          .replace('2', 'c')
+          .replace('3', 'd')
+          .replace('4', 'e')
+          .replace('5', 'f')
+          .replace('6', 'g')
+          .replace('7', 'h')
+          .replace('8', 'i')
+          .replace('9', 'j')
       }
 
       if (dice === 'd100') {
@@ -129,18 +129,17 @@ export default {
           .replace('20', 'T')
       }
 
-      return result
-        .replace('0', 'a')
-        .replace('1', 'b')
-        .replace('2', 'c')
-        .replace('3', 'd')
-        .replace('4', 'e')
-        .replace('5', 'f')
-        .replace('6', 'g')
-        .replace('7', 'h')
-        .replace('8', 'i')
-        .replace('9', 'j')
-    },
+        return result
+          .replace('1', 'a')
+          .replace('2', 'b')
+          .replace('3', 'c')
+          .replace('4', 'd')
+          .replace('5', 'e')
+          .replace('6', 'f')
+          .replace('7', 'g')
+          .replace('8', 'h')
+          .replace('9', 'i')
+      },
 
     replaceNumberToChar(value) {
       return value
