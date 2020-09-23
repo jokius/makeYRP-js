@@ -12,7 +12,25 @@
         @change="saveSheet"
       />
       <span v-else class="equipment-name">{{ name }}</span>
-      <span class="equipment-remove" @click="removeEquipment">Удалить</span>
+      <v-btn
+        color="white"
+        icon
+        small
+        class="icon-button"
+        @click="edit = !edit"
+      >
+        <v-icon>{{ edit ? 'mdi-lock-open-variant-outline' : 'mdi-lock-outline' }}</v-icon>
+      </v-btn>
+      <v-btn
+        color="red darken-4"
+        icon
+        small
+        dark
+        class="icon-button"
+        @click="removeEquipment"
+      >
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
     </div>
 
     <details>
@@ -102,257 +120,261 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex'
+import AddTagModal from '@/components/templates/pbta/EdgeOfUniverse/modals/AddTagModal'
 
-  import AddTagModal from '../modals/AddTagModal'
+export default {
+  name: 'Equipment',
 
-  export default {
-    name: 'Equipment',
-    components: { AddTagModal },
-    props: {
-      item: { type: Object, required: true },
-      path: { type: String, required: true },
-      index: { type: Number, required: true },
-      sheet: { type: Object, required: true },
-    },
+  components: { AddTagModal },
 
-    data() {
-      return {
-        privateType: {},
-        modalOpen: false,
-      }
-    },
+  props: {
+    item: { type: Object, required: true },
+    path: { type: String, required: true },
+    index: { type: Number, required: true },
+    sheet: { type: Object, required: true },
+  },
 
-    computed: {
-      ...mapState({
-        sheets: state => state.game.sheets,
-        tables: state => state.game.info.template.tables,
-      }),
+  data() {
+    return {
+      privateType: {},
+      modalOpen: false,
+    }
+  },
 
-      enable: {
-        get() {
-          return this.item.enable
-        },
-      },
+  computed: {
+    ...mapState({
+      sheets: state => state.game.sheets,
+      tables: state => state.game.info.template.tables,
+    }),
 
-      edit: {
-        get() {
-          return this.item.edit
-        },
-      },
-
-      name: {
-        get() {
-          return this.item.name
-        },
-
-        set(value) {
-          this.input('name', value)
-        },
-      },
-
-      quantity: {
-        get() {
-          return this.item.quantity
-        },
-
-        set(value) {
-          this.input('quantity', value)
-        },
-      },
-
-      damage: {
-        get() {
-          return this.item.damage
-        },
-
-        set(value) {
-          this.input('damage', value)
-        },
-      },
-
-      protection: {
-        get() {
-          return this.item.protection
-        },
-
-        set(value) {
-          this.input('protection', value)
-        },
-      },
-
-      description: {
-        get() {
-          return this.item.description
-        },
-
-        set(value) {
-          this.input('description', value)
-        },
-      },
-
-      tags: {
-        get() {
-          return this.item.tags
-        },
-
-        set(value) {
-          this.input('tags', value)
-        },
-      },
-
-      obj: {
-        get() {
-          return { open: this.modalOpen, tag: '' }
-        },
-
-        set({ open, tag, isClose }) {
-          if (!isClose) this.addTag(tag)
-          this.modalOpen = open
-        },
+    enable: {
+      get() {
+        return this.item.enable
       },
     },
 
-    methods: {
+    edit: {
+      get() {
+        return this.item.edit
+      },
+      set(value) {
+        this.input('edit', value)
+      },
+    },
 
-      changeEquipment(value) {
-        this.input('enable', value)
-        this.saveSheet()
+    name: {
+      get() {
+        return this.item.name
       },
 
-      removeEquipment() {
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: this.path,
-                             value: this.index,
-                             remove: true,
-                           })
-        this.saveSheet()
+      set(value) {
+        this.input('name', value)
+      },
+    },
+
+    quantity: {
+      get() {
+        return this.item.quantity
       },
 
-      addTag(tag) {
-        if (!tag) return
+      set(value) {
+        this.input('quantity', value)
+      },
+    },
 
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: `${this.path}[${this.index}].tags[${this.tags.length}]`,
-                             value: tag,
-                           })
-
-        this.saveSheet()
+    damage: {
+      get() {
+        return this.item.damage
       },
 
-      removeTag(value){
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: `${this.path}[${this.index}].tags`,
-                             value,
-                             remove: true,
-                           })
-        this.saveSheet()
+      set(value) {
+        this.input('damage', value)
+      },
+    },
+
+    protection: {
+      get() {
+        return this.item.protection
       },
 
-      input(target, value) {
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: `${this.path}[${this.index}].${target}`,
-                             value: value,
-                           })
+      set(value) {
+        this.input('protection', value)
+      },
+    },
+
+    description: {
+      get() {
+        return this.item.description
       },
 
-      saveSheet() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'change',
-          data: { ...this.sheet, type: 'sheet' },
+      set(value) {
+        this.input('description', value)
+      },
+    },
+
+    tags: {
+      get() {
+        return this.item.tags
+      },
+
+      set(value) {
+        this.input('tags', value)
+      },
+    },
+
+    obj: {
+      get() {
+        return { open: this.modalOpen, tag: '' }
+      },
+
+      set({ open, tag, isClose }) {
+        if (!isClose) this.addTag(tag)
+        this.modalOpen = open
+      },
+    },
+  },
+
+  methods: {
+
+    changeEquipment(value) {
+      this.input('enable', value)
+      this.saveSheet()
+    },
+
+    removeEquipment() {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: this.path,
+          value: this.index,
+          remove: true,
         })
-      },
+      this.saveSheet()
     },
-  }
+
+    addTag(tag) {
+      if (!tag) return
+
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `${this.path}[${this.index}].tags[${this.tags.length}]`,
+          value: tag,
+        })
+
+      this.saveSheet()
+    },
+
+    removeTag(value) {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `${this.path}[${this.index}].tags`,
+          value,
+          remove: true,
+        })
+      this.saveSheet()
+    },
+
+    input(target, value) {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `${this.path}[${this.index}].${target}`,
+          value: value,
+        })
+    },
+
+    saveSheet() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change',
+        data: { ...this.sheet, type: 'sheet' },
+      })
+    },
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .equipment-grid {
-    margin-bottom: 5px;
-    background-color: $grayC5;
-  }
+.equipment-grid {
+  margin-bottom: 5px;
+  background-color: $grayC5;
+}
 
-  .pointer {
-    cursor: pointer;
-  }
+.pointer {
+  cursor: pointer;
+}
 
-  .title-equipment {
-    display: grid;
-    grid-template-columns: 30px 1fr max-content;
-    background-color: $black;
-    color: $white;
-    line-height: 35px;
-    margin-left: -5px;
-  }
+.title-equipment {
+  display: grid;
+  grid-template-columns: 30px 1fr repeat(2, max-content);
+  background-color: $black;
+  color: $white;
+  line-height: 35px;
+  margin-left: -5px;
+}
 
-  .box {
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-    margin-left: 5px;
-    margin-top: 7px;
-    border: 2px solid $white;
-  }
+.box {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  margin-top: 7px;
+  border: 2px solid $white;
+}
 
-  .enable {
-    background-color: $white;
-    border: 2px solid $black;
-  }
+.enable {
+  background-color: $white;
+  border: 2px solid $black;
+}
 
-  .equipment-name {
-    margin-left: 5px;
-    font-size: 18px;
-    font-weight: 600;
-  }
+.equipment-name {
+  margin-left: 5px;
+  font-size: 18px;
+  font-weight: 600;
+}
 
-  .equipment-remove {
-    cursor: pointer;
-    margin-right: 10px;
-  }
+.equipment-remove {
+  cursor: pointer;
+  margin-right: 10px;
+}
 
-  .markers-grid {
-    display: grid;
-    grid-template-columns: repeat(4, max-content);
-    grid-column-gap: 10px;
-  }
+.markers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  grid-column-gap: 10px;
+}
 
-  .input-grid {
-    display: grid;
-    grid-template-columns: max-content 50px;
-    grid-column-gap: 10px;
-    height: 35px;
-    line-height: 35px;
-  }
+.input-grid {
+  display: grid;
+  grid-template-columns: max-content 50px;
+  grid-column-gap: 10px;
+  height: 35px;
+  line-height: 35px;
+}
 
-  .tags-grid {
-    display: grid;
-    grid-template-columns: max-content 1fr max-content;
-    grid-column-gap: 10px;
-    line-height: 35px;
-  }
+.tags-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  grid-column-gap: 10px;
+  line-height: 35px;
+}
 
-  .input {
-    padding: 0;
-    margin: 0;
-  }
+.input {
+  padding: 0;
+  margin: 0;
+}
 
-  .tag-label {
-    margin-top: 5px;
-  }
+.tag-label {
+  margin-top: 5px;
+}
 
-  .tag-button {
-    margin-top: 10px;
-    margin-right: 5px;
-  }
+.tag-button {
+  margin-top: 10px;
+  margin-right: 5px;
+}
 </style>
