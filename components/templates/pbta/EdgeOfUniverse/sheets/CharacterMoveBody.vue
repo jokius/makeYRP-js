@@ -1,5 +1,15 @@
 <template>
   <div class="moves-body">
+    <v-overflow-btn
+      :items="items"
+      label="Добавить..."
+      color="black"
+      segmented
+      item-color="black"
+      hide-details
+      @change="value => add(value)"
+    />
+
     <details class="moves" open>
       <summary class="moves-title">Базовые ходы</summary>
       <div class="moves-grid">
@@ -24,27 +34,6 @@
           :index="index"
           path="moves"
         />
-      </div>
-      <div class="actions">
-        <v-btn
-          class="button-add"
-          raised
-          color="black"
-          dark
-          @click="specialMovesOpen = true"
-        >
-          Добавить Специальный ход
-        </v-btn>
-        <v-spacer />
-        <v-btn
-          class="button-add"
-          raised
-          color="black"
-          dark
-          @click="otherMovesOpen = true"
-        >
-          Добавить Мировой ход
-        </v-btn>
       </div>
     </details>
     <details class="moves">
@@ -90,158 +79,180 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex'
+import { Pbta } from '@/lib/Pbta'
+import Move from '@/components/templates/pbta/EdgeOfUniverse/components/Move'
+import AddMoveModal from '@/components/templates/pbta/EdgeOfUniverse/modals/AddMoveModal'
+import AddWorldMoveModal from '@/components/templates/pbta/EdgeOfUniverse/modals/AddWorldMoveModal'
 
-  import Move from '../components/Move'
+export default {
+  name: 'CharacterMoveBody',
 
-  import AddMoveModal from '../modals/AddMoveModal'
-  import AddWorldMoveModal from '../modals/AddWorldMoveModal'
+  components: { AddWorldMoveModal, AddMoveModal, Move },
 
-  export default {
-    name: 'CharacterMoveBody',
-    components: { AddWorldMoveModal, AddMoveModal, Move },
-    props: {
-      id: { type: String, required: true },
+  props: {
+    id: { type: String, required: true },
+  },
+
+  data() {
+    return {
+      panels: [],
+      specialMovesOpen: false,
+      otherMovesOpen: false,
+      items: [
+        { text: 'Добавить специальный ход', value: 'special', callback: () => this.add('special') },
+        { text: 'Добавить мировой ход', value: 'other', callback: () => this.add('other') },
+        { text: 'Добавить свой ход', value: 'self', callback: () => this.add('self') },
+      ],
+    }
+  },
+
+  computed: {
+    ...mapState({
+      sheets: state => state.game.sheets,
+      tables: state => state.game.info.template.tables,
+    }),
+
+    sheet: {
+      get() {
+        return this.sheets.find(sheet => sheet.id === this.id)
+      },
     },
 
-    data() {
-      return {
-        panels: [],
-        specialMovesOpen: false,
-        otherMovesOpen: false,
+    params: {
+      get() {
+        return this.sheet.params
+      },
+    },
+
+    baseMoves: {
+      get() {
+        return this.tables.baseMoves
+      },
+    },
+
+    moves: {
+      get() {
+        return this.params.moves
+      },
+    },
+
+    optionalMoves: {
+      get() {
+        return this.tables.optionalMoves
+      },
+    },
+
+    spaceMoves: {
+      get() {
+        return this.tables.spaceMoves
+      },
+    },
+
+    specialMoveObj: {
+      get() {
+        return { open: this.specialMovesOpen, move: {} }
+      },
+
+      set({ open, move }) {
+        this.setMove(move)
+        this.specialMovesOpen = open
+      },
+    },
+
+    otherMoveObj: {
+      get() {
+        return { open: this.otherMovesOpen, move: {} }
+      },
+
+      set({ open, move }) {
+        this.setMove(move)
+        this.otherMovesOpen = open
+      },
+    },
+  },
+
+  methods: {
+    add(type) {
+      switch (type) {
+        case 'special':
+          this.specialMovesOpen = true
+          break
+        case 'other':
+          this.otherMovesOpen = true
+          break
+        case 'self':
+          this.setMove(Pbta.newMove())
+          break
+        default:
+          break
       }
     },
 
-    computed: {
-      ...mapState({
-        sheets: state => state.game.sheets,
-        tables: state => state.game.info.template.tables,
-      }),
+    setMove(move) {
+      if (!move.name) return
 
-      sheet: {
-        get() {
-          return this.sheets.find(sheet => sheet.id === this.id)
-        },
-      },
-
-      params: {
-        get() {
-          return this.sheet.params
-        },
-      },
-
-      baseMoves: {
-        get() {
-          return this.tables.baseMoves
-        },
-      },
-
-      moves: {
-        get() {
-          return this.params.moves
-        },
-      },
-
-      optionalMoves: {
-        get() {
-          return this.tables.optionalMoves
-        },
-      },
-
-      spaceMoves: {
-        get() {
-          return this.tables.spaceMoves
-        },
-      },
-
-      specialMoveObj: {
-        get() {
-          return { open: this.specialMovesOpen, move: {} }
-        },
-
-        set({ open, move }) {
-          this.setMove(move)
-          this.specialMovesOpen = open
-        },
-      },
-
-      otherMoveObj: {
-        get() {
-          return { open: this.otherMovesOpen, move: {} }
-        },
-
-        set({ open, move }) {
-          this.setMove(move)
-          this.otherMovesOpen = open
-        },
-      },
-    },
-
-    methods: {
-      setMove(move) {
-        if (!move.name) return
-
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: `moves[${this.moves.length}]`,
-                             value: move,
-                           })
-
-        this.saveSheet()
-      },
-
-      saveSheet() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'change',
-          data: { ...this.sheet, type: 'sheet' },
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `moves[${this.moves.length}]`,
+          value: move,
         })
-      },
+
+      this.saveSheet()
     },
-  }
+
+    saveSheet() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change',
+        data: { ...this.sheet, type: 'sheet' },
+      })
+    },
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .moves-body {
-    background-color: $grayC5;
-    overflow: auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: max-content;
-    padding: 0 5px;
-  }
+.moves-body {
+  background-color: $grayC5;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: max-content;
+  padding: 0 5px;
+}
 
-  .moves {
-    cursor: pointer;
-    margin-bottom: 5px;
-  }
+.moves {
+  cursor: pointer;
+  margin-bottom: 5px;
+}
 
-  .moves-title {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-  }
+.moves-title {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
 
-  .moves-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 15px;
-  }
+.moves-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 15px;
+}
 
-  .gray {
-    background-color: $grayC5;
-  }
+.gray {
+  background-color: $grayC5;
+}
 
-  .actions {
-    display: grid;
-    grid-template-columns: max-content 10px max-content;
-    justify-content: center;
-    margin-top: 15px;
-    margin-bottom: 5px;
-  }
+.actions {
+  display: grid;
+  grid-template-columns: max-content 10px max-content;
+  justify-content: center;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
 </style>

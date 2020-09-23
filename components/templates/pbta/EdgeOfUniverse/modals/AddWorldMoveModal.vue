@@ -53,97 +53,97 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import { Pbta } from '../../../../../lib/Pbta'
+import { mapState } from 'vuex'
+import { Pbta } from '@/lib/Pbta'
 
-  export default {
-    name: 'AddMoveModal',
+export default {
+  name: 'AddWorldMoveModal',
 
-    model: {
-      prop: 'obj',
-      event: 'completed',
-    },
+  model: {
+    prop: 'obj',
+    event: 'completed',
+  },
 
-    props: {
-      obj: { type: Object, required: true },
-      id: { type: String, required: true },
-    },
+  props: {
+    obj: { type: Object, required: true },
+    id: { type: String, required: true },
+  },
 
-    data() {
-      return {
-        move: {},
-        privateSelectRole: '',
-      }
-    },
+  data() {
+    return {
+      move: {},
+      privateSelectRole: '',
+    }
+  },
 
-    computed: {
-      ...mapState({
-        sheets: state => state.game.sheets,
-        tables: state => state.game.info.template.tables,
-      }),
+  computed: {
+    ...mapState({
+      sheets: state => state.game.sheets,
+      tables: state => state.game.info.template.tables,
+    }),
 
-      sheet: {
-        get() {
-          return this.sheets.find(sheet => sheet.id === this.id)
-        },
-      },
-
-      params: {
-        get() {
-          return this.sheet.params
-        },
-      },
-
-      moves: {
-        get() {
-          return this.params.moves
-        },
-      },
-
-      role: {
-        get() {
-          return this.params.role.key
-        },
-      },
-
-      roles: {
-        get() {
-          return this.tables.roles.filter(item => item.key !== this.role).map(item => (
-            { value: item.key, text: item.name }
-          ))
-        },
-      },
-
-      selectRole: {
-        get() {
-          return this.privateSelectRole
-        },
-
-        set(value) {
-          this.move = {}
-          this.privateSelectRole = value
-        },
-      },
-
-      selectMoves: {
-        get() {
-          if (this.privateSelectRole === '') return []
-
-          return Pbta.mapMoves(this.tables.specialMoves[this.privateSelectRole], this.moves)
-        },
+    sheet: {
+      get() {
+        return this.sheets.find(sheet => sheet.id === this.id)
       },
     },
 
-    methods: {
-      add() {
-        this.$emit('completed', { open: false, move: this.move })
+    params: {
+      get() {
+        return this.sheet.params
+      },
+    },
+
+    moves: {
+      get() {
+        return this.params.moves
+      },
+    },
+
+    role: {
+      get() {
+        return this.params.role.key
+      },
+    },
+
+    roles: {
+      get() {
+        return this.tables.roles.filter(item => item.key !== this.role).map(item => (
+          { value: item.key, text: item.name }
+        ))
+      },
+    },
+
+    selectRole: {
+      get() {
+        return this.privateSelectRole
+      },
+
+      set(value) {
         this.move = {}
-      },
-
-      close() {
-        this.$emit('completed', { open: false, move: {} })
-        this.move = {}
+        this.privateSelectRole = value
       },
     },
-  }
+
+    selectMoves: {
+      get() {
+        if (this.privateSelectRole === '') return []
+
+        return Pbta.mapMoves(this.tables.specialMoves[this.privateSelectRole], this.moves)
+      },
+    },
+  },
+
+  methods: {
+    add() {
+      this.$emit('completed', { open: false, move: this.move })
+      this.move = {}
+    },
+
+    close() {
+      this.$emit('completed', { open: false, move: {} })
+      this.move = {}
+    },
+  },
+}
 </script>

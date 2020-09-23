@@ -1,26 +1,35 @@
 <template>
   <div class="move-block">
-    <div :class="typeof move.enable === 'boolean' ? 'title-move-checkbox' : 'title-move'">
-      <div
-        v-if="typeof move.enable === 'boolean'"
-        :class="[{enable: enable }, 'box']"
-        @click="changeMove(!enable)"
-      />
-      <div v-if="typeof move.full === 'string'" class="title-cell button">
+    <div class="title-move">
+      <div v-if="!edit && canRoll" class="title-cell button">
         <span class="dice dice6 white-dice" @click="modalOpen = true">25</span>
-        <span class="move-name" @click="modalOpen = true">
-          {{ move.name }}
-        </span>
+        <span class="move-name" @click="modalOpen = true">{{ name }}</span>
       </div>
-      <span v-else class="move-name">{{ move.name }}</span>
+      <input
+        v-else-if="edit"
+        class="input"
+        v-model="name"
+        @change="saveSheet"
+      />
+      <span v-else class="move-name">{{ name }}</span>
       <v-spacer />
+      <v-btn
+        v-if="typeof edit !== 'undefined'"
+        color="white"
+        icon
+        small
+        class="icon-button"
+        @click="edit = !edit"
+      >
+        <v-icon>{{ edit ? 'mdi-lock-open-variant-outline' : 'mdi-lock-outline' }}</v-icon>
+      </v-btn>
       <v-btn
         v-if="move.remove"
         color="red darken-4"
         icon
         small
         dark
-        class="delete-button"
+        class="icon-button"
         @click="removeMove"
       >
         <v-icon>mdi-delete</v-icon>
@@ -31,101 +40,123 @@
       <summary class="pointer">
         Подробнее
       </summary>
-      <div class="actions">
-        <v-btn
-          v-if="typeof move.full === 'string'"
-          class="button-add"
-          raised
+      <div v-if="edit" class="edit">
+        <div>Описание</div>
+        <wysiwyg v-model="description" :options="wysiwygConfig" />
+
+        <v-select
+          v-model="changeType"
+          :items="stats"
+          chips
+          item-color="black"
+          label="Характеристика для проверки"
+          multiple
+        />
+
+        <div>Результат 10+</div>
+        <wysiwyg v-model="full" :options="wysiwygConfig" />
+
+        <div>Результат 7-9</div>
+        <wysiwyg v-model="part" :options="wysiwygConfig" />
+
+        <div>Результат 6-</div>
+        <wysiwyg v-model="fail" :options="wysiwygConfig" />
+
+        <div>Результат Дополнительно</div>
+        <wysiwyg v-model="details" :options="wysiwygConfig" />
+
+        <v-checkbox
+          v-model="damageButton"
           color="black"
-          small
-          dark
-          @click="autoFull"
-        >
-          Авто полный успех
-        </v-btn>
-        <v-btn
-          v-if="typeof move.full === 'string'"
-          class="button-add"
-          raised
-          color="black"
-          small
-          dark
-          @click="autoPart"
-        >
-          Авто частичный успех
-        </v-btn>
-        <v-btn
-          class="button-add"
-          raised
-          color="black"
-          small
-          dark
-          @click="showDescription"
-        >
-          Показать описание
-        </v-btn>
-        <div class="selects-grid">
-          <div v-if="typeof move.type === 'object'" class="type-select-grid">
-            <span class="select-title">Способ</span>
-            <v-select
-              v-model="type"
-              :items="move.type"
-              class="type-select"
-              color="black"
-              flat
-              hide-details
-            />
-          </div>
-          <div  class="type-select-grid">
-            <span class="select-title">Альтернативный способ</span>
-            <v-select
-              v-model="altType"
-              :items="altTypes"
-              class="type-select"
-              color="black"
-              flat
-              hide-details
-            />
+          label="Кнопка урона"
+        />
+      </div>
+      <div v-else>
+        <div class="actions">
+          <v-btn
+            v-if="canRoll"
+            class="button-add"
+            raised
+            color="black"
+            small
+            dark
+            @click="autoFull"
+          >
+            Авто полный успех
+          </v-btn>
+          <v-btn
+            v-if="canRoll"
+            class="button-add"
+            raised
+            color="black"
+            small
+            dark
+            @click="autoPart"
+          >
+            Авто частичный успех
+          </v-btn>
+          <v-btn
+            v-if="description.length > 0"
+            class="button-add"
+            raised
+            color="black"
+            small
+            dark
+            @click="showDescription"
+          >
+            Показать описание
+          </v-btn>
+          <div class="selects-grid">
+            <div v-if="typeof move.type === 'object' && canRoll" class="type-select-grid">
+              <span class="select-title">Способ</span>
+              <v-select
+                v-model="type"
+                :items="move.type"
+                class="type-select"
+                color="black"
+                flat
+                hide-details
+              />
+            </div>
+            <div v-if="canRoll" class="type-select-grid">
+              <span class="select-title">Альтернативный способ</span>
+              <v-select
+                v-model="altType"
+                :items="altTypes"
+                class="type-select"
+                color="black"
+                flat
+                hide-details
+              />
+            </div>
           </div>
         </div>
-      </div>
-
-      <span class="move-description" v-html="move.description" />
-      <v-text-field
-        v-if="texField"
-        v-model="texField"
-        color="indigo"
-        class="input name"
-        flat
-        hide-details
-        @change="saveSheet"
-      />
-      <v-textarea
-        v-if="textarea"
-        v-model="textarea"
-        auto-grow
-        no-resize
-        rows="2"
-        color="indigo"
-        background-color="white"
-        class="notes"
-        hide-details
-        @change="saveSheet"
-      />
-      <div v-if="move.selects" class="selects">
-        <v-select
-          v-for="(select, selectIndex) in selects"
-          :key="`other-select-${selectIndex}`"
-          :items="select.items"
-          class="other-select"
-          color="black"
-          :multiple="select.limit > 1 || select.multiple"
+        <span class="move-description" v-html="description" />
+        <v-text-field
+          v-if="textField"
+          v-model="textField"
+          color="indigo"
+          class="input name"
           flat
-          :value="select.value"
-          :label="select.label"
           hide-details
-          @change="value => otherSelect(selectIndex, value)"
+          @change="saveSheet"
         />
+        <div v-if="selects" class="selects">
+          <div v-for="(select, selectIndex) in selects" :key="`other-select-${selectIndex}`">
+            <v-select
+              :items="select.items"
+              class="other-select"
+              color="black"
+              :multiple="select.multiple"
+              flat
+              :value="select.value"
+              :label="select.label"
+              hide-details
+              @change="value => otherSelect(selectIndex, value)"
+            />
+            <div>{{ selectDescription(select) }}</div>
+          </div>
+        </div>
       </div>
     </details>
 
@@ -134,356 +165,488 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import RollModifierModal from '../modals/RollModifierModal'
+import { mapState } from 'vuex'
+import RollModifierModal from '@/components/templates/pbta/EdgeOfUniverse/modals/RollModifierModal'
 
-  export default {
-    name: 'Move',
-    components: { RollModifierModal },
-    props: {
-      move: { type: Object, required: true },
-      index: { type: Number, required: true },
-      path: { type: String, required: true },
-      sheet: { type: Object, required: true },
+export default {
+  name: 'Move',
+
+  components: { RollModifierModal },
+
+  props: {
+    move: { type: Object, required: true },
+    index: { type: Number, required: true },
+    path: { type: String, required: true },
+    sheet: { type: Object, required: true },
+  },
+
+  data() {
+    return {
+      modalOpen: false,
+      enable: false,
+      privateAltType: null,
+      wysiwygConfig: { hideModules: { image: true, link: true } },
+    }
+  },
+
+  computed: {
+    ...mapState({
+      tables: state => state.game.info.template.tables,
+    }),
+
+    canRoll() {
+      return typeof this.full === 'string' && this.full.length > 0
     },
 
-    data() {
-      return {
-        privateType: {},
-        modalOpen: false,
-        enable: false,
-        privateAltType: null,
-      }
+    type: {
+      get() {
+        return this.privateType
+      },
+
+      set(value) {
+        this.privateType = value
+      },
     },
 
-    computed: {
-      ...mapState({
-        tables: state => state.game.info.template.tables,
-      }),
-
-      type: {
-        get() {
-          return this.privateType
-        },
-
-        set(value) {
-          this.privateType = value
-        },
+    altType: {
+      get() {
+        return this.privateAltType || this.privateType
       },
 
-      altType: {
-        get() {
-          return this.privateAltType || this.privateType
-        },
+      set(value) {
+        this.privateAltType = value
+      },
+    },
 
-        set(value) {
-          this.privateAltType = value
-        },
+    altTypes() {
+      const stats = this.tables.stats
+      const list = Object.keys(stats).map(key => ({ text: stats[key], value: key }))
+      return list.concat(this.specialsStats.map(item => ({ text: item.name, value: item.key })))
+    },
+
+    edit: {
+      get() {
+        return this.move.edit
       },
 
-      altTypes() {
-        const stats = this.tables.stats
-        const list = Object.keys(stats).map(key => ({ text: stats[key], value: key }))
-        return list.concat(this.specialsStats.map(item => ({ text: item.name, value: item.key })))
+      set(value) {
+        this.input('edit', value)
+      },
+    },
+
+    name: {
+      get() {
+        return this.move.name
       },
 
-      texField: {
-        get() {
-          return this.move.texField
-        },
+      set(value) {
+        this.input('name', value)
+      },
+    },
 
-        set(value) {
-          this.input('texField', value)
-        },
+    description: {
+      get() {
+        return this.move.description
       },
 
-      textarea: {
-        get() {
-          return this.move.textarea
-        },
-
-        set(value) {
-          this.input('textarea', value)
-        },
+      set(value) {
+        this.input('description', value)
       },
+    },
 
-      selects: {
-        get() {
-          return this.move.selects
-        },
-      },
+    changeType: {
+      get() {
+        if (!this.move.type) return []
 
-      results: {
-        get() {
-          return {
-            full: this.move.full,
-            part: this.move.part,
-            fail: this.move.fail,
-          }
-        },
-      },
-
-      specialsStats: {
-        get() {
-          return this.sheet.params.specials.map(item => {
-            if (item && item.type === 'stats') return item
-          }).filter(Boolean)
+        if (typeof this.move.type === 'string') {
+          return [this.move.type]
+        } else {
+          return this.move.type
         }
       },
 
-      obj: {
-        get() {
-          return { open: this.modalOpen, modifier: 0 }
-        },
-
-        set({ open, modifier, isClose }) {
-          if (!isClose) this.roll(parseInt(modifier))
-          this.modalOpen = open
-        },
+      set(keys) {
+        if (keys.length > 1) {
+          this.input('type', this.typesByKeys(keys))
+        } else if (keys.length === 1) {
+          this.input('type', this.typesByKeys(keys)[0].value)
+        } else {
+          this.input('type', null)
+        }
       },
     },
 
-    created() {
-      if (typeof this.move.type === 'object') {
-        this.privateType = this.move.type[0].value
-      } else {
-        this.privateType = this.move.type
+    statesList() {
+      const stats = this.tables.stats
+      const specialsList = (this.tables.specials[this.roleKey] || []).filter(item => item.type === 'stats')
+      specialsList.forEach(item => stats[item.key] = item.name)
+      return stats
+    },
+
+    stats() {
+      return Object.keys(this.statesList).map(key => ({
+        value: key,
+        text: this.statesList[key],
+      }))
+    },
+
+    full: {
+      get() {
+        return this.move.full
+      },
+
+      set(value) {
+        this.input('full', value)
+      },
+    },
+
+    part: {
+      get() {
+        return this.move.part
+      },
+
+      set(value) {
+        this.input('part', value)
+      },
+    },
+
+    fail: {
+      get() {
+        return this.move.fail
+      },
+
+      set(value) {
+        this.input('fail', value)
+      },
+    },
+
+    details: {
+      get() {
+        return this.move.details
+      },
+
+      set(value) {
+        this.input('details', value)
+      },
+    },
+
+    damageButton: {
+      get() {
+        return this.move.damageButton
+      },
+
+      set(value) {
+        this.input('damageButton', value)
+      },
+    },
+
+    textField: {
+      get() {
+        return this.move.textField
+      },
+
+      set(value) {
+        this.input('textField', value)
+      },
+    },
+
+    textarea: {
+      get() {
+        return this.move.textarea
+      },
+
+      set(value) {
+        this.input('textarea', value)
+      },
+    },
+
+    selects() {
+      return this.move.selects
+    },
+
+    results: {
+      get() {
+        return {
+          full: this.move.full,
+          part: this.move.part,
+          fail: this.move.fail,
+        }
+      },
+    },
+
+    specialsStats: {
+      get() {
+        return this.sheet.params.specials.map(item => {
+          if (item && item.type === 'stats') return item
+        }).filter(Boolean)
+      },
+    },
+
+    obj: {
+      get() {
+        return { open: this.modalOpen, modifier: 0 }
+      },
+
+      set({ open, modifier, isClose }) {
+        if (!isClose) this.roll(parseInt(modifier))
+        this.modalOpen = open
+      },
+    },
+  },
+
+  created() {
+    if (typeof this.move.type === 'object') {
+      this.privateType = this.move.type[0].value
+    } else {
+      this.privateType = this.move.type
+    }
+
+    this.enable = this.move.enable
+  },
+
+  methods: {
+    typesByKeys(keys) {
+      return keys.map(key => ({
+        text: this.statesList[key],
+        value: key,
+      }))
+    },
+
+    otherSelect(index, value) {
+      this.input(`selects[${index}].value`, value)
+      this.saveSheet()
+    },
+
+    changeMove(value) {
+      this.enable = value
+      this.input('enable', value)
+      this.saveSheet()
+    },
+
+    removeMove() {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: this.path,
+          value: this.index,
+          remove: true,
+        })
+      this.saveSheet()
+    },
+
+    input(target, value) {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `${this.path}[${this.index}].${target}`,
+          value: value,
+        })
+    },
+
+    saveSheet() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change',
+        data: { ...this.sheet, type: 'sheet' },
+      })
+    },
+
+    autoFull() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'add',
+        data: {
+          type: 'message',
+          body: {
+            sheet: this.sheet.toChat,
+            damage: this.sheet.params.damage,
+            name: this.move.name,
+            autoFull: true,
+            results: this.results,
+            detailsAlways: this.move.detailsAlways || false,
+            details: this.move.details,
+            damageButton: this.move.damageButton || false,
+          },
+        },
+      })
+    },
+
+    autoPart() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'add',
+        data: {
+          type: 'message',
+          body: {
+            sheet: this.sheet.toChat,
+            damage: this.sheet.params.damage,
+            name: this.move.name,
+            autoPart: true,
+            results: this.results,
+            detailsAlways: this.move.detailsAlways || false,
+            details: this.move.details,
+            damageButton: this.move.damageButton || false,
+          },
+        },
+      })
+    },
+
+    showDescription() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'add',
+        data: {
+          type: 'message',
+          body: {
+            sheet: this.sheet.toChat,
+            name: this.move.name,
+            description: this.move.description,
+            showDescription: true,
+          },
+        },
+      })
+    },
+
+    roll(modifier) {
+      const type = this.altType || this.type
+      const state = { name: this.tables.stats[type], value: this.sheet.params.stats[type] }
+      if (typeof state.value === 'undefined') {
+        const specialsStat = this.specialsStats.find(item => item.key === type)
+        state.name = specialsStat.name.toUpperCase()
+        state.value = specialsStat.current
       }
 
-      this.enable = this.move.enable
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'add',
+        data: {
+          type: 'message',
+          body: {
+            sheet: this.sheet.toChat,
+            damage: this.sheet.params.damage,
+            name: this.move.name,
+            dices: { d6: 2 },
+            state,
+            modifier,
+            results: this.results,
+            detailsAlways: this.move.detailsAlways || false,
+            details: this.move.details,
+            damageButton: this.move.damageButton || false,
+            isMove: true,
+          },
+        },
+      })
     },
-
-    methods: {
-      otherSelect(index, value) {
-        this.input(`selects[${index}].value`, value)
-        this.saveSheet()
-      },
-
-      changeMove(value) {
-        this.enable = value
-        this.input('enable', value)
-        this.saveSheet()
-      },
-
-      removeMove() {
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: this.path,
-                             value: this.index,
-                             remove: true,
-                           })
-        this.saveSheet()
-      },
-
-      input(target, value) {
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: `${this.path}[${this.index}].${target}`,
-                             value: value,
-                           })
-      },
-
-      saveSheet() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'change',
-          data: { ...this.sheet, type: 'sheet' },
-        })
-      },
-
-      autoFull() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: {
-            type: 'message',
-            body: {
-              sheet: this.sheet.toChat,
-              damage: this.sheet.params.damage,
-              name: this.move.name,
-              autoFull: true,
-              results: this.results,
-              detailsAlways: this.move.detailsAlways || false,
-              details: this.move.details,
-              damageButton: this.move.damageButton || false,
-            },
-          },
-        })
-      },
-
-      autoPart() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: {
-            type: 'message',
-            body: {
-              sheet: this.sheet.toChat,
-              damage: this.sheet.params.damage,
-              name: this.move.name,
-              autoPart: true,
-              results: this.results,
-              detailsAlways: this.move.detailsAlways || false,
-              details: this.move.details,
-              damageButton: this.move.damageButton || false,
-            },
-          },
-        })
-      },
-
-      showDescription() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: {
-            type: 'message',
-            body: {
-              sheet: this.sheet.toChat,
-              name: this.move.name,
-              description: this.move.description,
-              showDescription: true,
-            },
-          },
-        })
-      },
-
-      roll(modifier) {
-        const type = this.altType || this.type
-        const state = { name: this.tables.stats[type], value: this.sheet.params.stats[type] }
-        if (typeof state.value === 'undefined') {
-          const specialsStat = this.specialsStats.find(item => item.key === type)
-          state.name = specialsStat.name.toUpperCase()
-          state.value = specialsStat.current
-        }
-
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: {
-            type: 'message',
-            body: {
-              sheet: this.sheet.toChat,
-              damage: this.sheet.params.damage,
-              name: this.move.name,
-              dices: { d6: 2 },
-              state,
-              modifier,
-              results: this.results,
-              detailsAlways: this.move.detailsAlways || false,
-              details: this.move.details,
-              damageButton: this.move.damageButton || false,
-              isMove: true,
-            },
-          },
-        })
-      },
-    },
-  }
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .move-block {
-    margin-bottom: 5px;
-  }
+.move-block {
+  margin-bottom: 5px;
+}
 
-  .title-move-checkbox {
-    display: grid;
-    grid-template-columns: 30px max-content 1fr max-content;
-    background-color: $black;
-    color: $white;
-    line-height: 35px;
-    margin-left: -5px;
-  }
+.title-move {
+  display: grid;
+  grid-template-columns: max-content 1fr repeat(2, max-content);
+  background-color: $black;
+  color: $white;
+  line-height: 35px;
+  margin-left: -5px;
+}
 
-  .title-move {
-    display: grid;
-    grid-template-columns: max-content 1fr max-content;
-    background-color: $black;
-    color: $white;
-    line-height: 35px;
-    margin-left: -5px;
-  }
+.dice {
+  font-size: 16px;
+  position: relative;
+  left: 5px;
+  top: 2px;
+}
 
-  .dice {
-    font-size: 16px;
-    position: relative;
-    left: 5px;
-    top: 2px;
+.button {
+  cursor: pointer;
+  color: $white;
+  &:hover,
+  &:focus,
+  &:active {
+    color: $grayEE;
   }
+}
 
-  .button {
-    cursor: pointer;
-    color: $white;
-    &:hover,
-    &:focus,
-    &:active {
-      color: $grayEE;
-    }
-  }
+.pointer {
+  cursor: pointer;
+}
 
-  .pointer {
-    cursor: pointer;
-  }
+.box {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  margin-top: 7px;
+  border: 2px solid $white;
+}
 
-  .box {
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-    margin-left: 5px;
-    margin-top: 7px;
-    border: 2px solid $white;
-  }
+.enable {
+  background-color: $white;
+  border: 2px solid $black;
+}
 
-  .enable {
-    background-color: $white;
-    border: 2px solid $black;
-  }
+.move-name {
+  margin-left: 5px;
+  min-height: 40px;
+  font-weight: 600;
+}
 
-  .move-name {
-    margin-left: 5px;
-    font-weight: 600;
-  }
+.selects-grid {
+  display: grid;
+  grid-row-gap: 10px;
+}
 
-  .type-select {
-    padding: 0;
-    margin: 0;
-    background-color: $white;
-  }
+.type-select-grid {
+  display: grid;
+  grid-template-columns: 1fr 135px;
+  grid-column-gap: 10px;
+  height: 35px;
+}
 
-  .select-grid {
-    display: grid;
-    grid-template-columns: max-content 135px;
-    grid-column-gap: 10px;
-    height: 35px;
-  }
+.type-select {
+  padding: 0;
+  margin: 0;
+  background-color: $white;
+}
 
-  .selects {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
+.selects {
+  display: grid;
+  grid-template-columns: 1fr;
+}
 
-  .select-title {
-    line-height: 35px;
-  }
+.select-title {
+  line-height: 35px;
+}
 
-  .delete-button {
-    margin-top: 4px;
-  }
+.icon-button {
+  margin-top: 4px;
+}
 
-  .actions {
-    display: grid;
-    grid-template-columns: max-content;
-    grid-row-gap: 10px;
-    margin-top: 15px;
-    margin-bottom: 5px;
-  }
+.actions {
+  display: grid;
+  grid-template-columns: max-content;
+  grid-row-gap: 10px;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
 
-  .white-dice {
-    background-color: $white;
-    color: $black;
-  }
+.white-dice {
+  background-color: $white;
+  color: $black;
+}
+
+.edit {
+  background: $white;
+}
+
+.input {
+  color: $white;
+}
 </style>
