@@ -45,75 +45,75 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import { Pbta } from '../../../../../lib/Pbta'
+import { mapState } from 'vuex'
+import { Pbta } from '@/lib/Pbta'
 
-  export default {
-    name: 'AddMoveModal',
+export default {
+  name: 'AddMoveModal',
 
-    model: {
-      prop: 'obj',
-      event: 'completed',
-    },
+  model: {
+    prop: 'obj',
+    event: 'completed',
+  },
 
-    props: {
-      obj: { type: Object, required: true },
-      id: { type: String, required: true },
-    },
+  props: {
+    obj: { type: Object, required: true },
+    id: { type: String, required: true },
+  },
 
-    data() {
-      return {
-        move: {},
-      }
-    },
+  data() {
+    return {
+      move: {},
+    }
+  },
 
-    computed: {
-      ...mapState({
-        sheets: state => state.game.sheets,
-        tables: state => state.game.info.template.tables,
-      }),
+  computed: {
+    ...mapState({
+      sheets: state => state.game.sheets,
+      tables: state => state.game.info.template.tables,
+    }),
 
-      sheet: {
-        get() {
-          return this.sheets.find(sheet => sheet.id === this.id)
-        },
-      },
-
-      params: {
-        get() {
-          return this.sheet.params
-        },
-      },
-
-      moves: {
-        get() {
-          return this.params.moves
-        },
-      },
-
-      role: {
-        get() {
-          return this.params.role.key
-        },
-      },
-
-      selectMoves: {
-        get() {
-          return Pbta.mapMoves(this.tables.specialMoves[this.role], this.moves)
-        },
+    sheet: {
+      get() {
+        return this.sheets.find(sheet => sheet.id === this.id)
       },
     },
 
-    methods: {
-      add() {
-        this.$emit('completed', { open: false, move: this.move })
-        this.move = {}
-      },
-
-      close() {
-        this.$emit('completed', { open: false, move: {} })
-        this.move = {}
+    params: {
+      get() {
+        return this.sheet.params
       },
     },
-  }
+
+    moves: {
+      get() {
+        return this.params.moves
+      },
+    },
+
+    role: {
+      get() {
+        return this.params.role.key
+      },
+    },
+
+    selectMoves: {
+      get() {
+        return Pbta.mapMoves(this.tables.specialMoves[this.role], this.moves)
+      },
+    },
+  },
+
+  methods: {
+    add() {
+      this.$emit('completed', { open: false, move: this.move })
+      this.move = {}
+    },
+
+    close() {
+      this.$emit('completed', { open: false, move: {} })
+      this.move = {}
+    },
+  },
+}
 </script>

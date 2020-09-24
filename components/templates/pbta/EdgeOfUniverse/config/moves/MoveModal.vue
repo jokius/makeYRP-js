@@ -41,6 +41,12 @@
               color="indigo"
               label="Кнопка урона"
             />
+
+            <v-checkbox
+              v-model="addTextField"
+              color="indigo"
+              label="Текстовое поле под описанием"
+            />
             <div v-for="(select, index) in selects" :key="`select-${index}`">
               <v-text-field
                 label="название группы"
@@ -144,6 +150,12 @@ export default {
   props: {
     obj: { type: Object, required: true },
     roleKey: { type: String, default: 'none' },
+  },
+
+  data() {
+    return {
+      addTextField: this.obj.move.textField === ''
+    }
   },
 
   computed: {
@@ -356,10 +368,10 @@ export default {
 
     change() {
       if (this.isValid) {
-        this.$emit('changeMove', {
-          open: false,
-          move: omitBy(this.move, value => typeof value === 'undefined' || value === null || value === ''),
-        })
+        const move = omitBy(this.move, value => typeof value === 'undefined' || value === null || value === '')
+        if (this.addTextField) move.textField = ''
+
+        this.$emit('changeMove', { open: false, move })
       }
     },
 

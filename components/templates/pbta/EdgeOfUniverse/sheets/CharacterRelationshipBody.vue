@@ -7,91 +7,119 @@
     >
       <span class="index">{{ index + 1 }}.</span>
       <v-text-field
-        :value="relation.value"
+        :value="relation.description"
         color="indigo"
-        :class="[{ full: !relation.last }, 'relation-name']"
+        class="relation-description"
         flat
         @input="(value) => changeRelation(value, index)"
         @change="saveSheet"
       />
-      <span class="relation-last">{{ relation.last }}</span>
+
+      <v-btn
+        color="red darken-4"
+        dark
+        @click="removeRelation(index)"
+      >
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
     </div>
+
+    <v-btn
+      color="indigo"
+      dark
+      small
+      @click="addRelation">
+      <span>Новая связь</span>
+    </v-btn>
   </div>
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex'
 
-  export default {
-    name: 'CharacterRelationshipBody',
-    props: {
-      id: { type: String, required: true },
-    },
+export default {
+  name: 'CharacterRelationshipBody',
 
-    computed: {
-      ...mapState({
-        sheets: state => state.game.sheets,
-      }),
+  props: {
+    id: { type: String, required: true },
+  },
 
-      sheet: {
-        get() {
-          return this.sheets.find(sheet => sheet.id === this.id)
-        },
-      },
+  computed: {
+    ...mapState({
+      sheets: state => state.game.sheets,
+    }),
 
-      relationship: {
-        get() {
-          return this.sheet.params.relationship
-        },
+    sheet: {
+      get() {
+        return this.sheets.find(sheet => sheet.id === this.id)
       },
     },
 
-    methods: {
-      changeRelation(value, index) {
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: `relationship.${index}.value`,
-                             value,
-                           })
+    relationship: {
+      get() {
+        return this.sheet.params.relationship
       },
+    },
+  },
 
-      saveSheet() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'change',
-          data: { ...this.sheet, type: 'sheet' },
+  methods: {
+    addRelation() {
+      const list = this.relationship.slice()
+      list.push({ description: '' })
+      this.$store.commit('game/updateSheetParams', { id: this.sheet.id, path: `relationship`, value: list })
+    },
+
+    changeRelation(value, index) {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `relationship.${index}.description`,
+          value,
         })
-      },
     },
-  }
+
+    removeRelation(index) {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `relationship`,
+          value: index,
+          remove: true,
+        })
+    },
+
+    saveSheet() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change',
+        data: { ...this.sheet, type: 'sheet' },
+      })
+    },
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .relationship-body {
-    background-color: $grayC5;
-    overflow: auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: max-content;
-    padding: 0 5px;
-  }
+.relationship-body {
+  background-color: $grayC5;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: max-content;
+  margin-top: 5px;
+  padding: 0 5px;
+}
 
-  .relation {
-    display: grid;
-    grid-template-columns: max-content 150px max-content;
-    grid-column-gap: 5px;
-  }
+.relation {
+  display: grid;
+  grid-template-columns: 30px 1fr max-content;
+  grid-column-gap: 5px;
+}
 
-  .full {
-    grid-column: none;
-    grid-column-start: 2;
-  }
-
-  .relation-name {
-    margin-top: -5px;
-    padding: 0;
-  }
+.relation-description {
+  margin-top: -5px;
+  padding: 0;
+}
 </style>
