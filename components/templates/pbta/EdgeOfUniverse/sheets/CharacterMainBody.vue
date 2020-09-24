@@ -662,7 +662,7 @@ export default {
         {
           id: this.sheet.id,
           path: 'equipment',
-          value: equipment,
+          value: equipment.map(item => ({ ...item, edit: false })),
         })
     },
 
