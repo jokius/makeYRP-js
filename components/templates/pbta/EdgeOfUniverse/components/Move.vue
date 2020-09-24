@@ -48,6 +48,7 @@
           v-model="changeType"
           :items="stats"
           chips
+          color="black"
           item-color="black"
           label="Характеристика для проверки"
           multiple
@@ -114,6 +115,7 @@
                 :items="move.type"
                 class="type-select"
                 color="black"
+                item-color="black"
                 flat
                 hide-details
               />
@@ -125,6 +127,7 @@
                 :items="altTypes"
                 class="type-select"
                 color="black"
+                item-color="black"
                 flat
                 hide-details
               />
@@ -133,7 +136,7 @@
         </div>
         <span class="move-description" v-html="description" />
         <v-text-field
-          v-if="textField"
+          v-if="typeof textField === 'string'"
           v-model="textField"
           color="indigo"
           class="input name"
@@ -147,6 +150,7 @@
               :items="select.items"
               class="other-select"
               color="black"
+              item-color="black"
               :multiple="select.multiple"
               flat
               :value="select.value"
@@ -363,7 +367,7 @@ export default {
     },
 
     selects() {
-      return this.move.selects
+      return this.move.selects || []
     },
 
     results: {
@@ -407,6 +411,10 @@ export default {
   },
 
   methods: {
+    selectDescription(select) {
+      return select.items[select.value]?.description || ''
+    },
+
     typesByKeys(keys) {
       return keys.map(key => ({
         text: this.statesList[key],
@@ -494,6 +502,14 @@ export default {
     },
 
     showDescription() {
+      let description = this.move.description
+      this.selects.forEach(select => {
+        const item = select.items[select.value]
+        description += `<div>${item.text}</div>`
+        if (item.description !== '') description += `<div>${item.description}</div>`
+      })
+      if (this.textField && this.textField !== '') description += `<div>${this.textField}</div>`
+
       this.$cable.perform({
         channel: 'GameChannel',
         action: 'add',
@@ -502,7 +518,7 @@ export default {
           body: {
             sheet: this.sheet.toChat,
             name: this.move.name,
-            description: this.move.description,
+            description: description,
             showDescription: true,
           },
         },
