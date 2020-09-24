@@ -175,6 +175,7 @@
       return {
         modalOpen: false,
         enable: false,
+        privateType: null,
         privateAltType: null,
         wysiwygConfig: { hideModules: { image: true, link: true } },
       }
@@ -200,6 +201,7 @@
 
         set(value) {
           this.privateType = value
+          this.altType = value
         },
       },
 
