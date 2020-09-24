@@ -94,7 +94,7 @@
       },
 
       add() {
-        const items = this.list.flat()
+        const items = this.list.flat().map(item => ({ ...item, edit: false }))
         this.$emit('completed', { open: false, items })
         this.list = []
       },
