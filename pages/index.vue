@@ -3,7 +3,10 @@
     <v-main v-if="user">
       <v-container class="fill-height" fluid>
         <div class="user-grid">
-          <v-avatar :key="user.id" size="36" color="indigo">
+          <v-avatar
+            :key="user.id" size="36"
+            :style="{ border: `2px solid ${user.color}`, backgroundColor: user.color }"
+          >
             <img
               v-if="user.imgThumb"
               :src="user.imgThumb"

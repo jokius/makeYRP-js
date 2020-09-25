@@ -6,7 +6,7 @@
       :class="[{ pointer: currentUser.id === user.id }, 'user-grid']"
       @click="openSelect(user)"
     >
-      <v-avatar size="72" color="indigo">
+      <v-avatar size="72" :style="{ border: `4px solid ${user.color}`, backgroundColor: user.color }">
         <img
           :src="src(user)"
           :alt="user.nickname"
