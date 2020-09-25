@@ -28,7 +28,8 @@
     "vue-konva": "2.1.4",
     "vue-wysiwyg": "^1.7.2",
     "vue2-dropzone": "^3.6.0",
-    "vuetify": "2.3.10"
+    "vuetify": "2.3.10",
+    "yargs-parser": "^20.2.0"
   },
   "devDependencies": {
     "@nuxt/types": "^2.14.6",
