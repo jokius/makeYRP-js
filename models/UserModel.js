@@ -4,6 +4,7 @@ export class UserModel {
   id = null
   admin = false
   nickname = null
+  color = null
   avatar = {}
   sheet = {}
 
@@ -12,6 +13,7 @@ export class UserModel {
     const attributes = data.attributes
     this.nickname = attributes.nickname
     this.avatar = attributes.avatar
+    this.color = attributes.color
     this.admin = Boolean(attributes.admin)
     this.sheet = new SheetModel().setInfo({ data: attributes.sheet, changeAcl: false }) || {}
 

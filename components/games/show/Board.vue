@@ -9,9 +9,11 @@
         @mousedown="stageMouseDown"
         @mouseup="stageMouseUp"
         @keydown="deletePress"
+        @dblclick="showEcho"
       >
         <v-layer ref="graphic">
           <k-image v-if="backgroundUrl" :key="mapKey" :config="backgroundConfig" />
+          <v-circle :config="configEcho" ref="echo" />
           <k-graphic
             v-for="graphic in graphics"
             :key="graphic.params.name"
@@ -70,7 +72,8 @@
         menuItems: [],
         item: {},
         loadingImages: false,
-        mapKey: Date.now()
+        mapKey: Date.now(),
+        circle: {},
       }
     },
 
@@ -153,6 +156,18 @@
         }
       },
 
+      configEcho() {
+        return {
+          x: 0,
+          y: 0,
+          radius: 0,
+          fill: 'transparent',
+          stroke: this.user.color,
+          strokeWidth: 8,
+          visible: false,
+        }
+      },
+
       isMaster() {
         return this.user.id === this.master.id
       },
@@ -173,6 +188,7 @@
       stage.$el.tabIndex = 1
       stage.$el.focus()
       stage.$el.addEventListener('keydown', this.deletePress)
+      this.createEcho()
     },
 
     watch: {
@@ -684,6 +700,27 @@
           this.loadingImages = false
         })
       },
+
+      createEcho() {
+        const echo = this.$refs.echo.getNode()
+        echo.tween = new Konva.Tween({
+          node: echo,
+          radius: 100,
+          easing: Konva.Easings.EaseIn,
+          duration: 1,
+          onFinish: () => echo.visible(false),
+        })
+      },
+
+      showEcho(e) {
+        const pos = mousePosition(e.evt)
+        console.log('pos', pos)
+        const echo = this.$refs.echo.getNode()
+        echo.absolutePosition({ x: pos.x, y: pos.y - 60 })
+        echo.visible(true)
+        echo.tween.reset()
+        echo.tween.play()
+      }
     },
   }
 </script>
