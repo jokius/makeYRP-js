@@ -4,7 +4,8 @@
     <div v-for="(rolls, dice) in dices" :key="`${dice}-${Date.now}`">
       <div v-for="(value, index) in rolls" :key="`${dice}-${index}-${Date.now}`" class="dice">
         <span :class=diceClass(dice)>{{ valueToSymb(dice, value) }}</span>
-        <span v-if="index + 1 < rolls.length" class="plus"> + </span>
+        <span v-if="index < rolls.length" class="plus"> + </span>
+        <span v-if="modDicesText !== 0 && index+1 === rolls.length" class="modDices"> {{ modDicesText }} </span>
       </div>
     </div>
     <p class="dices-sum"> = {{ sum }}</p>
@@ -49,8 +50,12 @@ export default {
       return this.mod === 'h' ? 'Большее значение: ' : 'Меньшее значение: '
     },
 
+    modDicesText(){
+      return this.incr
+    },
+
     incrMessage() {
-      return this.incr > 0 ? `+${this.incr}` : this.incr
+      return this.incr > 0 ? `+${this.incr}` : this.incrmodDicesT
     },
 
     sum() {
@@ -185,6 +190,13 @@ $size: 60px;
 }
 
 .plus {
+  font-size: 30px;
+  position: relative;
+  top: 14px;
+  right: 4px;
+}
+
+.modDices {
   font-size: 30px;
   position: relative;
   top: 14px;
