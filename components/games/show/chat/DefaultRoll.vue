@@ -5,6 +5,7 @@
       <div v-for="(value, index) in rolls" :key="`${dice}-${index}-${Date.now}`" class="dice">
         <span :class=diceClass(dice)>{{ valueToSymb(dice, value) }}</span>
         <span v-if="index + 1 < rolls.length" class="plus"> + </span>
+        <span v-if="incr !== 0 && index + 1 === rolls.length" class="plus"> {{ incrMessage }} </span>
       </div>
     </div>
     <p class="dices-sum"> = {{ sum }}</p>
@@ -92,7 +93,7 @@ export default {
     },
 
     valueToSymb(dice, value) {
-      if (!['d6', 'd8', 'd10', 'd12', 'd20', 'd100'].includes(dice)) return value
+      if (!['d8', 'd10', 'd12', 'd20'].includes(dice)) return value
 
       let result = value.toString()
 
@@ -129,17 +130,17 @@ export default {
           .replace('20', 'T')
       }
 
-        return result
-          .replace('1', 'a')
-          .replace('2', 'b')
-          .replace('3', 'c')
-          .replace('4', 'd')
-          .replace('5', 'e')
-          .replace('6', 'f')
-          .replace('7', 'g')
-          .replace('8', 'h')
-          .replace('9', 'i')
-      },
+      return result
+        .replace('1', 'a')
+        .replace('2', 'b')
+        .replace('3', 'c')
+        .replace('4', 'd')
+        .replace('5', 'e')
+        .replace('6', 'f')
+        .replace('7', 'g')
+        .replace('8', 'h')
+        .replace('9', 'i')
+    },
 
     replaceNumberToChar(value) {
       return value
@@ -157,6 +158,8 @@ export default {
 
     diceClass(dice) {
       const diceReplace = dice.replace('d', 'dice')
+      if ( !['dice8', 'dice10', 'dice12', 'dice20'].includes(diceReplace)) return 'custom-dice'
+
       if (diceReplace === 'dice100') {
         return 'dice10'
       } else {
@@ -188,7 +191,24 @@ $size: 60px;
   font-size: 30px;
   position: relative;
   top: 14px;
-  right: 4px;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.custom-dice {
+  border-radius: 5px;
+  min-width: 38px;
+  height: 38px;
+  overflow: hidden;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  padding-right: 4px;
+  font-weight: bold;
+  font-size: 21px;
+  padding-left: 4px;
 }
 
 .dice4 {
