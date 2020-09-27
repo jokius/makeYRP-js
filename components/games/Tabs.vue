@@ -1,5 +1,5 @@
 <template>
-  <v-tabs centered>
+  <v-tabs centered color="indigo">
     <v-tab>
       Актуальные
     </v-tab>

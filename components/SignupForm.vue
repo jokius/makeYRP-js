@@ -4,13 +4,14 @@
       <v-row align="center" justify="center">
         <v-col cols="12" sm="8" md="4">
           <v-card class="elevation-12">
-            <v-toolbar color="primary" dark flat>
+            <v-toolbar color="indigo" dark flat>
               <v-toolbar-title>Регистрация</v-toolbar-title>
             </v-toolbar>
             <v-card-text>
               <v-form ref="form" v-model="isValid">
                 <v-text-field
                   v-model="inputNickname"
+                  color="indigo"
                   required
                   :rules="requiredRules"
                   label="Ник"
@@ -19,6 +20,7 @@
 
                 <v-text-field
                   v-model="inputEmail"
+                  color="indigo"
                   required
                   :rules="emailRules"
                   :error-messages="asyncEmailErrors"
@@ -29,6 +31,7 @@
 
                 <v-text-field
                   v-model="inputPassword"
+                  color="indigo"
                   required
                   :rules="requiredRules"
                   :error-messages="asyncPasswordErrors"
@@ -42,11 +45,11 @@
               <nuxt-link to="login">Войти</nuxt-link>
               <v-spacer />
               <v-btn
-                :disabled="sending || !isValid"
-                color="primary"
+                dark
+                color="indigo"
                 @click="validate"
               >
-                Зарегестрироватся
+                Зарегистрироваться
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -57,7 +60,7 @@
 </template>
 
 <script>
-  import { emailRules, requiredRules } from '../lib/validationRules'
+  import { emailRules, requiredRules } from '~/lib/validationRules'
 
   export default {
     data: () => ({
