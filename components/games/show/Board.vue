@@ -493,8 +493,9 @@
           masterId: this.master.id,
         })
         if (!token.acl.canRead) return
+        if (this.tokens.find(item => item.id === token.id)) return
 
-        this.tokens = [...this.tokens, token]
+        this.tokens.push(token)
       },
 
       addImage(raw) {
@@ -505,8 +506,9 @@
           masterId: this.master.id,
         })
         if (!image.acl.canRead) return
+        if (this.images.find(item => item.id === image.id)) return
 
-        this.images = [...this.images, image]
+        this.images.push(image)
       },
 
       addGraphic(raw) {
@@ -517,8 +519,9 @@
           masterId: this.master.id,
         })
         if (!graphic.acl.canRead) return
+        if (this.graphics.find(item => item.id === graphic.id)) return
 
-        this.graphics = [...this.graphics, graphic]
+        this.graphics.push(graphic)
       },
 
       change(params) {
