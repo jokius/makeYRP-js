@@ -33,7 +33,7 @@
   import ChatMessage from './chat/ChatMessage'
   import { dicesRegx } from '@/lib/dicesRegx'
 
-  const HISTORY_LENGTH = 3
+  const HISTORY_LENGTH = 15
 
   export default {
     name: 'TabChat',
