@@ -2,7 +2,7 @@
   <div class="grid">
     <div :class="[{ selected }, 'button']" @click="cursor = 'brush'">
       <v-icon v-if="cursor === 'rect'" class="icon">mdi-checkbox-blank-outline</v-icon>
-      <v-icon v-else-if="cursor === 'circle'" class="icon">mdi-checkbox-blank-circle-outline</v-icon>
+      <v-icon v-else-if="cursor === 'ellipse'" class="icon">mdi-checkbox-blank-circle-outline</v-icon>
       <v-icon v-else class="icon">mdi-brush</v-icon>
     </div>
 
@@ -38,7 +38,7 @@
         kinds: [
           { text: 'Отруки', value: 'brush' },
           { text: 'Квадрат', value: 'rect' },
-          { text: 'Круг', value: 'circle' },
+          { text: 'Круг', value: 'ellipse' },
         ],
         sizes: [
           { text: 'Очень тонкие граници 3px', value: 3 },
@@ -72,7 +72,7 @@
 
       selected: {
         get() {
-          return ['brush', 'rect', 'circle'].includes(this.cursor)
+          return ['brush', 'rect', 'ellipse'].includes(this.cursor)
         },
       },
 

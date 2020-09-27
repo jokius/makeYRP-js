@@ -9,13 +9,13 @@
         @mousedown="stageMouseDown"
         @mouseup="stageMouseUp"
         @keydown="deletePress"
-        @dblclick="showEcho"
+        @dblclick="sendEcho"
       >
         <v-layer ref="graphic">
           <k-image v-if="backgroundUrl" :key="mapKey" :config="backgroundConfig" />
-          <v-circle :config="configEcho" ref="echo" />
           <k-graphic
             v-for="graphic in graphics"
+            :ref="graphic.name"
             :key="graphic.params.name"
             :kind="graphic.kind"
             :config="graphic.params"
@@ -56,7 +56,7 @@
   import KGraphic from './konva/KGraphic'
   import { dropImage } from '@/api/folder'
 
-  const drawingPoints = ['brush', 'rect', 'circle']
+  const drawingPoints = ['brush', 'rect', 'ellipse']
 
   export default {
     name: 'Board',
@@ -73,7 +73,6 @@
         item: {},
         loadingImages: false,
         mapKey: Date.now(),
-        circle: {},
       }
     },
 
@@ -156,18 +155,6 @@
         }
       },
 
-      configEcho() {
-        return {
-          x: 0,
-          y: 0,
-          radius: 0,
-          fill: 'transparent',
-          stroke: this.user.color,
-          strokeWidth: 8,
-          visible: false,
-        }
-      },
-
       isMaster() {
         return this.user.id === this.master.id
       },
@@ -188,7 +175,6 @@
       stage.$el.tabIndex = 1
       stage.$el.focus()
       stage.$el.addEventListener('keydown', this.deletePress)
-      this.createEcho()
     },
 
     watch: {
@@ -196,6 +182,11 @@
         this.setPosition()
         this.mapKey = Date.now()
       },
+
+      // graphics(newValue, oldValue) {
+      //   console.log('newValue', newValue)
+      //   console.log('oldValue', oldValue)
+      // }
     },
 
     methods: {
@@ -286,7 +277,7 @@
             })
 
             layer.add(graphic)
-          } else if (this.cursor === 'circle') {
+          } else if (this.cursor === 'ellipse') {
             graphic = new Konva.Ellipse({
               stroke: this.borderColor,
               strokeWidth: this.borderSize,
@@ -317,10 +308,10 @@
               type: 'graphic',
             })
             graphic.destroy()
-          } else if (this.cursor === 'circle') {
+          } else if (this.cursor === 'ellipse') {
             this.add({
               params: graphic.attrs,
-              kind: 'circle',
+              kind: 'ellipse',
               type: 'graphic',
             })
             graphic.destroy()
@@ -336,7 +327,7 @@
             graphic.points(newPoints)
           }  else if (this.cursor === 'rect') {
             graphic.size({ width: newPos.x - pos.x, height: newPos.y - pos.y })
-          }  else if (this.cursor === 'circle') {
+          }  else if (this.cursor === 'ellipse') {
             graphic.radius({ x: Math.abs(newPos.x - pos.x), y: Math.abs(newPos.y - pos.y) })
           }
 
@@ -496,6 +487,7 @@
         if (obj.token) this.addToken(obj.token)
         if (obj.image) this.addImage(obj.image)
         if (obj.graphic) this.addGraphic(obj.graphic)
+        if (obj.echo) this.showEcho(obj)
       },
 
       addToken(raw) {
@@ -701,26 +693,45 @@
         })
       },
 
-      createEcho() {
-        const echo = this.$refs.echo.getNode()
-        echo.tween = new Konva.Tween({
-          node: echo,
+      showEcho: async function ({ position, color, from }) {
+        const name = `echo-${from}-${Date.now()}`
+        const echo = {
+          kind: 'circle',
+          acl: { canWrite: false },
+          params: {
+            name,
+            x: position.x,
+            y: position.y,
+            radius: 8,
+            fill: 'transparent',
+            stroke: color,
+            strokeWidth: 8,
+            visible: true,
+          }
+        }
+
+        this.graphics.push(echo)
+        await this.$nextTick()
+
+        const layer = this.$refs.graphic.getNode().getLayer()
+        const circle = layer.find(node => node.name() === name)[0]
+
+        const tween = new Konva.Tween({
+          node: circle,
           radius: 100,
           easing: Konva.Easings.EaseIn,
-          duration: 1,
-          onFinish: () => echo.visible(false),
+          duration: 0.85,
+          onFinish: () => circle.destroy()
         })
+
+        tween.reset()
+        tween.play()
       },
 
-      showEcho(e) {
-        const pos = mousePosition(e.evt)
-        console.log('pos', pos)
-        const echo = this.$refs.echo.getNode()
-        echo.absolutePosition({ x: pos.x, y: pos.y - 60 })
-        echo.visible(true)
-        echo.tween.reset()
-        echo.tween.play()
-      }
+      sendEcho() {
+        const position = this.mousePosition()
+        this.add({ position, type: 'echo' })
+      },
     },
   }
 </script>
