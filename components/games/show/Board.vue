@@ -248,7 +248,9 @@
         const layer = this.$refs.graphic.getNode()
         let pos = {}
 
-        stage.on('mousedown touchstart', () => {
+        stage.on('mousedown touchstart', e => {
+          if (this.canDraggableStage(e.evt)) return
+
           pos = this.mousePosition()
           isPaint = drawingPoints.includes(this.cursor)
 
@@ -287,7 +289,9 @@
           }
         })
 
-        stage.on('mouseup touchend', () => {
+        stage.on('mouseup touchend', e => {
+          if (this.canDraggableStage(e.evt)) return
+
           isPaint = false
           if (this.cursor === 'brush') {
             this.add({
