@@ -116,7 +116,7 @@
       },
 
       showOldMessage(countAp){  //НЕ ТРОГРАТЬ БЛЯТЬ
-        if (this.count + countAp === - 1) this.count = this.oldMessages.length + 1
+        if (this.count + countAp === -1) this.count = this.oldMessages.length + 1
 
         this.count += countAp
         if (this.count === this.oldMessages.length + 1) this.count = 0
