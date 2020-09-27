@@ -115,15 +115,17 @@
         this.text = ''
       },
 
-      showOldMessage(countAp){
-        if ((this.count + countAp) > 0) this.count += countAp
-        if (this.count -1 === this.oldMessages.length) this.count = 0
-        if (this.oldMessages.length > HISTORY_LENGTH) this.oldMessages.splice( -1, 1)
+      showOldMessage(countAp){  //НЕ ТРОГРАТЬ БЛЯТЬ
+        if (this.count + countAp === - 1) this.count = this.oldMessages.length + 1
 
-        if (this.oldMessages[this.count -1] === undefined){
+        this.count += countAp
+        if (this.count === this.oldMessages.length + 1) this.count = 0
+        if (this.oldMessages.length > HISTORY_LENGTH) this.oldMessages.splice(-1, 1) //Remove last element
+
+        if (this.oldMessages[this.count - 1] === undefined){
           this.text = ''
         } else {
-          this.text = this.oldMessages[this.count-1]
+          this.text = this.oldMessages[this.count - 1]
         }
       },
     },
