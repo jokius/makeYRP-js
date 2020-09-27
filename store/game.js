@@ -28,7 +28,7 @@ export const state = () => ({
   currentRightClickMenu: '',
   messages: [],
   borderSize: 5,
-  borderColor: "#000000",
+  borderColor: null,
   bodyColor: '#00000000',
   pageColor: {},
   specialTabs: [],
