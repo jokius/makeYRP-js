@@ -12,6 +12,8 @@
       class="field-text"
       type="text"
       @keypress.enter="sendMessage"
+      @keydown.up="showOldMessage(1)"
+      @keydown.down="showOldMessage(-1)"
     />
 
     <v-btn
@@ -28,9 +30,10 @@
 
 <script>
   import { mapState } from 'vuex'
-
   import ChatMessage from './chat/ChatMessage'
   import { dicesRegx } from '@/lib/dicesRegx'
+
+  const HISTORY_LENGTH = 3
 
   export default {
     name: 'TabChat',
@@ -39,6 +42,8 @@
     data() {
       return {
         text: '',
+        count: 0,
+        oldMessages: [],
       }
     },
 
@@ -104,7 +109,22 @@
           },
         })
 
+        this.oldMessages.unshift(this.text)
+        this.count = 0
+
         this.text = ''
+      },
+
+      showOldMessage(countAp){
+        if ((this.count + countAp) > 0) this.count += countAp
+        if (this.count -1 === this.oldMessages.length) this.count = 0
+        if (this.oldMessages.length > HISTORY_LENGTH) this.oldMessages.splice( -1, 1)
+
+        if (this.oldMessages[this.count -1] === undefined){
+          this.text = ''
+        } else {
+          this.text = this.oldMessages[this.count-1]
+        }
       },
     },
   }
