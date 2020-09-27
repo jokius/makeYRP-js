@@ -182,11 +182,6 @@
         this.setPosition()
         this.mapKey = Date.now()
       },
-
-      // graphics(newValue, oldValue) {
-      //   console.log('newValue', newValue)
-      //   console.log('oldValue', oldValue)
-      // }
     },
 
     methods: {
@@ -253,7 +248,9 @@
         const layer = this.$refs.graphic.getNode()
         let pos = {}
 
-        stage.on('mousedown touchstart', () => {
+        stage.on('mousedown touchstart', e => {
+          if (this.canDraggableStage(e.evt)) return
+
           pos = this.mousePosition()
           isPaint = drawingPoints.includes(this.cursor)
 
@@ -292,7 +289,9 @@
           }
         })
 
-        stage.on('mouseup touchend', () => {
+        stage.on('mouseup touchend', e => {
+          if (this.canDraggableStage(e.evt)) return
+
           isPaint = false
           if (this.cursor === 'brush') {
             this.add({
@@ -421,9 +420,12 @@
           const image = this.images.find(item => item.params.name === name)
           if (!this.isMaster) return
 
-          this.selectedItemName = image.params.name
+          this.selectedItemName = image.name
         } else if (type === 'graphic') {
-          this.selectedItemName = this.graphics.find(item => item.params.name === name).params.name
+          const graphic = this.graphics.find(item => item.params.name === name)
+          if (!graphic.acl.canWrite) return
+
+          this.selectedItemName = graphic.name
         } else {
           this.selectedItemName = ''
         }
@@ -498,8 +500,9 @@
           masterId: this.master.id,
         })
         if (!token.acl.canRead) return
+        if (this.tokens.find(item => item.id === token.id)) return
 
-        this.tokens = [...this.tokens, token]
+        this.tokens.push(token)
       },
 
       addImage(raw) {
@@ -510,8 +513,9 @@
           masterId: this.master.id,
         })
         if (!image.acl.canRead) return
+        if (this.images.find(item => item.id === image.id)) return
 
-        this.images = [...this.images, image]
+        this.images.push(image)
       },
 
       addGraphic(raw) {
@@ -522,8 +526,9 @@
           masterId: this.master.id,
         })
         if (!graphic.acl.canRead) return
+        if (this.graphics.find(item => item.id === graphic.id)) return
 
-        this.graphics = [...this.graphics, graphic]
+        this.graphics.push(graphic)
       },
 
       change(params) {
@@ -537,12 +542,14 @@
       changeObj(obj) {
         if (obj.from === this.user.id) return
 
-        if (obj.token) this.changeToken(obj.token, obj.by)
-        if (obj.image) this.changeImage(obj.image)
-        if (obj.graphic) this.changeGraphic(obj.graphic)
+        if (obj.token) this.changeToken(obj.token, obj.from)
+        if (obj.image) this.changeImage(obj.image, obj.from)
+        if (obj.graphic) this.changeGraphic(obj.graphic, obj.from)
       },
 
-      changeToken(raw, by) {
+      changeToken(raw, from) {
+        if (this.user.id === from) return
+
         const index = this.tokens.findIndex(item => item.id === raw.data.id)
         const token = this.tokens[index]
         token.setInfo({
@@ -556,7 +563,9 @@
         }
       },
 
-      changeImage(raw) {
+      changeImage(raw, from) {
+        if (this.user.id === from) return
+
         const index = this.images.findIndex(item => item.id === raw.data.id)
         const image = this.images[index]
         image.setInfo({
@@ -571,7 +580,9 @@
         }
       },
 
-      changeGraphic(raw) {
+      changeGraphic(raw, from) {
+        if (this.user.id === from) return
+
         const index = this.graphics.findIndex(item => item.id === raw.data.id)
         const graphic = this.graphics[index]
         graphic.setInfo({
