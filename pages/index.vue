@@ -15,6 +15,13 @@
             <v-icon v-if="!user.imgThumb" dark>mdi-account-circle</v-icon>
           </v-avatar>
           <v-btn
+            dark
+            nuxt
+            to="user/config"
+          >
+            <v-icon dark>mdi-cog</v-icon>
+          </v-btn>
+          <v-btn
             tile
             color="indigo"
             dark
