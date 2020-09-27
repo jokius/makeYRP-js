@@ -416,9 +416,12 @@
           const image = this.images.find(item => item.params.name === name)
           if (!this.isMaster) return
 
-          this.selectedItemName = image.params.name
+          this.selectedItemName = image.name
         } else if (type === 'graphic') {
-          this.selectedItemName = this.graphics.find(item => item.params.name === name).params.name
+          const graphic = this.graphics.find(item => item.params.name === name)
+          if (!graphic.acl.canWrite) return
+
+          this.selectedItemName = graphic.name
         } else {
           this.selectedItemName = ''
         }
