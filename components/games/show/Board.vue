@@ -182,11 +182,6 @@
         this.setPosition()
         this.mapKey = Date.now()
       },
-
-      // graphics(newValue, oldValue) {
-      //   console.log('newValue', newValue)
-      //   console.log('oldValue', oldValue)
-      // }
     },
 
     methods: {
@@ -537,12 +532,14 @@
       changeObj(obj) {
         if (obj.from === this.user.id) return
 
-        if (obj.token) this.changeToken(obj.token, obj.by)
-        if (obj.image) this.changeImage(obj.image)
-        if (obj.graphic) this.changeGraphic(obj.graphic)
+        if (obj.token) this.changeToken(obj.token, obj.from)
+        if (obj.image) this.changeImage(obj.image, obj.from)
+        if (obj.graphic) this.changeGraphic(obj.graphic, obj.from)
       },
 
-      changeToken(raw, by) {
+      changeToken(raw, from) {
+        if (this.user.id === from) return
+
         const index = this.tokens.findIndex(item => item.id === raw.data.id)
         const token = this.tokens[index]
         token.setInfo({
@@ -556,7 +553,9 @@
         }
       },
 
-      changeImage(raw) {
+      changeImage(raw, from) {
+        if (this.user.id === from) return
+
         const index = this.images.findIndex(item => item.id === raw.data.id)
         const image = this.images[index]
         image.setInfo({
@@ -571,7 +570,9 @@
         }
       },
 
-      changeGraphic(raw) {
+      changeGraphic(raw, from) {
+        if (this.user.id === from) return
+
         const index = this.graphics.findIndex(item => item.id === raw.data.id)
         const graphic = this.graphics[index]
         graphic.setInfo({
