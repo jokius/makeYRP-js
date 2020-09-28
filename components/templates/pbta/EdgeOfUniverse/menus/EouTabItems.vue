@@ -1,5 +1,15 @@
 <template>
   <div class="grid">
+    <v-text-field
+      v-model="search"
+      color="indigo"
+      class="search"
+      flat
+      hide-details
+      single-line
+      placeholder="поиск..."
+      prepend-inner-icon="mdi-magnify"
+    />
     <v-treeview
       v-model="tree"
       :open="open"
@@ -46,6 +56,7 @@
         types: [],
         open: [],
         tree: [],
+        search: '',
       }
     },
 
@@ -54,12 +65,18 @@
         template: state => state.game.info.template
       }),
 
+      tables() {
+        return this.template.tables
+      },
+
       items() {
         return this.types.map(type => {
-          const children = this.template.items
-            .filter(item => item.type === type)
-            .map((item, index) => ({ id: index + 1, params: item }))
+          let children = this.tables.items.filter(item => item.type === type)
 
+          if (this.search !== '') {
+            children = children.filter(item => item.name.toLowerCase().includes(this.search.toLowerCase()))
+          }
+          children = children.map((item, index) => ({ id: index + 1, params: item }))
           return {
             name: type,
             children
@@ -69,7 +86,7 @@
     },
 
     created() {
-      this.types = uniq(this.template.items.map(item => item.type))
+      this.types = uniq(this.tables.items.map(item => item.type))
       this.open = this.types.slice()
     },
 
