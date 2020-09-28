@@ -73,154 +73,154 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex'
 
-  import TabChat from './TabChat'
-  import TabSheets from './sheets/TabSheets'
-  import TabSettings from './TabSettings'
-  import TabNotes from './notes/TabNotes'
-  import TabImages from './TabImages'
+import TabChat from './TabChat'
+import TabSheets from './sheets/TabSheets'
+import TabSettings from './TabSettings'
+import TabNotes from './notes/TabNotes'
+import TabImages from './images/TabImages'
 
-  export default {
-    name: 'BodyMenu',
+export default {
+  name: 'BodyMenu',
 
-    components: {
-      TabImages,
-      TabNotes,
-      TabSettings,
-      TabSheets,
-      TabChat,
-      EouTabItems: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabItems'),
-      EouTabPlanets: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabPlanets'),
-      EouTabCounters: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabCounters'),
-      BidTabClock: () => import('../../templates/BladeInTheDarck/menus/BidTabClock'),
-      DwTabItems: () => import('../../templates/pbta/DungeonWorld/menus/DwTabItems'),
-    },
+  components: {
+    TabImages,
+    TabNotes,
+    TabSettings,
+    TabSheets,
+    TabChat,
+    EouTabItems: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabItems'),
+    EouTabPlanets: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabPlanets'),
+    EouTabCounters: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabCounters'),
+    BidTabClock: () => import('../../templates/BladeInTheDarck/menus/BidTabClock'),
+    DwTabItems: () => import('../../templates/pbta/DungeonWorld/menus/DwTabItems'),
+  },
 
-    data() {
-      return {
-        privateCurrentIndex: 0,
-        navigation: {
-          width: 356,
-          borderSize: 3,
-        },
-      }
-    },
+  data() {
+    return {
+      privateCurrentIndex: 0,
+      navigation: {
+        width: 356,
+        borderSize: 3,
+      },
+    }
+  },
 
-    computed: {
-      ...mapState({
-        menus: state => state.game.info.menus,
-        marks: state => state.game.marks,
-        currentItem: state => state.game.currentItem,
-        master: state => state.game.info.master,
-        user: state => state.auth.user,
-      }),
+  computed: {
+    ...mapState({
+      menus: state => state.game.info.menus,
+      marks: state => state.game.marks,
+      currentItem: state => state.game.currentItem,
+      master: state => state.game.info.master,
+      user: state => state.auth.user,
+    }),
 
-      items: {
-        get() {
-          const beforeSystem = [
-            { label: 'Чат', icon: 'mdi-chat', type: 'chat', mark: 'chat' },
-            { label: 'Персонажи', icon: 'mdi-account', type: 'sheets', mark: 'sheet' },
+    items: {
+      get() {
+        const beforeSystem = [
+          { label: 'Чат', icon: 'mdi-chat', type: 'chat', mark: 'chat' },
+          { label: 'Персонажи', icon: 'mdi-account', type: 'sheets', mark: 'sheet' },
+        ]
+        let afterSystem = []
+
+        if (this.user.id === this.master.id) {
+          afterSystem = [
+            { label: 'Изображения', icon: 'mdi-image-multiple', type: 'images', mark: null },
+            { label: 'Настройки страници', icon: 'mdi-cog', type: 'settings', mark: null },
           ]
-          let afterSystem = []
-
-          if (this.user.id === this.master.id) {
-            afterSystem =  [
-              { label: 'Изображения', icon: 'mdi-image-multiple', type: 'images', mark: null },
-              { label: 'Настройки страници', icon: 'mdi-cog', type: 'settings', mark: null },
-            ]
-          }
-
-          const system = this.menus.map(menu => ({
-            label: menu.params.name,
-            icon: menu.params.icon,
-            type: menu.params.type,
-            mark: menu.params.mark || null,
-          }))
-
-          return beforeSystem.concat(system).concat(afterSystem)
-        },
-      },
-
-      currentIndex: {
-        get() {
-          return this.privateCurrentIndex
-        },
-
-        set(index) {
-          this.privateCurrentIndex = index
-          this.$store.commit('game/addCurrentItem', this.items[index])
-        },
-      },
-    },
-
-    created() {
-      this.$store.commit('game/addCurrentItem', this.items[0])
-      this.items.forEach(item => {
-        if (item.mark) this.$store.commit('game/addMarker', item.mark)
-      })
-    },
-
-    mounted() {
-      this.setBorderWidth()
-      this.setEvents()
-    },
-
-    methods: {
-      content(mark) {
-        if (!mark) return 0
-
-        return this.marks[mark] || 0
-      },
-
-      setBorderWidth() {
-        const drawer = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
-        drawer.style.width = `${this.navigation.borderSize}px`
-        drawer.style.cursor = 'ew-resize'
-      },
-
-      setEvents() {
-        const minSize = this.navigation.borderSize
-        const el = this.$refs.drawer.$el
-        const drawerBorder = el.querySelector('.v-navigation-drawer__border')
-        const vm = this
-        const direction = el.classList.contains('v-navigation-drawer--right') ? 'right' : 'left'
-
-        function resize(e) {
-          document.body.style.cursor = 'ew-resize'
-          const scroll = direction === 'right' ? document.body.scrollWidth - e.clientX : e.clientX
-          el.style.width = `${scroll}px`
         }
 
-        drawerBorder.addEventListener(
-          'mousedown',
-          function(e) {
-            if (e.offsetX < minSize) {
-              el.style.transition ='initial'
-              document.addEventListener("mousemove", resize, false)
-            }
-          },
-          false
-        )
+        const system = this.menus.map(menu => ({
+          label: menu.params.name,
+          icon: menu.params.icon,
+          type: menu.params.type,
+          mark: menu.params.mark || null,
+        }))
 
-        document.addEventListener(
-          'mouseup',
-          function() {
-            el.style.transition =''
-            vm.navigation.width = el.style.width
-            document.body.style.cursor = ""
-            document.removeEventListener('mousemove', resize, false)
-          },
-          false
-        )
+        return beforeSystem.concat(system).concat(afterSystem)
       },
     },
-  }
+
+    currentIndex: {
+      get() {
+        return this.privateCurrentIndex
+      },
+
+      set(index) {
+        this.privateCurrentIndex = index
+        this.$store.commit('game/addCurrentItem', this.items[index])
+      },
+    },
+  },
+
+  created() {
+    this.$store.commit('game/addCurrentItem', this.items[0])
+    this.items.forEach(item => {
+      if (item.mark) this.$store.commit('game/addMarker', item.mark)
+    })
+  },
+
+  mounted() {
+    this.setBorderWidth()
+    this.setEvents()
+  },
+
+  methods: {
+    content(mark) {
+      if (!mark) return 0
+
+      return this.marks[mark] || 0
+    },
+
+    setBorderWidth() {
+      const drawer = this.$refs.drawer.$el.querySelector('.v-navigation-drawer__border')
+      drawer.style.width = `${this.navigation.borderSize}px`
+      drawer.style.cursor = 'ew-resize'
+    },
+
+    setEvents() {
+      const minSize = this.navigation.borderSize
+      const el = this.$refs.drawer.$el
+      const drawerBorder = el.querySelector('.v-navigation-drawer__border')
+      const vm = this
+      const direction = el.classList.contains('v-navigation-drawer--right') ? 'right' : 'left'
+
+      function resize(e) {
+        document.body.style.cursor = 'ew-resize'
+        const scroll = direction === 'right' ? document.body.scrollWidth - e.clientX : e.clientX
+        el.style.width = `${scroll}px`
+      }
+
+      drawerBorder.addEventListener(
+        'mousedown',
+        function (e) {
+          if (e.offsetX < minSize) {
+            el.style.transition = 'initial'
+            document.addEventListener('mousemove', resize, false)
+          }
+        },
+        false,
+      )
+
+      document.addEventListener(
+        'mouseup',
+        function () {
+          el.style.transition = ''
+          vm.navigation.width = el.style.width
+          document.body.style.cursor = ''
+          document.removeEventListener('mousemove', resize, false)
+        },
+        false,
+      )
+    },
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  .menuGrid {
-    display: grid;
-    grid-template-columns: auto 50px;
-  }
+.menuGrid {
+  display: grid;
+  grid-template-columns: auto 50px;
+}
 </style>
