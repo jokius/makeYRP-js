@@ -9,15 +9,15 @@
 
 <script>
   import { mapState } from 'vuex'
-
-  import DiceButton from './leftMenuButtons/DiceButton'
-  import LayerButton from './leftMenuButtons/LayerButton'
-  import CursorButton from './leftMenuButtons/CursorButton'
-  import DrawingButton from './leftMenuButtons/DrawingButton'
+  import CursorButton from '@/components/games/show/leftMenu/buttons/CursorButton'
+  import DrawingButton from '@/components/games/show/leftMenu/buttons/DrawingButton'
+  import LayerButton from '@/components/games/show/leftMenu/buttons/LayerButton'
+  import DiceButton from '@/components/games/show/leftMenu/buttons/DiceButton'
 
   export default {
     name: 'LeftMenu',
-    components: { DrawingButton, CursorButton, LayerButton, DiceButton },
+
+    components: { DiceButton, LayerButton, DrawingButton, CursorButton },
 
     computed: {
       ...mapState({

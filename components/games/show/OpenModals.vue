@@ -48,6 +48,14 @@
         :is-new="modal.isNew"
         :note="modal.note"
       />
+      <edit-text-modal
+        v-else-if="modal.name === 'edit-text'"
+        :key="`edit-text_${modal.key}`"
+        :uniq-key="modal.key"
+        :target="modal.text"
+        :change="modal.change"
+        :callback="modal.callback"
+      />
       <planet-modal
         v-else-if="modal.name === 'planet'"
         :key="`planet_${modal.key}`"
@@ -83,48 +91,49 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex'
+import AccessModal from '@/components/games/show/modals/AccessModal'
+import RenameItemFolder from '@/components/games/show/RenameItemFolder'
+import PageModal from '@/components/games/show/modals/PageModal'
+import ColorPickerModal from '@/components/games/show/modals/ColorPickerModal'
+import SheetModal from '@/components/games/show/sheets/SheetModal'
+import InfoModal from '@/components/games/show/modals/InfoModal'
+import NoteModal from '@/components/games/show/notes/NoteModal'
+import EditTextModal from '@/components/games/show/modals/EditTextModal'
 
-  import ColorPickerModal from './ColorPickerModal'
-  import SheetModal from './sheets/SheetModal'
-  import InfoModal from './InfoModal'
-  import NoteModal from './notes/NoteModal'
-  import PageModal from './PageModal'
-  import AccessModal from '@/components/games/show/AccessModal'
-  import RenameItemFolder from '@/components/games/show/RenameItemFolder'
+export default {
+  name: 'OpenModals',
 
-  export default {
-    name: 'OpenModals',
-
-    components: {
-      RenameItemFolder,
-      AccessModal,
-      EouItemModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/EouItemModal'),
-      PlanetModal: () => import('../../templates/pbta/EdgeOfUniverse/modals/PlanetModal'),
-      DwItemModal: () => import('../../templates/pbta/DungeonWorld/modals/DwItemModal'),
-      NoteModal,
-      InfoModal,
-      SheetModal,
-      ColorPickerModal,
-      PageModal
-    },
-    data () {
-      return {
-        alert: true,
-      }
-    },
-    computed: {
-      ...mapState({
-        openModals: state => state.game.openModals,
-      }),
-    },
-  }
+  components: {
+    EditTextModal,
+    NoteModal,
+    InfoModal,
+    SheetModal,
+    ColorPickerModal,
+    PageModal,
+    RenameItemFolder,
+    AccessModal,
+    EouItemModal: () => import('@/components/templates/pbta/EdgeOfUniverse/modals/EouItemModal'),
+    PlanetModal: () => import('@/components/templates/pbta/EdgeOfUniverse/modals/PlanetModal'),
+    DwItemModal: () => import('@/components/templates/pbta/DungeonWorld/modals/DwItemModal'),
+  },
+  data() {
+    return {
+      alert: true,
+    }
+  },
+  computed: {
+    ...mapState({
+      openModals: state => state.game.openModals,
+    }),
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  .alert {
-    width: 100vw;
-    position: absolute;
-    z-index: 999999;
-  }
+.alert {
+  width: 100vw;
+  position: absolute;
+  z-index: 999999;
+}
 </style>

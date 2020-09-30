@@ -16,12 +16,11 @@
 </template>
 
 <script>
-
-
-  import DraggableDialog from './DraggableDialog'
+  import DraggableDialog from '@/components/games/show/DraggableDialog'
 
   export default {
     name: 'InfoModal',
+
     components: { DraggableDialog },
 
     props: {

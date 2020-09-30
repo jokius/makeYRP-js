@@ -3,6 +3,7 @@
     <div :class="[{ selected }, 'button']" @click="cursor = 'brush'">
       <v-icon v-if="cursor === 'rect'" class="icon">mdi-checkbox-blank-outline</v-icon>
       <v-icon v-else-if="cursor === 'ellipse'" class="icon">mdi-checkbox-blank-circle-outline</v-icon>
+      <v-icon v-else-if="cursor === 'text'" class="icon">mdi-format-text</v-icon>
       <v-icon v-else class="icon">mdi-brush</v-icon>
     </div>
 
@@ -16,8 +17,31 @@
         flat
       />
       <div :style="styleBorder" class="color-current" @click="openBorderColorSelect" />
-      <div v-if="cursor !== 'brush'" :style="styleBody" class="color-current" @click="openBodyColorSelect" />
+      <div
+        v-if="!['brush', 'text'].includes(cursor)"
+        :style="styleBody"
+        class="color-current"
+        @click="openBodyColorSelect"
+      />
+      <v-text-field
+        v-if="cursor === 'text'"
+        v-model="text"
+        color="indigo"
+        class="input"
+        flat
+        hide-details
+      />
+      <v-text-field
+        v-if="cursor === 'text'"
+        v-model.number="font"
+        color="indigo"
+        class="input font"
+        type="number"
+        flat
+        hide-details
+      />
       <v-select
+        v-else
         v-model="size"
         :items="sizes"
         color="indigo"
@@ -38,16 +62,17 @@ export default {
   data() {
     return {
       kinds: [
-        { text: 'Отруки', value: 'brush' },
+        { text: 'От руки', value: 'brush' },
         { text: 'Квадрат', value: 'rect' },
         { text: 'Круг', value: 'ellipse' },
+        { text: 'Текст', value: 'text' },
       ],
       sizes: [
-        { text: 'Очень тонкие граници 3px', value: 3 },
-        { text: 'Тонкие граници 4px', value: 4 },
-        { text: 'Обычные граници 5px', value: 5 },
-        { text: 'Широкие граници 6px', value: 6 },
-        { text: 'Очень широкие граници 7px', value: 7 },
+        { text: 'Очень тонкие границы 3px', value: 3 },
+        { text: 'Тонкие границы 4px', value: 4 },
+        { text: 'Обычные границы 5px', value: 5 },
+        { text: 'Широкие границы 6px', value: 6 },
+        { text: 'Очень широкие границы 7px', value: 7 },
       ],
       targetBorder: { type: 'borderColor' },
       targetBody: { type: 'bodyColor' },
@@ -61,6 +86,8 @@ export default {
       borderSize: state => state.game.borderSize,
       borderColor: state => state.game.borderColor,
       bodyColor: state => state.game.bodyColor,
+      fontSize: state => state.game.fontSize,
+      drawText: state => state.game.drawText,
     }),
 
     cursor: {
@@ -74,7 +101,7 @@ export default {
     },
 
     selected() {
-      return ['brush', 'rect', 'ellipse'].includes(this.cursor)
+      return ['brush', 'rect', 'ellipse', 'text'].includes(this.cursor)
     },
 
     kind: {
@@ -97,6 +124,26 @@ export default {
       },
     },
 
+    text: {
+      get() {
+        return this.drawText
+      },
+
+      set(value) {
+        this.$store.commit('game/changeDrawText', value)
+      },
+    },
+
+    font: {
+      get() {
+        return this.fontSize
+      },
+
+      set(value) {
+        this.$store.commit('game/changeBorderSize', value)
+      },
+    },
+
     styleBorder() {
       return {
         backgroundColor: this.borderColor,
@@ -110,12 +157,6 @@ export default {
       }
     },
   },
-
-  // created() {
-  //   console.log('this.user.color', this.user.color)
-  //   if (this.borderColor) this.$store.commit('game/changeBorderColor', this.user.color)
-  //   console.log('this.borderColor', this.borderColor)
-  // },
 
   methods: {
     openBorderColorSelect() {
@@ -171,7 +212,7 @@ $border: 1px solid $black;
   top: 0;
   left: 35px;
   border: $border;
-  background-color: $white;
+  background-color: #fff;
   width: max-content;
   padding: 5px;
 }
@@ -194,5 +235,20 @@ $border: 1px solid $black;
 .kind {
   width: 130px;
   margin-right: 5px;
+}
+
+.input {
+  margin: 0;
+  padding: 0;
+}
+
+.font {
+  margin-left: 2px;
+  width: 60px;
+  &:after {
+    content: 'px';
+    margin-top: 2px;
+    color: #000;
+  }
 }
 </style>

@@ -87,94 +87,93 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import { set } from 'lodash'
+import { mapState } from 'vuex'
+import { set } from 'lodash'
+import { AclUsers } from '@/api/acl'
+import DraggableDialog from '@/components/games/show/DraggableDialog'
+import { UserModel } from '@/models/UserModel'
+import Loader from '@/components/Loader'
 
-  import Loader from '../../Loader'
-  import { AclUsers } from '@/api/acl'
-  import DraggableDialog from '@/components/games/show/DraggableDialog'
-  import { UserModel } from '@/models/UserModel'
+export default {
+  name: 'AccessModal',
 
-  export default {
-    name: 'AccessModal',
+  components: { Loader, DraggableDialog },
 
-    components: { DraggableDialog, Loader },
+  props: {
+    uniqKey: { type: Number, required: true },
+    obj: { type: Object, required: true },
+  },
 
-    props: {
-      uniqKey: { type: Number, required: true },
-      obj: { type: Object, required: true },
+  data() {
+    return {
+      newObjName: this.obj.name,
+      acl: {},
+      loaded: false,
+    }
+  },
+
+  computed: {
+    ...mapState({
+      currentUser: state => state.game.currentUser,
+      game: state => state.game.info,
+    }),
+
+    isValid() {
+      return this.name && this.name !== ''
     },
 
-    data() {
-      return {
-        newObjName: this.obj.name,
-        acl: {},
-        loaded: false,
-      }
-    },
-
-    computed: {
-      ...mapState({
-        currentUser: state => state.game.currentUser,
-        game: state => state.game.info,
-      }),
-
-      isValid() {
-        return this.name && this.name !== ''
+    name: {
+      get() {
+        return this.newObjName
       },
-
-      name: {
-        get() {
-          return this.newObjName
-        },
-        set(value) {
-          this.newObjName = value
-        },
+      set(value) {
+        this.newObjName = value
       },
     },
+  },
 
-    created() {
-      AclUsers({ axios: this.$axios, params: this.obj }).then(acl => {
-        this.acl = acl.data.attributes
-        this.acl.levels.forEach(level => {
-          level.user = new UserModel().setInfo(level.user)
-        })
-
-        this.loaded = true
+  created() {
+    AclUsers({ axios: this.$axios, params: this.obj }).then(acl => {
+      this.acl = acl.data.attributes
+      this.acl.levels.forEach(level => {
+        level.user = new UserModel().setInfo(level.user)
       })
+
+      this.loaded = true
+    })
+  },
+
+  methods: {
+    changePermission(path, value) {
+      set(this.acl, path, value)
     },
 
-    methods: {
-      changePermission(path, value) {
-        set(this.acl, path, value)
-      },
-
-      close() {
-        this.loaded = false
-        this.acl = {}
-        this.$store.commit('game/removeOpenModal', this.uniqKey)
-      },
-
-      save() {
-        const data = { type: this.obj.type, id: this.obj.id, write_all: this.acl.writeAll, read_all: this.acl.readAll }
-        data.levels = this.acl.levels.map(level => ({ ...level, user: null, user_id: level.user.id }))
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'change_access',
-          data,
-        })
-
-        this.close()
-      },
+    close() {
+      this.loaded = false
+      this.acl = {}
+      this.$store.commit('game/removeOpenModal', this.uniqKey)
     },
-  }
+
+    save() {
+      const data = { type: this.obj.type, id: this.obj.id, write_all: this.acl.writeAll, read_all: this.acl.readAll }
+      data.levels = this.acl.levels.map(level => ({ ...level, user: null, user_id: level.user.id }))
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change_access',
+        data,
+      })
+
+      this.close()
+    },
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .whiteText {
-    color: $white;
-  }
+.whiteText {
+  color: $white;
+}
 </style>
 

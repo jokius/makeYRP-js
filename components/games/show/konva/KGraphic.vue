@@ -3,6 +3,7 @@
   <v-rect v-else-if="kind === 'rect'" :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
   <v-ellipse v-else-if="kind === 'ellipse'" :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
   <v-circle v-else-if="kind === 'circle'" :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
+  <v-text v-else-if="kind === 'text'" :config="configKonva" @transformend="handleEvent" @dragend="handleEvent" />
 </template>
 
 <script>

@@ -28,6 +28,8 @@ export const state = () => ({
   currentRightClickMenu: '',
   messages: [],
   borderSize: 5,
+  fontSize: 12,
+  drawText: 'Новый текст',
   borderColor: null,
   bodyColor: '#00000000',
   pageColor: {},
@@ -171,6 +173,14 @@ export const mutations = {
 
   changeBorderSize(state, value) {
     state.borderSize = value
+  },
+
+  changeFontSize(state, value) {
+    state.fontSize = value
+  },
+
+  changeDrawText(state, value) {
+    state.drawText = value
   },
 
   addOpenModal(state, params) {

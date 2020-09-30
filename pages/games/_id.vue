@@ -25,7 +25,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import LeftMenu from '../../components/games/show/LeftMenu'
+import LeftMenu from '../../components/games/show/leftMenu/LeftMenu'
 import HeadMenu from '../../components/games/show/HeadMenu'
 import BodyMenu from '../../components/games/show/BodyMenu'
 import BodyContent from '../../components/games/show/BodyContent'
