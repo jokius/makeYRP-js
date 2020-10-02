@@ -162,10 +162,11 @@ export default {
     layers() {
       const list = []
       Object.keys(layers).forEach(layer => {
-        if (!layer.hidden || this.isMaster) {
+        if (!layers[layer].hidden || this.isMaster) {
           list.push(layer)
         }
       })
+
       return list
     },
 
