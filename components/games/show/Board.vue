@@ -13,30 +13,27 @@
       >
         <v-layer ref="graphic">
           <k-image v-if="backgroundUrl" :key="mapKey" :config="backgroundConfig" />
-          <k-graphic
-            v-for="graphic in graphics"
-            :ref="graphic.name"
-            :key="graphic.params.name"
-            :kind="graphic.kind"
-            :config="graphic.params"
-            :handleEventEnd="handleEventEnd"
-            :draggable="canDraggable(graphic.acl.canWrite)"
-          />
+          <template v-for="item in items">
+            <k-graphic
+              v-if="item.type === 'graphic'"
+              :ref="item.name"
+              :key="item.name"
+              :kind="item.kind"
+              :hidden="isHidden(item.layer)"
+              :config="item.params"
+              :handleEventEnd="handleEventEnd"
+              :draggable="canDraggable(item.acl.canWrite)"
+            />
 
-          <k-image
-            v-for="token in tokens"
-            :key="token.name"
-            :config="token.params"
-            :handleEventEnd="handleEventEnd"
-            :draggable="canDraggable(token.acl.canWrite)"
-          />
-          <k-image
-            v-for="image in images"
-            :key="image.params.name"
-            :config="image.params"
-            :handleEventEnd="handleEventEnd"
-            :draggable="canDraggable(isMaster)"
-          />
+            <k-image
+              v-else
+              :key="item.name"
+              :config="item.params"
+              :hidden="isHidden(item.layer)"
+              :handleEventEnd="handleEventEnd"
+              :draggable="canDraggable(item.acl.canWrite)"
+            />
+          </template>
           <v-transformer ref="transformer" />
         </v-layer>
       </v-stage>
@@ -48,13 +45,15 @@
 import { mapState } from 'vuex'
 import KImage from './konva/KImage'
 import { loadGraphics, loadImages, loadTokens } from '@/api/board'
-import { TokenModel } from '@/models/TokenModel'
 import { mousePosition } from '@/lib/mousePosition'
 import RightClickMenu from './RightClickMenu'
 import { ImageModel } from '@/models/ImageModel'
 import { GraphicModel } from '@/models/GraphicModel'
+import { TokenModel } from '@/models/TokenModel'
 import KGraphic from './konva/KGraphic'
 import { dropImage } from '@/api/folder'
+import { layers } from '@/lib/layer'
+
 
 const DRAWING_POINTS = ['brush', 'rect', 'ellipse', 'text']
 
@@ -64,9 +63,7 @@ export default {
 
   data() {
     return {
-      tokens: [],
-      images: [],
-      graphics: [],
+      privateItems: [],
       selectedItemName: '',
       position: { x: 0, y: 0 },
       menuItems: [],
@@ -99,6 +96,7 @@ export default {
       bodyColor: state => state.game.bodyColor,
       fontSize: state => state.game.fontSize,
       drawText: state => state.game.drawText,
+      currentLayer: state => state.game.currentLayer,
       master: state => state.game.info.master,
       user: state => state.auth.user,
       altPressed: state => state.game.altPressed,
@@ -160,6 +158,29 @@ export default {
     isMaster() {
       return this.user.id === this.master.id
     },
+
+    layers() {
+      const list = []
+      Object.keys(layers).forEach(layer => {
+        if (!layer.hidden || this.isMaster) {
+          list.push(layer)
+        }
+      })
+      return list
+    },
+
+    items() {
+      const items = this.privateItems.filter(item => this.layers.includes(item.layer))
+     return items.sort(this.sortByRank)
+    },
+
+    itemsByLayer() {
+      return this.privateItems.filter(item => item.layer === this.currentLayer).sort(this.sortByRank)
+    },
+
+    lastRank() {
+      return this.itemsByLayer[this.itemsByLayer.length - 1]?.params?.rank || 0
+    },
   },
 
   created() {
@@ -183,6 +204,10 @@ export default {
     params() {
       this.setPosition()
       this.mapKey = Date.now()
+    },
+
+    currentLayer() {
+      this.resetTransformer()
     },
   },
 
@@ -210,6 +235,7 @@ export default {
     sendToken(sheet, position) {
       this.add({
         sheet_id: sheet.id,
+        layer: this.currentLayer,
         params: {
           url: sheet.imgUrl,
           scaleX: 1,
@@ -218,6 +244,7 @@ export default {
           y: position.y,
           width: 200,
           height: 150,
+          rank: this.lastRank + 1
         },
         type: 'token',
       })
@@ -225,6 +252,7 @@ export default {
 
     sendImage(image, position) {
       this.add({
+        layer: this.currentLayer,
         params: {
           url: image.imgUrl,
           scaleX: 1,
@@ -233,6 +261,7 @@ export default {
           y: position.y,
           width: 200,
           height: 150,
+          rank: this.lastRank + 1
         },
         type: 'image',
       })
@@ -296,38 +325,26 @@ export default {
       })
 
       stage.on('mouseup touchend', e => {
-        if (this.canDraggableStage(e.evt)) return
+        if (!graphic || this.canDraggableStage(e.evt)) return
 
         isPaint = false
-        if (this.cursor === 'brush') {
-          this.add({
-            params: graphic.attrs,
-            kind: 'line',
-            type: 'graphic',
-          })
-          graphic.destroy()
-        } else if (this.cursor === 'rect') {
-          this.add({
-            params: graphic.attrs,
-            kind: 'rect',
-            type: 'graphic',
-          })
-          graphic.destroy()
-        } else if (this.cursor === 'ellipse') {
-          this.add({
-            params: graphic.attrs,
-            kind: 'ellipse',
-            type: 'graphic',
-          })
-          graphic.destroy()
-        } else if (this.cursor === 'text') {
-          this.add({
-            params: graphic.attrs,
-            kind: 'text',
-            type: 'graphic',
-          })
-          graphic.destroy()
+        const graphicObj = {
+          layer: this.currentLayer,
+          params: { ...graphic.attrs, rank: this.lastRank + 1 },
+          type: 'graphic',
         }
+
+        if (this.cursor === 'brush') {
+          this.add({ ...graphicObj, kind: 'line' })
+        } else if (this.cursor === 'rect') {
+          this.add({ ...graphicObj, kind: 'rect' })
+        } else if (this.cursor === 'ellipse') {
+          this.add({ ...graphicObj, kind: 'ellipse' })
+        } else if (this.cursor === 'text') {
+          this.add({ ...graphicObj, kind: 'text' })
+        }
+
+        if (graphic) graphic.destroy()
       })
 
       stage.on('mousemove touchmove', () => {
@@ -388,8 +405,7 @@ export default {
 
     stageMouseDown(e) {
       if (e.target === e.target.getStage() || e.target.name() === 'background') {
-        this.selectedItemName = ''
-        this.updateTransformer()
+        this.resetTransformer()
         this.changeStageDraggable(e)
       } else {
         this.showTransformer(e)
@@ -425,18 +441,18 @@ export default {
       const name = e.target.name()
       const [type] = name.split('-')
       if (type === 'token') {
-        const token = this.tokens.find(item => item.name === name)
-        if (!token.acl.canWrite) return
+        const token = this.privateItems.find(item => item.name === name)
+        if (!token.acl.canWrite || this.currentLayer !== token.layer) return
 
         this.selectedItemName = token.name
       } else if (type === 'image' && this.isMaster) {
-        const image = this.images.find(item => item.params.name === name)
-        if (!this.isMaster) return
+        const image = this.privateItems.find(item => item.name === name)
+        if (!this.isMaster || this.currentLayer !== image.layer) return
 
         this.selectedItemName = image.name
       } else if (type === 'graphic') {
-        const graphic = this.graphics.find(item => item.params.name === name)
-        if (!graphic.acl.canWrite) return
+        const graphic = this.privateItems.find(item => item.name === name)
+        if (!graphic.acl.canWrite || this.currentLayer !== graphic.layer) return
 
         this.selectedItemName = graphic.name
       } else {
@@ -454,22 +470,78 @@ export default {
       const name = e.target.name()
       const [type] = name.split('-')
       if (type === 'token') {
-        this.tokenRightMenu(this.tokens.find(item => item.name === name).id)
+        this.tokenRightMenu(this.privateItems.find(item => item.name === name))
       } else if (type === 'image') {
-        this.imageRightMenu(this.images.find(item => item.params.name === name).id)
+        this.imageRightMenu(this.privateItems.find(item => item.name === name))
+      } else if (type === 'graphic') {
+        this.graphicRightMenu(this.privateItems.find(item => item.name === name))
       }
     },
 
-    tokenRightMenu(id) {
-      this.menuItems = [{ title: 'Удалить токен', callback: () => this.remove({ id, type: 'token' }) }]
-      this.item = { type: 'token', id }
-      this.$store.commit('game/updateCurrentRightClickMenu', `token-${id}`)
+    tokenRightMenu(token) {
+      if (this.currentLayer !== token.layer) return
+
+      this.menuItems = []
+      if (this.isMaster) {
+        this.layers.filter(item => item !== token.layer).forEach(layerKey => {
+          const layer = layers[layerKey]
+          this.menuItems.push({ title: `Перенести на ${layer.name}`,
+            callback: () => this.changeLayer({ target: token, type: 'token', layer: layerKey }) })
+        })
+      }
+
+      this.menuItems.push({ title: 'На передний план',
+        callback: () => this.changeRank({ target: token, type: 'token', up: true }) })
+      this.menuItems.push({ title: 'На задний план',
+        callback: () => this.changeRank({ target: token, type: 'token', down: true }) })
+      this.menuItems.push({ title: 'Удалить токен',
+        callback: () => this.remove({ id: token.id, type: 'token' }) })
+      this.item = { type: 'token', id: token.id }
+      this.$store.commit('game/updateCurrentRightClickMenu', `token-${token.id}`)
     },
 
-    imageRightMenu(id) {
-      this.menuItems = [{ title: 'Удалить изображение', callback: () => this.remove({ id, type: 'image' }) }]
-      this.item = { type: 'image', id }
-      this.$store.commit('game/updateCurrentRightClickMenu', `image-${id}`)
+    imageRightMenu(image) {
+      if (this.currentLayer !== image.layer) return
+
+      this.menuItems = []
+      if (this.isMaster) {
+        this.layers.filter(item => item !== image.layer).forEach(layerKey => {
+          const layer = layers[layerKey]
+          this.menuItems.push({ title: `Перенести на ${layer.name}`,
+            callback: () => this.changeLayer({ target: image, type: 'image', layer: layerKey }) })
+        })
+      }
+
+      this.menuItems.push({ title: 'На передний план',
+        callback: () => this.changeRank({ target: image, type: 'image', up: true }) })
+      this.menuItems.push({ title: 'На задний план',
+        callback: () => this.changeRank({ target: image, type: 'image', down: true }) })
+      this.menuItems.push({ title: 'Удалить изображение',
+        callback: () => this.remove({ id: image.id, type: 'image' }) })
+      this.item = { id: image.id, type: 'image' }
+      this.$store.commit('game/updateCurrentRightClickMenu', `image-${image.id}`)
+    },
+
+    graphicRightMenu(graphic) {
+      if (this.currentLayer !== graphic.layer) return
+
+      this.menuItems = []
+      if (this.isMaster) {
+        this.layers.filter(item => item !== graphic.layer).forEach(layerKey => {
+          const layer = layers[layerKey]
+          this.menuItems.push({ title: `Перенести на ${layer.name}`,
+            callback: () => this.changeLayer({ target: graphic, type: 'graphic', layer: layerKey }) })
+        })
+      }
+
+      this.menuItems.push({ title: 'На передний план',
+        callback: () => this.changeRank({ target: graphic, type: 'graphic', up: true }) })
+      this.menuItems.push({ title: 'На задний план',
+        callback: () => this.changeRank({ target: graphic, type: 'graphic', down: true }) })
+      this.menuItems.push({ title: 'Удалить рисунок',
+        callback: () => this.remove({ id: graphic.id, type: 'graphic' }) })
+      this.item = { id: graphic.id, type: 'graphic' }
+      this.$store.commit('game/updateCurrentRightClickMenu', `graphic-${graphic.id}`)
     },
 
     loadTokens() {
@@ -505,6 +577,21 @@ export default {
       if (obj.echo) this.showEcho(obj)
     },
 
+    findTokenIndex(id) {
+      const strId = id.toString()
+      return this.privateItems.findIndex(item => item.id === strId && item.type === 'token')
+    },
+
+    findImageIndex(id) {
+      const strId = id.toString()
+      return this.privateItems.findIndex(item => item.id === strId && item.type === 'image')
+    },
+
+    findGraphicIndex(id) {
+      const strId = id.toString()
+      return this.privateItems.findIndex(item => item.id === strId && item.type === 'graphic')
+    },
+
     addToken(raw) {
       const token = new TokenModel().setInfo({
         data: raw.data,
@@ -513,9 +600,9 @@ export default {
         masterId: this.master.id,
       })
       if (!token.acl.canRead) return
-      if (this.tokens.find(item => item.id === token.id)) return
+      if (this.findTokenIndex(token.id) >= 0) return
 
-      this.tokens.push(token)
+      this.privateItems.push(token)
     },
 
     addImage(raw) {
@@ -526,9 +613,9 @@ export default {
         masterId: this.master.id,
       })
       if (!image.acl.canRead) return
-      if (this.images.find(item => item.id === image.id)) return
+      if (this.findImageIndex(image.id) >= 0) return
 
-      this.images.push(image)
+      this.privateItems.push(image)
     },
 
     addGraphic(raw) {
@@ -539,9 +626,9 @@ export default {
         masterId: this.master.id,
       })
       if (!graphic.acl.canRead) return
-      if (this.graphics.find(item => item.id === graphic.id)) return
+      if (this.findGraphicIndex(graphic.id) >= 0) return
 
-      this.graphics.push(graphic)
+      this.privateItems.push(graphic)
     },
 
     change(params) {
@@ -555,58 +642,36 @@ export default {
     changeObj(obj) {
       if (obj.from === this.user.id) return
 
-      if (obj.token) this.changeToken(obj.token, obj.from)
-      if (obj.image) this.changeImage(obj.image, obj.from)
-      if (obj.graphic) this.changeGraphic(obj.graphic, obj.from)
+      if (obj.token) this.changeToken(obj.token)
+      if (obj.image) this.changeImage(obj.image)
+      if (obj.graphic) this.changeGraphic(obj.graphic)
     },
 
-    changeToken(raw, from) {
-      if (this.user.id === from) return
+    changeToken(raw) {
+      const index = this.findTokenIndex(raw.data.id)
+      const token = this.privateItems[index]
+      token.setInfo({ data: raw.data, changeAcl: false })
 
-      const index = this.tokens.findIndex(item => item.id === raw.data.id)
-      const token = this.tokens[index]
-      token.setInfo({
-        data: raw.data,
-        changeAcl: false,
-      })
-      this.$set(this.tokens, index, token)
-      if (this.selectedItemName === token.name) {
-        this.selectedItemName = ''
-        this.updateTransformer()
-      }
+      this.$set(this.privateItems, index, token)
+      if (this.selectedItemName === token.name) this.resetTransformer()
     },
 
-    changeImage(raw, from) {
-      if (this.user.id === from) return
+    changeImage(raw) {
+      const index = this.findImageIndex(raw.data.id)
+      const image = this.privateItems[index]
+      image.setInfo({ data: raw.data, changeAcl: false })
 
-      const index = this.images.findIndex(item => item.id === raw.data.id)
-      const image = this.images[index]
-      image.setInfo({
-        data: raw.data,
-        changeAcl: false,
-      })
-      this.$set(this.images, index, image)
-
-      if (this.selectedItemName === image.name) {
-        this.selectedItemName = ''
-        this.updateTransformer()
-      }
+      this.$set(this.privateItems, index, image)
+      if (this.selectedItemName === image.name) this.resetTransformer()
     },
 
-    changeGraphic(raw, from) {
-      if (this.user.id === from && raw.data.attributes.kind !== 'text') return
+    changeGraphic(raw) {
+      const index = this.findGraphicIndex(raw.data.id)
+      const graphic = this.privateItems[index]
+      graphic.setInfo({ data: raw.data, changeAcl: false })
 
-      const index = this.graphics.findIndex(item => item.id === raw.data.id)
-      const graphic = this.graphics[index]
-      graphic.setInfo({
-        data: raw.data,
-        changeAcl: false,
-      })
-      this.$set(this.graphics, index, graphic)
-      if (this.selectedItemName === graphic.name) {
-        this.selectedItemName = ''
-        this.updateTransformer()
-      }
+      this.$set(this.privateItems, index, graphic)
+      if (this.selectedItemName === graphic.name) this.resetTransformer()
     },
 
     remove(params) {
@@ -624,35 +689,33 @@ export default {
     },
 
     removeToken(token) {
-      const index = this.tokens.findIndex(item => item.id === token.id.toString())
-      this.tokens.splice(index, 1)
-      this.selectedItemName = ''
-      this.updateTransformer()
+      const index = this.findTokenIndex(token.id)
+      this.privateItems.splice(index, 1)
+      this.resetTransformer()
     },
 
     removeImage(image) {
-      const index = this.images.findIndex(item => item.id === image.id.toString())
-      this.images.splice(index, 1)
-      this.selectedItemName = ''
-      this.updateTransformer()
+      const index = this.findImageIndex(image.id)
+      this.privateItems.splice(index, 1)
+      this.resetTransformer()
     },
 
     removeGraphic(graphic) {
-      const index = this.graphics.findIndex(item => item.id === graphic.id.toString())
-      this.graphics.splice(index, 1)
-      this.selectedItemName = ''
-      this.updateTransformer()
+      const index = this.findGraphicIndex(graphic.id)
+      this.privateItems.splice(index, 1)
+      this.resetTransformer()
     },
 
     handleEventEnd(e) {
       const target = e.target
-      const token = this.tokens.find(token => token.name === target.name())
+
+      const token = this.privateItems.find(item => item.name === target.name())
       if (token) return this.handleEventObject(token, target, 'token')
 
-      const image = this.images.find(image => image.params.name === target.name())
+      const image = this.privateItems.find(item => item.name === target.name())
       if (image) return this.handleEventObject(image, target, 'image')
 
-      const graphic = this.graphics.find(graphic => graphic.params.name === target.name())
+      const graphic = this.privateItems.find(graphic => graphic.name === target.name())
       if (graphic) this.handleEventObject(graphic, target, 'graphic')
     },
 
@@ -664,6 +727,7 @@ export default {
       object.params.scaleY = target.scaleY()
       this.change({
         id: object.id,
+        layer: object.layer,
         params: { ...object.params },
         type,
       })
@@ -720,8 +784,10 @@ export default {
     showEcho: async function ({ position, color, from }) {
       const name = `echo-${from}-${Date.now()}`
       const echo = {
+        type: 'graphic',
         kind: 'circle',
         acl: { canWrite: false },
+        layer: 'players',
         params: {
           name,
           x: position.x,
@@ -731,10 +797,11 @@ export default {
           stroke: color,
           strokeWidth: 8,
           visible: true,
+          rank: 9999999,
         },
       }
 
-      this.graphics.push(echo)
+      this.privateItems.push(echo)
       await this.$nextTick()
 
       const layer = this.$refs.graphic.getNode().getLayer()
@@ -745,7 +812,10 @@ export default {
         radius: 100,
         easing: Konva.Easings.EaseIn,
         duration: 0.85,
-        onFinish: () => circle.destroy(),
+        onFinish: () => {
+          const index = this.privateItems.findIndex(item => item.name === name)
+          this.privateItems.splice(index, 1)
+        }
       })
 
       tween.reset()
@@ -767,16 +837,80 @@ export default {
 
     editText(e) {
       const key = Date.now()
-      const index = this.graphics.findIndex(graphic => graphic.params.name === e.target.name())
-      const text = this.graphics[index]
+      const index = this.privateItems.findIndex(item => item.name === e.target.name())
+      const text = this.privateItems[index]
       this.$store.commit('game/addOpenModal',
         {
           name: 'edit-text',
           key,
           text,
           change: this.change,
-          callback: (params) => this.$set(this.graphics, index, { ...text, params })
+          callback: (params) => this.$set(this.privateItems, index, { ...text, params })
         })
+    },
+
+    isHidden(layer) {
+      if (!this.isMaster) return false
+
+      return this.currentLayer === 'gm' && layer !== 'gm' || this.currentLayer !== 'gm' && layer === 'gm'
+    },
+
+    updateTarget({ target, type, props }) {
+      let index
+      switch (type) {
+        case 'token':
+          index = this.findTokenIndex(target.id)
+          this.$set(this.privateItems, index, { ...target, ...props })
+          break
+        case 'image':
+          index = this.findImageIndex(target.id)
+          this.$set(this.privateItems, index, { ...target, ...props })
+          break
+        case 'graphic':
+          index = this.findGraphicIndex(target.id)
+          this.$set(this.privateItems, index, { ...target, ...props })
+          break
+      }
+    },
+
+    changeLayer({ target, layer, type }) {
+      this.updateTarget({ target, type, props: { layer } })
+      this.change({
+        id: target.id,
+        params: { ...target.params },
+        layer,
+        type,
+      })
+
+      this.resetTransformer()
+    },
+
+    resetTransformer() {
+      this.selectedItemName = ''
+      this.updateTransformer()
+    },
+
+    sortByRank(item1, item2) {
+      const rank1 = layers[item1.layer].weight + item1.params.rank || 0
+      const rank2 = layers[item2.layer].weight + item2.params.rank || 0
+      return rank1 > rank2 ? 1 : -1
+    },
+
+    changeRank({ target, type, up }) {
+      let rank
+      if (up) {
+        rank = this.itemsByLayer[this.itemsByLayer.length - 1].params.rank + 1
+      } else {
+        rank = this.itemsByLayer[0].params.rank - 1
+      }
+
+      this.updateTarget({ target, type, props: { params: { ...target.params, rank } } })
+      this.change({
+        id: target.id,
+        layer: target.layer,
+        params: { ...target.params, rank },
+        type,
+      })
     }
   },
 }

@@ -46,8 +46,9 @@
     width: 30px;
     height: 30px;
     background-color: $white;
-    border-bottom-style: none;
     cursor: pointer;
+    border: 1px solid $black;
+    border-bottom: none;
   }
 
   .icon {

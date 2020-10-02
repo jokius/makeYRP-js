@@ -14,6 +14,7 @@
 
     props: {
       kind: { type: String, required: true },
+      hidden: { type: Boolean, required: true },
       config: { type: Object, required: true },
       draggable: { type: Boolean },
       handleEventEnd: { type: Function },
@@ -32,7 +33,8 @@
 
       configKonva: {
         get() {
-          return { ...this.config, draggable: this.draggable }
+          const opacity = this.hidden ? 0.5 : 1
+          return { ...this.config, draggable: this.draggable, opacity }
         },
       },
     },

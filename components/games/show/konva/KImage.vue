@@ -10,6 +10,7 @@
 
     props: {
       config: { type: Object, required: true },
+      hidden: { type: Boolean, default: false },
       draggable: { type: Boolean },
       handleEventEnd: { type: Function },
     },
@@ -27,10 +28,13 @@
 
       configKonva: {
         get() {
+          const opacity = this.hidden ? 0.5 : 1
+
           return {
             ...this.config,
             image: this.image,
             draggable: this.draggable,
+            opacity,
           }
         },
       },
