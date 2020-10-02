@@ -1,6 +1,9 @@
 <template>
   <vue-draggable-resizable
+    ref="modal"
     drag-handle=".drag-handle"
+    class-name-active="resize-boards"
+    class-name-handle="draggable-dialog-handle"
     :w="isShow ? width : 'auto'"
     :h="isShow ? height : 40"
     :x="xPoint"
@@ -8,12 +11,15 @@
     :z="zIndex"
     :min-width="150"
     :min-height="40"
+    :max-width="300"
+    :max-height="300"
     :resizable="resizable && isShow"
     :active="resizable && isShow"
-    class-name-active="resize-boards"
-    class-name-handle="draggable-dialog-handle"
-    @resizing="onResize"
+    :preventDeactivation="false"
+    :onDrag="onDrag"
     :class="{ opacity: !isShow }"
+    @dragging="onDragging"
+    @resizing="onResize"
   >
     <div @click.capture="changeZIndex">
       <v-card v-if="isShow" class="resize-style" :style="style" ref="dragWidow">
@@ -163,10 +169,22 @@
         this.yPoint = (window.innerHeight - this.height) / 2
       },
 
-      onResize: function (_x, _y, width, height) {
+      onResize(_x, _y, width, height) {
         if (!this.resizable) return
 
         this.$emit('onResize', { width, height })
+      },
+
+      onDrag(x, y) {
+        return x >= -1 && y >= -1
+      },
+
+      onDragging(x, y) {
+        const modal = this.$refs.modal.$el
+        const pos = { x, y }
+        if (x <= -1) pos.x = 0
+        if (y <= -1) pos.y = 0
+        modal.style.transform = `translate(${pos.x}px, ${pos.y}px)`
       },
     },
   }
