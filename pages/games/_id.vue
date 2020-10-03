@@ -15,8 +15,8 @@
     <v-overlay :value="overlay">
       <v-card>
         <v-card-text class="disconnect-message">
-          <h1>Соединение с сервером потерено</h1>
-          <p>Обновите страницу либо подождите востонавления соеденения</p>
+          <h1>Соединение с сервером потеряно</h1>
+          <p>Обновите страницу либо подождите восстановления соединения</p>
         </v-card-text>
       </v-card>
     </v-overlay>
@@ -124,15 +124,19 @@ export default {
   methods: {
     addObj(obj) {
       if (obj.user) this.$store.commit('game/addUser', obj.user)
+      if (obj.sheet_folder) this.$store.commit('game/addSheetFolder',
+        { user: this.user, raw: obj.sheet_folder })
       if (obj.sheet) this.$store.commit('game/addSheet', { user: this.user, raw: obj.sheet })
       if (obj.page) this.$store.commit('game/addPage', obj.page)
-      if (obj.item_folder) this.$store.commit('game/addMenuFolder', { user: this.user, raw: obj.item_folder })
+      if (obj.item_folder) this.$store.commit('game/addMenuFolder',
+        { user: this.user, raw: obj.item_folder })
       if (obj.menu_item) this.$store.commit('game/addMenuItem', { user: this.user, raw: obj.menu_item })
       if (obj.message) this.addMessage(obj.message)
     },
 
     updateObj(obj) {
       if (obj.user) this.$store.commit('game/updateUser', obj.user)
+      if (obj.sheet_folder) this.$store.commit('game/updateSheetFolder', obj.sheet_folder)
       if (obj.sheet) this.$store.commit('game/updateSheets', obj.sheet)
       if (obj.page) this.$store.commit('game/updatePage', obj.page)
       if (obj.item_folder) this.$store.commit('game/updateFolderItem', obj.item_folder)
@@ -141,6 +145,7 @@ export default {
 
     deleteObj(obj) {
       if (obj.user) this.$store.commit('game/deleteUser', obj.user)
+      if (obj.sheet_folder) this.$store.commit('game/deleteSheetFolder', obj)
       if (obj.sheet) this.$store.commit('game/deleteSheet', obj.sheet)
       if (obj.page) this.$store.commit('game/deletePage', obj.page)
       if (obj.item_folder) this.$store.commit('game/deleteMenuFolder', obj)

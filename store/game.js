@@ -10,6 +10,7 @@ import { UserModel } from '@/models/UserModel'
 import { loadMenuFolders } from '@/api/menu'
 import { MenuItemModel } from '@/models/MenuItemModel'
 import { MenuFolderItemModel } from '@/models/MenuFolderItemModel'
+import { SheetFolderModel } from '@/models/SheetFolderModel'
 
 export const state = () => ({
   info: null,
@@ -44,8 +45,8 @@ export const actions = {
     try {
       commit('gameLoaded', await loadGame({ axios, id }))
       commit('usersLoaded', await loadUsers({ axios, id }))
-      const list = await loadSheets({ axios, id })
-      commit('sheetsLoaded', { user, list: list.data })
+      const folder = await loadSheets({ axios, id })
+      commit('sheetsLoaded', { user, folder: folder.data })
       commit('messagesLoaded', await loadMessages({ axios, id }))
       const promises = []
       state.info.menus.forEach(menu => {
@@ -119,10 +120,10 @@ const addSheet = (state, { user, raw }) => {
     currentUserId: user.id,
     masterId: state.info.master.id,
   })
-  if (!sheet.acl.canRead) return false
+  if (!sheet.acl.canRead) return
 
   state.sheets = [...state.sheets, sheet]
-  return true
+  return sheet
 }
 
 const pushMenuItem = (state, { user, raw }) => {
@@ -139,16 +140,31 @@ const pushMenuItem = (state, { user, raw }) => {
   return menuItem
 }
 
-const deleteSheet = (state, id) => state.sheets = state.sheets.filter(sheet => sheet.id !== id.toString())
+const deleteSheet = (state, id) => {
+  const game = state.info
+  const sheet = state.sheets.find(item => item.id === id.toString())
+  console.log('sheet', sheet)
+  const folder = game.folderById(game.rootFolder, sheet.folderId)
+
+  console.log('folder', folder)
+  folder.deleteSheet(sheet.id)
+  state.sheets = state.sheets.filter(item => item.id !== sheet.id)
+}
 
 export const mutations = {
   gameLoaded(state, game) {
     state.info = new GameModel().setInfo(game)
   },
 
-  sheetsLoaded(state, { list, user }) {
+  sheetsLoaded(state, { folder, user }) {
+    const game = state.info
     state.sheets = []
-    list.map(raw => addSheet(state, { raw, user }))
+    game.rootFolder = new SheetFolderModel().setInfo({
+      data: folder,
+      changeAcl: true,
+      user: user,
+      addSheet: (params) => addSheet(state, params),
+    })
   },
 
   menuRootFolder(state, { raw, user }) {
@@ -283,6 +299,10 @@ export const mutations = {
     state.pageName = name
   },
 
+  deleteSheetFolder(state, raw) {
+    state.info.deleteChild(state.info.rootFolder, raw.id.toString())
+  },
+
   deleteSheet(state, id) {
     deleteSheet(state, id)
     if (state.currentItem.mark !== 'sheet' && state.marks.sheet > 0) {
@@ -315,10 +335,34 @@ export const mutations = {
     state.loaded = true
   },
 
-  addSheet(state, params) {
-    if (addSheet(state, params)) {
-      if (state.currentItem.mark !== 'sheet') state.marks = { ...state.marks, sheet: state.marks.sheet + 1 }
+  addSheetFolder(state, { raw, user }) {
+    if (state.info.master.id !== user.id) return
+
+    const path = raw.data.attributes.path
+    let parentFolder
+    let folder
+    const newFolder = new SheetFolderModel().setInfo({ data: raw.data, changeAcl: false })
+
+    path.forEach((id, index) => {
+      if (path.length === index + 1) return
+
+      parentFolder = (parentFolder || state.info.rootFolder).children.find(item => item.id === id.toString())
+      folder = parentFolder.children.find(item => item.id === path[index + 1]) || null
+    })
+
+    if (folder) {
+      folder.setInfo({ data: raw.data, changeAcl: false })
+    } else {
+      (parentFolder || state.info.rootFolder).children.push(newFolder)
     }
+  },
+
+  addSheet(state, params) {
+    const sheet = addSheet(state, params)
+    if (!sheet) return
+
+    state.info.addSheetToFolder(sheet)
+    if (state.currentItem.mark !== 'sheet') state.marks = { ...state.marks, sheet: state.marks.sheet + 1 }
   },
 
   addUser(state, user) {
@@ -362,6 +406,11 @@ export const mutations = {
     if (!mark) return
 
     if (state.currentItem.mark !== mark) state.marks = { ...state.marks, [mark]: state.marks[mark] + 1 }
+  },
+
+  updateSheetFolder(state, raw) {
+    const folder = state.info.folderById(state.info.rootFolder, raw.data.id)
+    folder.setInfo({ data: raw.data, changeAcl: false })
   },
 
   updateSheets(state, sheet) {

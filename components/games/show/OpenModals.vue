@@ -25,6 +25,15 @@
         :is-new="modal.isNew"
         :old-name="modal.oldName"
       />
+      <rename-sheet-folder
+        v-else-if="modal.name === 'rename-sheet-folder'"
+        :key="`rename-sheet-folder_${modal.key}`"
+        :uniq-key="modal.key"
+        :id="modal.id"
+        :parent-id="modal.parentId"
+        :is-new="modal.isNew"
+        :old-name="modal.oldName"
+      />
       <sheet-modal
         v-else-if="modal.name === 'sheet'"
         :id="modal.id"
@@ -93,7 +102,8 @@
 <script>
 import { mapState } from 'vuex'
 import AccessModal from '@/components/games/show/modals/AccessModal'
-import RenameItemFolder from '@/components/games/show/RenameItemFolder'
+import RenameItemFolder from '@/components/games/show/modals/RenameItemFolder'
+import RenameSheetFolder from '@/components/games/show/modals/RenameSheetFolder'
 import PageModal from '@/components/games/show/modals/PageModal'
 import ColorPickerModal from '@/components/games/show/modals/ColorPickerModal'
 import SheetModal from '@/components/games/show/sheets/SheetModal'
@@ -105,6 +115,7 @@ export default {
   name: 'OpenModals',
 
   components: {
+    RenameSheetFolder,
     EditTextModal,
     NoteModal,
     InfoModal,

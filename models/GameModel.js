@@ -12,6 +12,7 @@ export class GameModel {
   system = ''
   template = {}
   customTemplate = {}
+  rootFolder = {}
 
   setInfo({ data, included }) {
     this.id = data.id
@@ -71,6 +72,39 @@ export class GameModel {
     page.changeGridColor(color)
 
     return this
+  }
+
+  folderById(parent, id) {
+    if (parent.id === id) return parent // is root folder
+
+    let folder = parent.children.find(item => item.id === id)
+    if (folder) return folder
+
+    parent.children.forEach(child => {
+      if (folder) return
+      folder = this.folderById(child, id)
+    })
+
+    return folder
+  }
+
+  deleteChild(parent, id) {
+    let folder = parent.children.find(item => item.id === id)
+    if (folder) {
+      parent.children = parent.children.filter(item => item.id !== id)
+      return true
+    }
+
+    parent.children.forEach(child => {
+      if (folder) return true
+      folder = this.deleteChild(child, id)
+    })
+
+    return true
+  }
+
+  addSheetToFolder(sheet) {
+    this.folderById(this.rootFolder, sheet.folderId).addSheet(sheet)
   }
 
   get sheetTypes() {

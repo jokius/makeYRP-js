@@ -5,7 +5,7 @@
     :width="300"
     :height="200"
     :size="{}"
-    name="rename-item-folder"
+    name="rename-sheet-folder"
   >
     <template v-slot:body>
       <v-container class="fill-height page-modal-body" fluid>
@@ -43,10 +43,10 @@
 </template>
 
 <script>
-  import DraggableDialog from './DraggableDialog'
+  import DraggableDialog from '../DraggableDialog'
 
   export default {
-    name: 'RenameItemFolder',
+    name: 'RenameSheetFolder',
 
     components: { DraggableDialog },
 
@@ -96,7 +96,7 @@
             id: this.id,
             parent_id: this.parentId,
             name: this.name,
-            type: 'item_folder',
+            type: 'sheet_folder',
           },
         })
       },
