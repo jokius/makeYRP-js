@@ -43,6 +43,7 @@
               color="indigo"
               label="Кубик урона"
               hint="d4, d6 и тд; L - если меньшее, H - если большее"
+              persistent-hint
               :error-messages="damageError"
               :error="damageError !== ''"
             />
@@ -577,7 +578,6 @@ export default {
   grid-template-columns: 1fr;
   grid-template-rows: repeat(2, max-content);
   grid-row-gap: 5px;
-  height: 600px;
 }
 
 .main-row1 {
@@ -604,7 +604,7 @@ export default {
 
 .damage-info-grid {
   display: grid;
-  grid-template-columns: 150px max-content max-content;
+  grid-template-columns: 220px 300px max-content;
   grid-column-gap: 10px;
 }
 

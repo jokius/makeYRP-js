@@ -75,14 +75,14 @@
       width: {
         get() {
           const width = this.size.width
-          return typeof width === 'number' ? `${width}px` : width
+          return `${width - 2}px`
         },
       },
 
       height: {
         get() {
           const height = this.size.height
-          return typeof height === 'number' ? `${height}px` : height
+          return `${height - 40}px`
         },
       },
     },

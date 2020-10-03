@@ -11,8 +11,6 @@
     :z="zIndex"
     :min-width="150"
     :min-height="40"
-    :max-width="300"
-    :max-height="300"
     :resizable="resizable && isShow"
     :active="resizable && isShow"
     :preventDeactivation="false"

@@ -872,7 +872,6 @@
     grid-template-columns: 1fr;
     grid-template-rows: 260px max-content;
     grid-row-gap: 5px;
-    height: 570px;
   }
 
   .main-row1 {

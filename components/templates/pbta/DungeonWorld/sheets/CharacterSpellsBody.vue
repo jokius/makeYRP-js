@@ -278,7 +278,7 @@
     background-color: $grayC5;
     overflow: auto;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 0.99fr;
     grid-auto-rows: max-content;
     padding: 0 5px;
   }

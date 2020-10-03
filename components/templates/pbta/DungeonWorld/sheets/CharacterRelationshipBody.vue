@@ -106,7 +106,7 @@
     background-color: $grayC5;
     overflow: auto;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 0.99fr;
     grid-template-rows: max-content;
     margin-top: 5px;
     padding: 0 5px;

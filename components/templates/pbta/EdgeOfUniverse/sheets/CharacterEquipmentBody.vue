@@ -146,6 +146,8 @@ export default {
 
 .equipment-body {
   background-color: $grayC5;
+  display: grid;
+  grid-template-columns: 0.99fr;
 }
 
 .equipments-grid {

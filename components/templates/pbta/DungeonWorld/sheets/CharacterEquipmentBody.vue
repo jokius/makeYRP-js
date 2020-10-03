@@ -150,18 +150,22 @@ export default {
 <style scoped lang="scss">
 @import '~assets/css/colors';
 
+.equipment-body {
+  background-color: $grayC5;
+  display: grid;
+  grid-template-columns: 0.99fr;
+}
+
 .weight-info {
   background-color: $black;
   color: $white;
   text-align: center;
+  position: relative;
+  width: 101%;
 }
 
 .select-button {
   margin: 0;
-}
-
-.equipment-body {
-  background-color: $grayC5;
 }
 
 .equipments-grid {
