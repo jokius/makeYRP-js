@@ -11,10 +11,7 @@ export class SheetFolderModel {
     const attributes = params.data.attributes
     this.name = attributes.name
     this.depth = attributes.depth
-    this.sheets = attributes.sheets.map(raw => {
-      const sheet = addSheet({ ...params, raw })
-      if (sheet.acl.canRead) return sheet
-    }).filter(Boolean)
+    this.sheets = attributes.sheets.map(raw => addSheet({ ...params, raw })).filter(Boolean)
     this.children = attributes.children.map(child => new SheetFolderModel().setInfo({ ...params, data: child.data }))
 
     return this

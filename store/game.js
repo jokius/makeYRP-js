@@ -143,8 +143,10 @@ const pushMenuItem = (state, { user, raw }) => {
 const deleteSheet = (state, id) => {
   const game = state.info
   const sheet = state.sheets.find(item => item.id === id.toString())
-  console.log('sheet', sheet)
   const folder = game.folderById(game.rootFolder, sheet.folderId)
+  folder.deleteSheet(sheet.id)
+  state.sheets = state.sheets.filter(item => item.id !== sheet.id)
+}
 
   console.log('folder', folder)
   folder.deleteSheet(sheet.id)
@@ -468,40 +470,14 @@ export const mutations = {
   },
 
   accessSheet(state, { user, raw }) {
-    let index = state.sheets.findIndex(item => item.id === raw.data.id)
-    let sheet = state.sheets[index]
-
-    if (sheet) {
-      sheet.setInfo({
-        data: raw.data,
-        changeAcl: true,
-        currentUserId: user.id,
-        masterId: state.info.master.id,
-      })
-    } else {
-      sheet = new SheetModel().setInfo({
-        data: raw.data,
-        changeAcl: true,
-        currentUserId: user.id,
-        masterId: state.info.master.id,
-      })
-    }
-
-    if (sheet.acl.canRead) {
-      if (index >= 0) {
-        state.sheets[index] = sheet
-      } else {
-        state.sheets = [...state.sheets, sheet]
-        if (state.currentItem.mark !== 'sheet') state.marks = { ...state.marks, sheet: state.marks.sheet + 1 }
-      }
-    } else {
-      if (index >= 0) {
-        deleteSheet(state, sheet.id)
-        if (state.currentItem.mark !== 'sheet' && state.marks.sheet > 0) {
-          state.marks = { ...state.marks, sheet: state.marks.sheet - 1 }
-        }
-      }
-    }
+    const game = state.info
+    state.sheets = []
+    game.rootFolder = new SheetFolderModel().setInfo({
+      data: raw.data,
+      changeAcl: true,
+      user: user,
+      addSheet: (params) => addSheet(state, params),
+    })
   },
 
   accessMenuItem(state, { user, raw }) {
