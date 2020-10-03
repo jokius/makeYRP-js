@@ -148,11 +148,6 @@ const deleteSheet = (state, id) => {
   state.sheets = state.sheets.filter(item => item.id !== sheet.id)
 }
 
-  console.log('folder', folder)
-  folder.deleteSheet(sheet.id)
-  state.sheets = state.sheets.filter(item => item.id !== sheet.id)
-}
-
 export const mutations = {
   gameLoaded(state, game) {
     state.info = new GameModel().setInfo(game)
