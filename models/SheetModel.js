@@ -18,7 +18,7 @@ export class SheetModel {
     this.sheetType = attributes.sheetType
     this.name = attributes.name
     this.params = attributes.params
-    this.folderId = attributes.folderId.toLocaleString()
+    this.folderId = attributes?.folderId?.toLocaleString() || ''
     if (params.changeAcl) this.acl = new AclModel().setInfo({ ...params, data: attributes.acl })
 
     return this
