@@ -120,270 +120,269 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex'
 
-  import Avatar from '../components/Avatar'
+import Avatar from '../components/Avatar'
 
-  import Move from '../../HorrorMovieWorld/sheets/Move'
-  import AddEnemyMoveModal from '../modals/AddEnemyMoveModal'
-  import DamageButton from '../components/DamageButton'
+import Move from '../../HorrorMovieWorld/sheets/Move'
+import AddEnemyMoveModal from '../modals/AddEnemyMoveModal'
+import DamageButton from '../components/DamageButton'
 
-  export default {
-    name: 'EnemyMainBody',
-    components: { DamageButton, AddEnemyMoveModal, Move, Avatar },
+export default {
+  name: 'EnemyMainBody',
+  components: { DamageButton, AddEnemyMoveModal, Move, Avatar },
 
-    props: {
-      id: { type: String, required: true },
-    },
+  props: {
+    id: { type: String, required: true },
+  },
 
-    data() {
-      return {
-        modalOpen: false,
-        currentState: {},
-      }
-    },
+  data() {
+    return {
+      modalOpen: false,
+      currentState: {},
+    }
+  },
 
-    computed: {
-      ...mapState({
-        sheets: state => state.game.sheets,
-        tables: state => state.game.info.template.tables,
-      }),
+  computed: {
+    ...mapState({
+      sheets: state => state.game.sheets,
+      tables: state => state.game.info.template.tables,
+    }),
 
-      sheet: {
-        get() {
-          return this.sheets.find(sheet => sheet.id === this.id)
-        },
-      },
-
-      params: {
-        get() {
-          return this.sheet.params
-        },
-      },
-
-      roles: {
-        get() {
-          return this.tables.roles
-        },
-      },
-
-      name: {
-        get() {
-          return this.sheet.name
-        },
-        set(name) {
-          this.$store.commit('game/updateSheetName', { id: this.sheet.id, name })
-        },
-      },
-
-      damage: {
-        get() {
-          return this.params.damage || 1
-        },
-
-        set(value) {
-          this.input('damage', value)
-        },
-      },
-
-      protection: {
-        get() {
-          return this.params.protection
-        },
-
-        set(value) {
-          this.input('protection', value)
-        },
-      },
-
-      wounds: {
-        get() {
-          return this.params.wounds
-        },
-
-        set(value) {
-          this.input('wounds', value)
-        },
-      },
-
-      woundsMax: {
-        get() {
-          return this.params.woundsMax
-        },
-
-        set(value) {
-          this.input('woundsMax', value)
-        },
-      },
-
-      moves: {
-        get() {
-          return this.params.moves
-        },
-      },
-
-      notes: {
-        get() {
-          return this.params.notes
-        },
-
-        set(value) {
-          this.input('notes', value)
-        },
-      },
-
-      description: {
-        get() {
-          return this.params.notes
-        },
-
-        set(value) {
-          this.input('description', value)
-        },
-      },
-
-      enemies: {
-        get() {
-          return this.tables.enemies.map(enemy => ({ text: enemy.name, value: enemy }))
-        },
-      },
-
-      enemySelect: {
-        get() {
-          return this.enemies.find(enemy => enemy.text === this.name)
-        }
-      },
-
-      obj: {
-        get() {
-          return { open: this.modalOpen, move: {} }
-        },
-
-        set({ open, move }) {
-          this.setMove(move)
-          this.modalOpen = open
-        },
+    sheet: {
+      get() {
+        return this.sheets.find(sheet => sheet.id === this.id)
       },
     },
 
-    methods: {
-      input(target, value) {
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: target,
-                             value: value,
-                           })
+    params: {
+      get() {
+        return this.sheet.params
+      },
+    },
+
+    roles: {
+      get() {
+        return this.tables.roles
+      },
+    },
+
+    name: {
+      get() {
+        return this.sheet.name
+      },
+      set(name) {
+        this.$store.commit('game/updateSheetName', { id: this.sheet.id, name })
+      },
+    },
+
+    damage: {
+      get() {
+        return this.params.damage || 1
       },
 
-      setEnemy(value) {
-        this.name = value.name
-        this.description = value.description
-        this.damage = value.damage
-        this.protection = value.protection
-        this.woundsMax = value.woundsMax
-        const moves = []
-        value.moves.forEach(name => {
-          const move = this.tables.enemyMoves.find(move => move.name === name)
-          move.remove = true
-          moves.push(move)
+      set(value) {
+        this.input('damage', value)
+      },
+    },
+
+    protection: {
+      get() {
+        return this.params.protection
+      },
+
+      set(value) {
+        this.input('protection', value)
+      },
+    },
+
+    wounds: {
+      get() {
+        return this.params.wounds
+      },
+
+      set(value) {
+        this.input('wounds', value)
+      },
+    },
+
+    woundsMax: {
+      get() {
+        return this.params.woundsMax
+      },
+
+      set(value) {
+        this.input('woundsMax', value)
+      },
+    },
+
+    moves: {
+      get() {
+        return this.params.moves
+      },
+    },
+
+    notes: {
+      get() {
+        return this.params.notes
+      },
+
+      set(value) {
+        this.input('notes', value)
+      },
+    },
+
+    description: {
+      get() {
+        return this.params.notes
+      },
+
+      set(value) {
+        this.input('description', value)
+      },
+    },
+
+    enemies: {
+      get() {
+        return this.tables.enemies.map(enemy => ({ text: enemy.name, value: enemy }))
+      },
+    },
+
+    enemySelect: {
+      get() {
+        return this.enemies.find(enemy => enemy.text === this.name)
+      },
+    },
+
+    obj: {
+      get() {
+        return { open: this.modalOpen, move: {} }
+      },
+
+      set({ open, move }) {
+        this.setMove(move)
+        this.modalOpen = open
+      },
+    },
+  },
+
+  methods: {
+    input(target, value) {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: target,
+          value: value,
+        })
+    },
+
+    setEnemy(value) {
+      this.name = value.name
+      this.description = value.description
+      this.damage = value.damage
+      this.protection = value.protection
+      this.woundsMax = value.woundsMax
+      const moves = []
+      value.moves.forEach(name => {
+        const move = this.tables.enemyMoves.find(move => move.name === name)
+        move.remove = true
+        moves.push(move)
+      })
+
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `moves`,
+          value: moves,
         })
 
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: `moves`,
-                             value: moves,
-                           })
-
-        this.saveSheet()
-      },
-
-      setMove(move) {
-        if (!move.name) return
-
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: `moves[${this.moves.length}]`,
-                             value: move,
-                           })
-
-        this.saveSheet()
-      },
-
-      saveSheet() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'change',
-          data: { ...this.sheet, type: 'sheet' },
-        })
-      },
+      this.saveSheet()
     },
-  }
+
+    setMove(move) {
+      if (!move.name) return
+
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: `moves[${this.moves.length}]`,
+          value: move,
+        })
+
+      this.saveSheet()
+    },
+
+    saveSheet() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change',
+        data: { ...this.sheet, type: 'sheet' },
+      })
+    },
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .main-body {
-    background-color: $grayC5;
-    overflow: auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(2, max-content);
-    grid-row-gap: 5px;
-    height: 570px;
-  }
+.main-body {
+  background-color: $grayC5;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, max-content);
+  grid-row-gap: 5px;
+}
 
-  .main-row1 {
-    display: grid;
-    grid-template-columns: 200px 0.99fr;
-    grid-template-rows: max-content;
-    grid-column-gap: 10px;
-    margin-right: 5px;
-  }
+.main-row1 {
+  display: grid;
+  grid-template-columns: 200px 0.99fr;
+  grid-template-rows: max-content;
+  grid-column-gap: 10px;
+  margin-right: 5px;
+}
 
-  .main-row2 {
-    display: grid;
-    grid-template-columns: 0.99fr;
-    grid-template-rows: max-content;
-    margin-left: 5px;
-    margin-right: 5px;
-  }
+.main-row2 {
+  display: grid;
+  grid-template-columns: 0.99fr;
+  grid-template-rows: max-content;
+  margin-left: 5px;
+  margin-right: 5px;
+}
 
-  .input {
-    margin: 0;
-    padding: 0;
-  }
+.input {
+  margin: 0;
+  padding: 0;
+}
 
-  .name {
-    margin-top: 10px;
-  }
+.name {
+  margin-top: 10px;
+}
 
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 170px);
-    grid-column-gap: 10px;
-    justify-content: center;
-    margin-top: 10px;
-  }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 170px);
+  grid-column-gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
 
-  .moves-title {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-  }
+.moves-title {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
 
-  .actions {
-    display: grid;
-    grid-template-columns: max-content;
-    justify-content: center;
-  }
+.actions {
+  display: grid;
+  grid-template-columns: max-content;
+  justify-content: center;
+}
 
-  .notes {
-    margin-bottom: 5px;
-  }
+.notes {
+  margin-bottom: 5px;
+}
 </style>

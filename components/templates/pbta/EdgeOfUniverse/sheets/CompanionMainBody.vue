@@ -122,401 +122,400 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import { get } from 'lodash'
+import { mapState } from 'vuex'
+import { get } from 'lodash'
 
-  import Avatar from '../components/Avatar'
+import Avatar from '../components/Avatar'
 
-  import RollModifierModal from '../../HorrorMovieWorld/modals/RollModifierModal'
-  import { Pbta } from '../../../../../lib/Pbta'
-  import DamageButton from '../components/DamageButton'
+import RollModifierModal from '../../HorrorMovieWorld/modals/RollModifierModal'
+import { Pbta } from '../../../../../lib/Pbta'
+import DamageButton from '../components/DamageButton'
 
-  export default {
-    name: 'CompanionMainBody',
-    components: { DamageButton, RollModifierModal, Avatar },
+export default {
+  name: 'CompanionMainBody',
+  components: { DamageButton, RollModifierModal, Avatar },
 
-    props: {
-      id: { type: String, required: true },
-    },
+  props: {
+    id: { type: String, required: true },
+  },
 
-    data() {
-      return {
-        modalOpen: false,
-        currentState: {},
-      }
-    },
+  data() {
+    return {
+      modalOpen: false,
+      currentState: {},
+    }
+  },
 
-    computed: {
-      ...mapState({
-        sheets: state => state.game.sheets,
-        tables: state => state.game.info.template.tables,
-      }),
+  computed: {
+    ...mapState({
+      sheets: state => state.game.sheets,
+      tables: state => state.game.info.template.tables,
+    }),
 
-      sheet: {
-        get() {
-          return this.sheets.find(sheet => sheet.id === this.id)
-        },
-      },
-
-      params: {
-        get() {
-          return this.sheet.params
-        },
-      },
-
-      roles: {
-        get() {
-          return this.tables.companions
-        },
-      },
-
-      name: {
-        get() {
-          return this.sheet.name
-        },
-        set(name) {
-          this.$store.commit('game/updateSheetName', { id: this.sheet.id, name })
-        },
-      },
-
-      role: {
-        get() {
-          return this.params.role
-        },
-
-        set(value) {
-          this.changeRole(value)
-          this.saveSheet()
-        },
-      },
-
-      fury: {
-        get() {
-          return this.params.stats.fury
-        },
-
-        set(value) {
-          this.input('stats.fury', value)
-        },
-      },
-
-      control: {
-        get() {
-          return this.params.stats.control
-        },
-
-        set(value) {
-          this.input('stats.control', value)
-        },
-      },
-
-      skill: {
-        get() {
-          return this.params.stats.skill
-        },
-
-        set(value) {
-          this.input('stats.skill', value)
-        },
-      },
-
-      reputation: {
-        get() {
-          return this.params.stats.reputation
-        },
-
-        set(value) {
-          this.input('stats.reputation', value)
-        },
-      },
-
-      damage: {
-        get() {
-          return this.params.damage
-        },
-
-        set(value) {
-          this.inputBox('damage', value, 5)
-        },
-      },
-
-      protection: {
-        get() {
-          return this.params.protection
-        },
-
-        set(value) {
-          this.inputBox('protection', value, 5)
-        },
-      },
-
-      hp: {
-        get() {
-          return this.params.hp
-        },
-
-        set(value) {
-          this.inputBox('hp.current', value, this.params.hp.max)
-        },
-      },
-
-      tableRoles: {
-        get() {
-          return this.tables.companions.map(item => (
-            { value: item.key, text: item.name }
-          ))
-        },
-      },
-
-      description: {
-        get() {
-          return this.role.description
-        },
-      },
-
-      specials: {
-        get() {
-          return this.params.specials || []
-        }
-      },
-
-      obj: {
-        get() {
-          return { open: this.modalOpen, modifier: 0 }
-        },
-
-        set({ open, modifier, isClose }) {
-          if (!isClose) this.roll(parseInt(modifier))
-          this.modalOpen = open
-        },
+    sheet: {
+      get() {
+        return this.sheets.find(sheet => sheet.id === this.id)
       },
     },
 
-    created() {
-      if (this.params.role === '@random') {
-        this.changeRole(Pbta.randomRole(this.tableRoles).value)
+    params: {
+      get() {
+        return this.sheet.params
+      },
+    },
+
+    roles: {
+      get() {
+        return this.tables.companions
+      },
+    },
+
+    name: {
+      get() {
+        return this.sheet.name
+      },
+      set(name) {
+        this.$store.commit('game/updateSheetName', { id: this.sheet.id, name })
+      },
+    },
+
+    role: {
+      get() {
+        return this.params.role
+      },
+
+      set(value) {
+        this.changeRole(value)
         this.saveSheet()
-      }
+      },
     },
 
-    methods: {
-      changeRole(roleName) {
-        const role = this.tables.companions.find(item => item.key === roleName)
-        this.input('role', role)
-        this.changeStats()
+    fury: {
+      get() {
+        return this.params.stats.fury
       },
 
-      changeStats() {
-        const role = this.tables.companions.find(item => item.key === this.role.key)
+      set(value) {
+        this.input('stats.fury', value)
+      },
+    },
 
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: 'hp',
-                             value: role.hp,
-                           })
-
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: 'stats.welfare',
-                             value: role.welfare,
-                           })
-
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: 'damage',
-                             value: role.damage,
-                           })
-
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: 'supply',
-                             value: role.supply,
-                           })
+    control: {
+      get() {
+        return this.params.stats.control
       },
 
-      saveSheet() {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'change',
-          data: { ...this.sheet, type: 'sheet' },
+      set(value) {
+        this.input('stats.control', value)
+      },
+    },
+
+    skill: {
+      get() {
+        return this.params.stats.skill
+      },
+
+      set(value) {
+        this.input('stats.skill', value)
+      },
+    },
+
+    reputation: {
+      get() {
+        return this.params.stats.reputation
+      },
+
+      set(value) {
+        this.input('stats.reputation', value)
+      },
+    },
+
+    damage: {
+      get() {
+        return this.params.damage
+      },
+
+      set(value) {
+        this.inputBox('damage', value, 5)
+      },
+    },
+
+    protection: {
+      get() {
+        return this.params.protection
+      },
+
+      set(value) {
+        this.inputBox('protection', value, 5)
+      },
+    },
+
+    hp: {
+      get() {
+        return this.params.hp
+      },
+
+      set(value) {
+        this.inputBox('hp.current', value, this.params.hp.max)
+      },
+    },
+
+    tableRoles: {
+      get() {
+        return this.tables.companions.map(item => (
+          { value: item.key, text: item.name }
+        ))
+      },
+    },
+
+    description: {
+      get() {
+        return this.role.description
+      },
+    },
+
+    specials: {
+      get() {
+        return this.params.specials || []
+      },
+    },
+
+    obj: {
+      get() {
+        return { open: this.modalOpen, modifier: 0 }
+      },
+
+      set({ open, modifier, isClose }) {
+        if (!isClose) this.roll(parseInt(modifier))
+        this.modalOpen = open
+      },
+    },
+  },
+
+  created() {
+    if (this.params.role === '@random') {
+      this.changeRole(Pbta.randomRole(this.tableRoles).value)
+      this.saveSheet()
+    }
+  },
+
+  methods: {
+    changeRole(roleName) {
+      const role = this.tables.companions.find(item => item.key === roleName)
+      this.input('role', role)
+      this.changeStats()
+    },
+
+    changeStats() {
+      const role = this.tables.companions.find(item => item.key === this.role.key)
+
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: 'hp',
+          value: role.hp,
         })
-      },
 
-      input(target, value) {
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: target,
-                             value: value,
-                           })
-      },
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: 'stats.welfare',
+          value: role.welfare,
+        })
+
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: 'damage',
+          value: role.damage,
+        })
+
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: 'supply',
+          value: role.supply,
+        })
+    },
+
+    saveSheet() {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change',
+        data: { ...this.sheet, type: 'sheet' },
+      })
+    },
+
+    input(target, value) {
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: target,
+          value: value,
+        })
+    },
 
 
-      inputBox(target, number, max) {
-        const current = get(this.params, target)
-        let value = current < max ? number : 0
-        value = number === current && number === 1 ? 0 : number
-        this.$store.commit('game/updateSheetParams',
-                           {
-                             id: this.sheet.id,
-                             path: target,
-                             value: value,
-                           })
+    inputBox(target, number, max) {
+      const current = get(this.params, target)
+      let value = current < max ? number : 0
+      value = number === current && number === 1 ? 0 : number
+      this.$store.commit('game/updateSheetParams',
+        {
+          id: this.sheet.id,
+          path: target,
+          value: value,
+        })
 
-        this.saveSheet()
-      },
+      this.saveSheet()
+    },
 
-      openModifier(state) {
-        this.currentState = state
-        this.modalOpen = true
-      },
+    openModifier(state) {
+      this.currentState = state
+      this.modalOpen = true
+    },
 
-      roll(modifier) {
-        this.$cable.perform({
-          channel: 'GameChannel',
-          action: 'add',
-          data: {
-            type: 'message',
-            body: {
-              sheet: this.sheet.toChat,
-              name: this.currentState.name,
-              dices: { d6: 2 },
-              state: this.currentState,
-              modifier,
-              results: null,
-              detailsAlways: false,
-              details: null,
-            },
+    roll(modifier) {
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'add',
+        data: {
+          type: 'message',
+          body: {
+            sheet: this.sheet.toChat,
+            name: this.currentState.name,
+            dices: { d6: 2 },
+            state: this.currentState,
+            modifier,
+            results: null,
+            detailsAlways: false,
+            details: null,
           },
-        })
-      },
+        },
+      })
     },
-  }
+  },
+}
 </script>
 
 <style scoped lang="scss">
-  @import '~assets/css/colors';
+@import '~assets/css/colors';
 
-  .main-body {
-    background-color: $grayC5;
-    overflow: auto;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(2, max-content);
-    grid-row-gap: 5px;
-    min-height: 570px;
-  }
+.main-body {
+  background-color: $grayC5;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, max-content);
+  grid-row-gap: 5px;
+}
 
-  .main-row1 {
-    display: grid;
-    grid-template-columns: 200px 0.99fr;
-    grid-template-rows: max-content;
-    grid-column-gap: 10px;
-  }
+.main-row1 {
+  display: grid;
+  grid-template-columns: 200px 0.99fr;
+  grid-template-rows: max-content;
+  grid-column-gap: 10px;
+}
 
-  .main-row2 {
-    display: grid;
-    grid-template-columns: 0.99fr;
-    grid-template-rows: max-content;
-    margin-left: 5px;
-  }
+.main-row2 {
+  display: grid;
+  grid-template-columns: 0.99fr;
+  grid-template-rows: max-content;
+  margin-left: 5px;
+}
 
-  .input {
-    margin: 0;
-    padding: 0;
-  }
+.input {
+  margin: 0;
+  padding: 0;
+}
 
-  .name {
-    margin-top: 10px;
-  }
+.name {
+  margin-top: 10px;
+}
 
-  .role-grid {
-    display: grid;
-    grid-template-columns: 1fr max-content;
-    grid-column-gap: 10px;
-  }
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  grid-column-gap: 10px;
+}
 
-  .attributes {
-    display: grid;
-    grid-template-columns: 1fr max-content;
-    grid-column-gap: 15px;
-  }
+.attributes {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  grid-column-gap: 15px;
+}
 
-  .attributes-col1 {
-    display: grid;
-    grid-row-gap: 5px;
-  }
+.attributes-col1 {
+  display: grid;
+  grid-row-gap: 5px;
+}
 
-  .attributes-col2 {
-    display: grid;
-    grid-row-gap: 5px;
-  }
+.attributes-col2 {
+  display: grid;
+  grid-row-gap: 5px;
+}
 
-  .state {
-    display: grid;
-    grid-template-columns: 1fr 50px;
-    background-color: $black;
-    color: $white;
-    height: 35px;
-    line-height: 35px;
-  }
+.state {
+  display: grid;
+  grid-template-columns: 1fr 50px;
+  background-color: $black;
+  color: $white;
+  height: 35px;
+  line-height: 35px;
+}
 
-  .state-label {
-    cursor: pointer;
-    margin-left: 10px;
-  }
+.state-label {
+  cursor: pointer;
+  margin-left: 10px;
+}
 
-  .state-input {
-    margin: 0;
-    text-align: center;
-    height: 35px;
-    line-height: 35px;
-    background-color: $white;
-    color: $black;
-    border: 3px solid $black;
-  }
+.state-input {
+  margin: 0;
+  text-align: center;
+  height: 35px;
+  line-height: 35px;
+  background-color: $white;
+  color: $black;
+  border: 3px solid $black;
+}
 
-  .icon {
-    width: 35px;
-    height: 35px;
-  }
+.icon {
+  width: 35px;
+  height: 35px;
+}
 
-  .box-line {
-    display: inline-flex;
-  }
+.box-line {
+  display: inline-flex;
+}
 
-  .box {
-    position: relative;
-    bottom: 8px;
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-    margin-left: 5px;
-    border: 2px solid $black;
-    background-color: $white;
-  }
+.box {
+  position: relative;
+  bottom: 8px;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  border: 2px solid $black;
+  background-color: $white;
+}
 
-  .black {
-    background-color: $black;
-    color: $white;
-    text-align: center;
-  }
+.black {
+  background-color: $black;
+  color: $white;
+  text-align: center;
+}
 
-  .button-damage {
-    margin-left: 5px;
-  }
+.button-damage {
+  margin-left: 5px;
+}
 
-  .enable {
-    background-color: $black;
-  }
+.enable {
+  background-color: $black;
+}
 
-  .supply {
-    display: grid;
-    grid-template-columns: max-content repeat(2, 60px);
-    grid-column-gap: 10px;
-  }
+.supply {
+  display: grid;
+  grid-template-columns: max-content repeat(2, 60px);
+  grid-column-gap: 10px;
+}
 </style>
