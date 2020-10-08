@@ -5,6 +5,7 @@ import { AclModel } from './AclModel'
 export class SheetModel {
   id = null
   folderId = null
+  folder_id = null
   name = ''
   params = {}
   sheetType = ''
@@ -19,6 +20,7 @@ export class SheetModel {
     this.name = attributes.name
     this.params = attributes.params
     this.folderId = attributes?.folderId?.toLocaleString() || ''
+    this.folder_id = attributes?.folderId?.toLocaleString() || ''
     if (params.changeAcl) this.acl = new AclModel().setInfo({ ...params, data: attributes.acl })
 
     return this
