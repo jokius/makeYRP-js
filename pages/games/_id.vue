@@ -63,6 +63,7 @@ export default {
         if (obj.update) this.updateObj(obj)
         if (obj.delete) this.deleteObj(obj)
         if (obj.access) this.accessObj(obj)
+        if (obj.changeFolder) this.changeFolderObj(obj)
       },
     },
 
@@ -154,7 +155,14 @@ export default {
 
     accessObj(obj) {
       if (obj.sheet) this.$store.commit('game/accessSheet', { user: this.user, raw: obj.sheet })
-      if (obj.menu_item) this.$store.commit('game/accessMenuItem', { user: this.user, raw: obj.menu_item })
+      if (obj.menu_item) this.$store.commit('game/accessMenuItem',
+        { user: this.user, raw: obj.menu_item })
+    },
+
+    changeFolderObj(obj) {
+      if (obj.sheet) this.$store.commit('game/changeFolderSheet', { user: this.user, raw: obj.sheet })
+      if (obj.menu_item) this.$store.commit('game/changeFolderMenuItem',
+        { user: this.user, raw: obj.menu_item })
     },
 
     addMessage(message) {

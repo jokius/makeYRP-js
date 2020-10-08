@@ -1,23 +1,25 @@
 <template>
   <div v-if="showFolder(folder)" :style="style">
-    <right-click-menu :position="position" :current-obj="obj" :replacedItems="replacedItems">
-      <div v-if="!isRoot" class="folder-title hover-color" @click="open = !open" @contextmenu="handler($event)">
-        <v-icon>
-          {{ open ? 'mdi-menu-down' : 'mdi-menu-right' }}
-        </v-icon>
-        <v-icon>
-          {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-        </v-icon>
+    <drop class="drop" @drop="handleDrop">
+      <right-click-menu :position="position" :current-obj="obj" :replacedItems="replacedItems">
+        <div v-if="!isRoot" class="folder-title hover-color" @click="open = !open" @contextmenu="handler($event)">
+          <v-icon>
+            {{ open ? 'mdi-menu-down' : 'mdi-menu-right' }}
+          </v-icon>
+          <v-icon>
+            {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+          </v-icon>
 
-        <div class="folder-name">
-          {{ name }}
+          <div class="folder-name">
+            {{ name }}
+          </div>
         </div>
+      </right-click-menu>
+      <div v-if="isRoot || open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
+        <sheets-folder v-for="child in children" :key="`sheets-folder-${child.id}`" :folder="child" />
+        <sheet-item v-for="sheet in sheets" :key="`sheets-item-${sheet.id}`" :sheet="sheet" />
       </div>
-    </right-click-menu>
-    <div v-if="isRoot || open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
-      <sheets-folder v-for="child in children" :key="`sheets-folder-${child.id}`" :folder="child" />
-      <sheet-item v-for="sheet in sheets" :key="`sheets-item-${sheet.id}`" :sheet="sheet" />
-    </div>
+    </drop>
   </div>
 </template>
 
@@ -107,6 +109,16 @@ export default {
   },
 
   methods: {
+    handleDrop({ sheet }) {
+      if (!sheet.acl.canWrite || !sheet || this.folder.id === sheet.folderId) return
+
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change_folder',
+        data: { ...sheet, type: 'sheet', folder_id: this.folder.id },
+      })
+    },
+
     showFolder(folder) {
       return this.user.id === this.master.id || this.deepItems(folder)
     },

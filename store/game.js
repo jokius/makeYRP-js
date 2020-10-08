@@ -475,7 +475,30 @@ export const mutations = {
     })
   },
 
+  changeFolderSheet(state, { user, raw }) {
+    const game = state.info
+    state.sheets = []
+    game.rootFolder = new SheetFolderModel().setInfo({
+      data: raw.data,
+      changeAcl: true,
+      user: user,
+      addSheet: (params) => addSheet(state, params),
+    })
+  },
+
   accessMenuItem(state, { user, raw }) {
+    const rootFolder = new MenuFolderItemModel().setInfo({
+      data: raw.data,
+      changeAcl: true,
+      currentUserId: user.id,
+      masterId: state.info.master.id,
+    })
+
+    const menu = state.info.menus.find(menu => menu.id === rootFolder.menuId)
+    menu.rootFolder = rootFolder
+  },
+
+  changeFolderMenuItem(state, { user, raw }) {
     const rootFolder = new MenuFolderItemModel().setInfo({
       data: raw.data,
       changeAcl: true,

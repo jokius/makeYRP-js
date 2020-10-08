@@ -1,23 +1,25 @@
 <template>
   <div v-if="showFolder(folder)" :style="style">
-    <right-click-menu :position="position" :current-obj="obj" :replacedItems="replacedItems">
-      <div v-if="!isRoot" class="folder-title hover-color" @click="open = !open" @contextmenu="handler($event)">
-        <v-icon>
-          {{ open ? 'mdi-menu-down' : 'mdi-menu-right' }}
-        </v-icon>
-        <v-icon>
-          {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-        </v-icon>
+    <drop class="drop" @drop="handleDrop">
+      <right-click-menu :position="position" :current-obj="obj" :replacedItems="replacedItems">
+        <div v-if="!isRoot" class="folder-title hover-color" @click="open = !open" @contextmenu="handler($event)">
+          <v-icon>
+            {{ open ? 'mdi-menu-down' : 'mdi-menu-right' }}
+          </v-icon>
+          <v-icon>
+            {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+          </v-icon>
 
-        <div class="folder-name">
-          {{ name }}
+          <div class="folder-name">
+            {{ name }}
+          </div>
         </div>
+      </right-click-menu>
+      <div v-if="isRoot || open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
+        <notes-folder v-for="child in children" :key="`notes-folder-${child.id}`" :folder="child" />
+        <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" />
       </div>
-    </right-click-menu>
-    <div v-if="isRoot || open" :class="[{ 'not-root': !isRoot }, 'folder-body']">
-      <notes-folder v-for="child in children" :key="`notes-folder-${child.id}`" :folder="child" />
-      <note-item v-for="item in items" :key="`notes-item-${item.id}`" :note="item" />
-    </div>
+    </drop>
   </div>
 </template>
 <script>
@@ -94,6 +96,16 @@ export default {
   },
 
   methods: {
+    handleDrop({ note }) {
+      if (!note.acl.canWrite || !note || this.folder.id === note.folderId) return
+
+      this.$cable.perform({
+        channel: 'GameChannel',
+        action: 'change_folder',
+        data: { ...note, type: 'menu_item', folder_id: this.folder.id },
+      })
+    },
+
     showFolder(folder) {
       return this.user.id === this.master.id || this.deepItems(folder)
     },
