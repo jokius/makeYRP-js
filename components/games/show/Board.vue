@@ -172,7 +172,7 @@ export default {
 
     items() {
       const items = this.privateItems.filter(item => this.layers.includes(item.layer))
-     return items.sort(this.sortByRank)
+      return items.sort(this.sortByRank)
     },
 
     itemsByLayer() {
@@ -245,7 +245,7 @@ export default {
           y: position.y,
           width: 200,
           height: 150,
-          rank: this.lastRank + 1
+          rank: this.lastRank + 1,
         },
         type: 'token',
       })
@@ -262,7 +262,7 @@ export default {
           y: position.y,
           width: 200,
           height: 150,
-          rank: this.lastRank + 1
+          rank: this.lastRank + 1,
         },
         type: 'image',
       })
@@ -486,17 +486,25 @@ export default {
       if (this.isMaster) {
         this.layers.filter(item => item !== token.layer).forEach(layerKey => {
           const layer = layers[layerKey]
-          this.menuItems.push({ title: `Перенести на ${layer.name}`,
-            callback: () => this.changeLayer({ target: token, type: 'token', layer: layerKey }) })
+          this.menuItems.push({
+            title: `Перенести на ${layer.name}`,
+            callback: () => this.changeLayer({ target: token, type: 'token', layer: layerKey }),
+          })
         })
       }
 
-      this.menuItems.push({ title: 'На передний план',
-        callback: () => this.changeRank({ target: token, type: 'token', up: true }) })
-      this.menuItems.push({ title: 'На задний план',
-        callback: () => this.changeRank({ target: token, type: 'token', down: true }) })
-      this.menuItems.push({ title: 'Удалить токен',
-        callback: () => this.remove({ id: token.id, type: 'token' }) })
+      this.menuItems.push({
+        title: 'На передний план',
+        callback: () => this.changeRank({ target: token, type: 'token', up: true }),
+      })
+      this.menuItems.push({
+        title: 'На задний план',
+        callback: () => this.changeRank({ target: token, type: 'token', down: true }),
+      })
+      this.menuItems.push({
+        title: 'Удалить токен',
+        callback: () => this.remove({ id: token.id, type: 'token' }),
+      })
       this.item = { type: 'token', id: token.id }
       this.$store.commit('game/updateCurrentRightClickMenu', `token-${token.id}`)
     },
@@ -508,17 +516,25 @@ export default {
       if (this.isMaster) {
         this.layers.filter(item => item !== image.layer).forEach(layerKey => {
           const layer = layers[layerKey]
-          this.menuItems.push({ title: `Перенести на ${layer.name}`,
-            callback: () => this.changeLayer({ target: image, type: 'image', layer: layerKey }) })
+          this.menuItems.push({
+            title: `Перенести на ${layer.name}`,
+            callback: () => this.changeLayer({ target: image, type: 'image', layer: layerKey }),
+          })
         })
       }
 
-      this.menuItems.push({ title: 'На передний план',
-        callback: () => this.changeRank({ target: image, type: 'image', up: true }) })
-      this.menuItems.push({ title: 'На задний план',
-        callback: () => this.changeRank({ target: image, type: 'image', down: true }) })
-      this.menuItems.push({ title: 'Удалить изображение',
-        callback: () => this.remove({ id: image.id, type: 'image' }) })
+      this.menuItems.push({
+        title: 'На передний план',
+        callback: () => this.changeRank({ target: image, type: 'image', up: true }),
+      })
+      this.menuItems.push({
+        title: 'На задний план',
+        callback: () => this.changeRank({ target: image, type: 'image', down: true }),
+      })
+      this.menuItems.push({
+        title: 'Удалить изображение',
+        callback: () => this.remove({ id: image.id, type: 'image' }),
+      })
       this.item = { id: image.id, type: 'image' }
       this.$store.commit('game/updateCurrentRightClickMenu', `image-${image.id}`)
     },
@@ -530,17 +546,25 @@ export default {
       if (this.isMaster) {
         this.layers.filter(item => item !== graphic.layer).forEach(layerKey => {
           const layer = layers[layerKey]
-          this.menuItems.push({ title: `Перенести на ${layer.name}`,
-            callback: () => this.changeLayer({ target: graphic, type: 'graphic', layer: layerKey }) })
+          this.menuItems.push({
+            title: `Перенести на ${layer.name}`,
+            callback: () => this.changeLayer({ target: graphic, type: 'graphic', layer: layerKey }),
+          })
         })
       }
 
-      this.menuItems.push({ title: 'На передний план',
-        callback: () => this.changeRank({ target: graphic, type: 'graphic', up: true }) })
-      this.menuItems.push({ title: 'На задний план',
-        callback: () => this.changeRank({ target: graphic, type: 'graphic', down: true }) })
-      this.menuItems.push({ title: 'Удалить рисунок',
-        callback: () => this.remove({ id: graphic.id, type: 'graphic' }) })
+      this.menuItems.push({
+        title: 'На передний план',
+        callback: () => this.changeRank({ target: graphic, type: 'graphic', up: true }),
+      })
+      this.menuItems.push({
+        title: 'На задний план',
+        callback: () => this.changeRank({ target: graphic, type: 'graphic', down: true }),
+      })
+      this.menuItems.push({
+        title: 'Удалить рисунок',
+        callback: () => this.remove({ id: graphic.id, type: 'graphic' }),
+      })
       this.item = { id: graphic.id, type: 'graphic' }
       this.$store.commit('game/updateCurrentRightClickMenu', `graphic-${graphic.id}`)
     },
@@ -772,7 +796,7 @@ export default {
         if (file.type.match(/image\//)) {
           promises.push(dropImage({
             axios: this.$axios,
-            params: { position, file, pageId: this.pageId },
+            params: { position, file, pageId: this.pageId, layer: this.currentLayer, rank: this.lastRank + 1 },
           }))
         }
       })
@@ -816,7 +840,7 @@ export default {
         onFinish: () => {
           const index = this.privateItems.findIndex(item => item.name === name)
           this.privateItems.splice(index, 1)
-        }
+        },
       })
 
       tween.reset()
@@ -846,7 +870,7 @@ export default {
           key,
           text,
           change: this.change,
-          callback: (params) => this.$set(this.privateItems, index, { ...text, params })
+          callback: (params) => this.$set(this.privateItems, index, { ...text, params }),
         })
     },
 
@@ -912,7 +936,7 @@ export default {
         params: { ...target.params, rank },
         type,
       })
-    }
+    },
   },
 }
 </script>

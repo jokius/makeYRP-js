@@ -37,6 +37,8 @@ export const dropImage = ({ axios, params }) => {
   formData.append('x', params.position.x)
   formData.append('y', params.position.x)
   formData.append('page_id', params.pageId)
+  formData.append('layer', params.layer)
+  formData.append('rank', params.rank)
 
   return axios
     .post('folders/0/images/drop', formData)
