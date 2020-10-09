@@ -165,7 +165,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import { uniqBy } from 'lodash'
+  import { uniqBy, get } from 'lodash'
   import MoveModal from '../moves/MoveModal'
 
   export default {
@@ -281,7 +281,7 @@
       },
 
       changeMove(move) {
-        const moves = (this.customTables?.[this.group] || []).slice()
+        const moves = get(this.customTables, this.group, []).slice()
         const oldMoveIndex = moves.findIndex(item => item.name === move.name)
 
         if (oldMoveIndex >= 0) {
@@ -294,11 +294,12 @@
       },
 
       customMoveIndex(move, group) {
-        return (this.customTables?.[group] || []).findIndex(item => item.name === move.name)
+        return get(this.customTables, group, []).findIndex(item => item.name === move.name)
       },
 
       removeMove(index, group) {
-        this.$store.commit('gameConfig/update', { path: `customTemplate.tables.${group}`, value: index, remove: true })
+        this.$store.commit('gameConfig/update',
+          { path: `customTemplate.tables.${group}`, value: index, remove: true })
       },
 
       save() {

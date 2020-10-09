@@ -145,7 +145,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import { uniqBy } from 'lodash'
+import { uniqBy, get } from 'lodash'
 import RoleItemModal from '~/components/templates/pbta/EdgeOfUniverse/config/sheets/RoleItemModal'
 import SelectItemModal from '~/components/templates/pbta/EdgeOfUniverse/config/sheets/SelectItemModal'
 
@@ -275,7 +275,7 @@ export default {
     },
 
     changeItem(item) {
-      const items = (this.customTables?.[this.group] || []).slice()
+      const items = get(this.customTables, this.group, []).slice()
       const oldItemIndex = items.findIndex(obj => obj.name === item.name)
 
       if (oldItemIndex >= 0) {
@@ -296,7 +296,7 @@ export default {
     },
 
     customItemIndex(item, group) {
-      return (this.customTables?.[group] || []).findIndex(obj => obj.name === item.name)
+      return get(this.customTables, group, []).findIndex(obj => obj.name === item.name)
     },
 
     removeItem(index, group) {
