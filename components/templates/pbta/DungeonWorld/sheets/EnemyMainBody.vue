@@ -290,10 +290,6 @@ export default {
       get() {
         return this.params.damageTags
       },
-
-      set(value) {
-        this.input('damageTags', value)
-      },
     },
 
     protection: {
@@ -380,10 +376,6 @@ export default {
       get() {
         return this.params.tags
       },
-
-      set(value) {
-        this.input('tags', value)
-      }
     },
 
     img: {
@@ -499,7 +491,7 @@ export default {
       this.$store.commit('game/updateSheetParams',
         {
           id: this.sheet.id,
-          path: `damageTags[${this.tags.length}]`,
+          path: `damageTags[${this.damageTags.length}]`,
           value: tag,
         })
 
