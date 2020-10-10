@@ -7,7 +7,7 @@
       <v-container class="fill-height" fluid>
         <v-row align="center" justify="center">
           <v-col cols="12">
-            <v-select
+            <v-autocomplete
               v-model="item"
               :items="itemsList"
               color="indigo"
