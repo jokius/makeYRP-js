@@ -115,11 +115,22 @@ export default {
     },
 
     width() {
-      return parseInt(this.params.width, 10)
+      let width = parseInt(this.params.width, 10)
+      const screenWith = window.screen.width
+      if (screenWith > width) {
+        width = screenWith
+      }
+
+      return screenWith
     },
 
     height() {
-      return parseInt(this.params.height, 10)
+      let height = parseInt(this.params.height, 10)
+      const screenHeight = window.screen.height
+      if (screenHeight > height) {
+        height = screenHeight
+      }
+      return height
     },
 
     xOffset() {
