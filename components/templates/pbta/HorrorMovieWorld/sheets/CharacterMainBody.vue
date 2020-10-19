@@ -68,7 +68,7 @@
       </div>
     </div>
     <div class="main-row2">
-      <div class="characteristics-grid">
+      <div class="stats-grid">
         <div
           v-for="(characteristic, index) in characteristics"
           :key="`characteristics-${index}`"
@@ -553,7 +553,7 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .characteristics-grid {
+  .stats-grid {
     display: grid;
     grid-auto-flow: column;
     grid-column-gap: 20px;

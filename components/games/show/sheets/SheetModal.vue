@@ -60,6 +60,12 @@
         :key="key"
         :size="size"
       />
+      <aw-character-sheet
+        v-else-if="sheetName === 'apocalypse_world-character'"
+        :id="id"
+        :key="key"
+        :size="size"
+      />
       <v-alert
         v-else
         :key="key"
@@ -95,6 +101,7 @@
       EouCompanionSheet: () => import('~/components/templates/pbta/EdgeOfUniverse/sheets/CompanionSheet'),
       DwCharacterSheet: () => import('~/components/templates/pbta/DungeonWorld/sheets/CharacterSheet'),
       DwEnemySheet: () => import('~/components/templates/pbta/DungeonWorld/sheets/EnemySheet'),
+      AwCharacterSheet: () => import('~/components/templates/pbta/ApocalypseWorld/sheets/CharacterSheet'),
     },
 
     props: {
@@ -158,6 +165,8 @@
             case 'dungeon_world-character':
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
             case 'dungeon_world-enemy':
+              return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
+            case 'apocalypse_world-character':
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }
             default:
               return { width: this.privateWidth || 950, height: this.privateHeight || 600 }

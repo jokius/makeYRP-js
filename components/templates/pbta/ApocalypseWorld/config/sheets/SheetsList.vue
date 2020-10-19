@@ -35,9 +35,6 @@
             <v-btn color="indigo" dark @click="showEquipmentModal(role.key)">
               <span>предметы</span>
             </v-btn>
-            <v-btn color="indigo" dark @click="showRelationshipModal(role.key)">
-              <span>история</span>
-            </v-btn>
             <v-btn
               v-if="role.remove || role.restore"
               color="red darken-4"
@@ -59,7 +56,6 @@
     <role-moves-modal v-if="moveModalOpen" v-model="moveObj" :role-key="roleKey" />
     <role-specials-modal v-if="specialsModalOpen" v-model="specialsObj" :role-key="roleKey" />
     <role-items-modal v-if="equipmentModalOpen" v-model="itemObj" :role-key="roleKey" />
-    <role-relationship-modal v-if="relationshipModalOpen" v-model="relationshipObj" :role-key="roleKey" />
   </div>
 </template>
 
@@ -69,13 +65,12 @@ import { uniqBy } from 'lodash'
 import RoleModal from '~/components/templates/pbta/ApocalypseWorld/config/sheets/RoleModal'
 import RoleMovesModal from '~/components/templates/pbta/ApocalypseWorld/config/sheets/RoleMovesModal'
 import RoleItemsModal from '~/components/templates/pbta/ApocalypseWorld/config/sheets/RoleItemsModal'
-import RoleRelationshipModal from '~/components/templates/pbta/ApocalypseWorld/config/sheets/RoleRelationshipModal'
 import RoleSpecialsModal from '~/components/templates/pbta/ApocalypseWorld/config/sheets/RoleSpecialsModal'
 
 export default {
   name: 'SheetsList',
 
-  components: { RoleSpecialsModal, RoleRelationshipModal, RoleItemsModal, RoleMovesModal, RoleModal },
+  components: { RoleSpecialsModal, RoleItemsModal, RoleMovesModal, RoleModal },
 
   data() {
     return {
@@ -83,7 +78,6 @@ export default {
       specialsModalOpen: false,
       moveModalOpen: false,
       equipmentModalOpen: false,
-      relationshipModalOpen: false,
       role: {},
       roleKey: '',
       emptyRole: {
@@ -159,16 +153,6 @@ export default {
         this.equipmentModalOpen = open
       },
     },
-
-    relationshipObj: {
-      get() {
-        return { open: this.relationshipModalOpen }
-      },
-
-      set({ open }) {
-        this.relationshipModalOpen = open
-      },
-    },
   },
 
   created() {
@@ -200,11 +184,6 @@ export default {
     showEquipmentModal(key) {
       this.roleKey = key
       this.equipmentModalOpen = true
-    },
-
-    showRelationshipModal(key) {
-      this.roleKey = key
-      this.relationshipModalOpen = true
     },
 
     changeRole(role) {
