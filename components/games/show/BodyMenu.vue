@@ -31,6 +31,7 @@
         <eou-tab-planets v-else-if="currentItem.type === 'eou-planet'" />
         <eou-tab-items v-else-if="currentItem.type === 'eou-items'" />
         <dw-tab-items v-else-if="currentItem.type === 'dw-items'" />
+        <dw-tab-clock v-else-if="currentItem.type === 'dw-clock'" />
         <span v-else>В разработке</span>
       </keep-alive>
     </v-navigation-drawer>
@@ -95,6 +96,7 @@ export default {
     EouTabCounters: () => import('../../templates/pbta/EdgeOfUniverse/menus/EouTabCounters'),
     BidTabClock: () => import('../../templates/BladeInTheDarck/menus/BidTabClock'),
     DwTabItems: () => import('../../templates/pbta/DungeonWorld/menus/DwTabItems'),
+    DwTabClock: () => import('../../templates/pbta/DungeonWorld/menus/DwTabClocks'),
   },
 
   data() {
