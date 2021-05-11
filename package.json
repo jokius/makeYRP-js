@@ -18,7 +18,7 @@
     "dart-sass": "^1.25.0",
     "js-file-download": "^0.4.12",
     "konva": "7.0.3",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "nuxt": "^2.14.6",
     "short-uuid": "^4.1.0",
     "slugify": "^1.4.5",
